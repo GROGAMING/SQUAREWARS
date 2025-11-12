@@ -154,18 +154,23 @@ export function updateCellDisplay(
   cell.dataset.ghost = "1";
 
   const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
-  const cellRect = cell.getBoundingClientRect();
-  const layerRect = outlineLayer.getBoundingClientRect();
-  const left = cellRect.left - layerRect.left;
-  const top = cellRect.top - layerRect.top;
+  const logicalCol = col; // Lock column at the start
+  const startRow = -1; // Start above the grid
+  const endRow = row;
+
+  const startX = px(logicalCol * (CELL + GAP));
+  const startY = px(startRow * (CELL + GAP));
+  const endY = px(endRow * (CELL + GAP));
 
   const ghost = document.createElement("div");
   ghost.className = `chip-ghost ${
     player === PLAYER.RED ? "red" : "blue"
   } drop-in`;
-  ghost.style.left = `${left}px`;
-  ghost.style.top = `${top}px`;
-  ghost.style.setProperty("--drop-y", `${(row + 1) * (CELL + GAP)}px`);
+  ghost.style.left = `${startX}px`;
+  ghost.style.top = `${startY}px`;
+  ghost.style.width = `${px(CELL)}px`;
+  ghost.style.height = `${px(CELL)}px`;
+
   outlineLayer.appendChild(ghost);
 
   const finish = () => {
@@ -192,7 +197,17 @@ export function updateCellDisplay(
     }
   };
 
-  ghost.addEventListener("animationend", finish, { once: true });
+  // Animate the ghost piece
+  ghost.animate(
+    [
+      { transform: `translateY(${startY}px)` },
+      { transform: `translateY(${endY}px)` },
+    ],
+    {
+      duration: 800,
+      easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+    }
+  ).onfinish = finish;
 }
 
 /** Update every cell */
