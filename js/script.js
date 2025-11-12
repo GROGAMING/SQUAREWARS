@@ -627,23 +627,23 @@ function ensureCriticalButtons() {
 document.addEventListener("DOMContentLoaded", () => {
   const root = document.body;
 
-  bindDelegatedEvent(root, '[data-qa="btn-single"]', "pointerup", () =>
+  bindDelegatedEvent(root, '[data-qa="btn-single"]', "click", () =>
     navigateTo(UI_IDS.scoringSelectModal)
   );
-  bindDelegatedEvent(root, '[data-qa="btn-multi"]', "pointerup", () =>
+  bindDelegatedEvent(root, '[data-qa="btn-multi"]', "click", () =>
     navigateTo(UI_IDS.scoringSelectModal)
   );
-  bindDelegatedEvent(root, '[data-qa="btn-back"]', "pointerup", () =>
+  bindDelegatedEvent(root, '[data-qa="btn-back"]', "click", () =>
     navigateTo(UI_IDS.modeSelectModal)
   );
-  bindDelegatedEvent(root, '[data-qa="btn-start"]', "pointerup", () =>
+  bindDelegatedEvent(root, '[data-qa="btn-start"]', "click", () =>
     navigateTo(UI_IDS.difficultySelectModal)
   );
-  bindDelegatedEvent(root, '[data-qa="btn-restart"]', "pointerup", () =>
+  bindDelegatedEvent(root, '[data-qa="btn-restart"]', "click", () =>
     initGame()
   );
 
-  ensureCriticalButtons();
+  ensureCriticalButtons(); // Verify buttons are not blocked
 });
 
 /* ------------ Expose for inline HTML ------------ */

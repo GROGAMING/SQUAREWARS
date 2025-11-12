@@ -17,10 +17,10 @@
       <div class="modal">
         <h2>Choose Game Mode</h2>
         <p>Select how you want to play SQUARE WARS:</p>
-        <button class="single-player" onclick="setGameMode('single')">
+        <button class="single-player" data-qa="btn-single" onclick="setGameMode('single')">
           🔴 Single Player<br /><small>vs Computer</small>
         </button>
-        <button onclick="setGameMode('multi')">
+        <button data-qa="btn-multi" onclick="setGameMode('multi')">
           🔵 Multiplayer<br /><small>2 Players</small>
         </button>
       </div>
@@ -85,8 +85,8 @@
         </div>
 
         <div class="qf-actions">
-          <button class="qf-start" onclick="confirmQuickfire()">Start</button>
-          <button class="qf-cancel" onclick="backFromQuickfire()">Back</button>
+          <button class="qf-start" data-qa="btn-start" onclick="confirmQuickfire()">Start</button>
+          <button class="qf-cancel" data-qa="btn-back" onclick="backFromQuickfire()">Back</button>
         </div>
       </div>
     </div>
