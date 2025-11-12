@@ -488,20 +488,36 @@ export function updateLabelsForModeUI(
   }
 }
 
-const screens = {
-  mode: document.getElementById("modeSelectModal"),
-  scoring: document.getElementById("scoringSelectModal"),
-  quickfire: document.getElementById("quickfireSelectModal"),
-  // Add other screens here as needed
-};
+export function showScreen(name) {
+  const screens = document.querySelectorAll("[data-screen], .screen");
+  screens.forEach((screen) => {
+    if (screen.dataset.screen === name || screen.classList.contains(name)) {
+      screen.style.display = "";
+      screen.setAttribute("aria-hidden", "false");
+    } else {
+      screen.style.display = "none";
+      screen.setAttribute("aria-hidden", "true");
+    }
+  });
+}
 
-function showScreen(name) {
-  Object.values(screens).forEach((el) => el && (el.classList.add("hidden"), el.setAttribute("aria-hidden", "true")));
-  const el = screens[name];
-  if (el) {
-    el.classList.remove("hidden");
-    el.setAttribute("aria-hidden", "false");
-  }
+/** Wire up buttons with delegated click handling */
+export function wireButtons() {
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest("button, a, [role='button']");
+    if (!el) return;
+
+    // Call named function if requested
+    const fnName = el.dataset.click;
+    const arg = el.dataset.arg ?? undefined;
+    if (fnName && typeof window[fnName] === "function") {
+      window[fnName](arg);
+    }
+
+    // Screen switching if requested
+    const target = el.dataset.target;
+    if (target) showScreen(target);
+  });
 }
 
 export function initUI() {

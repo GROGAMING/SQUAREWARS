@@ -718,3 +718,7 @@ window.closeInstructions = closeInstructions;
 window.confirmQuickfire = confirmQuickfire;
 window.backFromQuickfire = backFromQuickfire;
 window.onQuickfireInput = onQuickfireInput;
+
+window.addEventListener("DOMContentLoaded", () => {
+  if (typeof wireButtons === "function") wireButtons();
+});
