@@ -465,42 +465,87 @@ document
   .getElementById(UI_IDS.endGameModal)
   .addEventListener("click", () => {});
 
-document.getElementById(UI_IDS.tryAgainBtn).addEventListener("click", () => {
-  hideEndGameModal();
-  redGames = 0;
-  blueGames = 0;
-  initGame();
-  updateDisplay(
-    currentPlayer,
-    gameMode,
-    aiDifficulty,
-    scoringMode,
-    redGames,
-    blueGames
-  );
-});
+/* ------------ Event Binding Enhancements ------------ */
+function bindEvent(selector, event, handler) {
+  const elements = document.querySelectorAll(selector);
+  elements.forEach((el) => {
+    el.removeEventListener(event, handler); // Prevent duplicate bindings
+    el.addEventListener(event, handler);
+  });
+}
 
-document.getElementById(UI_IDS.changeModeBtn).addEventListener("click", () => {
-  hideEndGameModal();
-  const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
-  if (outlineLayer) outlineLayer.innerHTML = "";
-  redGames = 0;
-  blueGames = 0;
-  gameActive = false;
-  gameMode = null;
-  aiDifficulty = null;
-  const modeModal = document.getElementById(UI_IDS.modeSelectModal);
-  modeModal.classList.remove(CSS.HIDDEN);
-  modeModal.setAttribute("aria-hidden", "false");
-  updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
-  updateDisplay(
-    currentPlayer,
-    gameMode,
-    aiDifficulty,
-    scoringMode,
-    redGames,
-    blueGames
-  );
+function logUnhandledInteraction(event) {
+  console.warn(`Unhandled interaction on ${event.target.id || event.target}`);
+}
+
+// Bind pointerup with fallback to click
+function bindPointerEvent(selector, handler) {
+  bindEvent(selector, "pointerup", handler);
+  bindEvent(selector, "click", handler);
+}
+
+// Ensure all critical buttons are bound
+function ensureButtonBindings() {
+  bindPointerEvent("#tryAgainBtn", () => {
+    hideEndGameModal();
+    redGames = 0;
+    blueGames = 0;
+    initGame();
+    updateDisplay(
+      currentPlayer,
+      gameMode,
+      aiDifficulty,
+      scoringMode,
+      redGames,
+      blueGames
+    );
+  });
+
+  bindPointerEvent("#changeModeBtn", () => {
+    hideEndGameModal();
+    const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
+    if (outlineLayer) outlineLayer.innerHTML = "";
+    redGames = 0;
+    blueGames = 0;
+    gameActive = false;
+    gameMode = null;
+    aiDifficulty = null;
+    const modeModal = document.getElementById(UI_IDS.modeSelectModal);
+    modeModal.classList.remove(CSS.HIDDEN);
+    modeModal.setAttribute("aria-hidden", "false");
+    updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
+    updateDisplay(
+      currentPlayer,
+      gameMode,
+      aiDifficulty,
+      scoringMode,
+      redGames,
+      blueGames
+    );
+  });
+
+  bindPointerEvent("#qfTarget", (e) => onQuickfireInput(e.target));
+}
+
+// Verify handlers are registered
+function verifyHandlers() {
+  const criticalButtons = [
+    "#tryAgainBtn",
+    "#changeModeBtn",
+    "#qfTarget",
+  ];
+  criticalButtons.forEach((selector) => {
+    const el = document.querySelector(selector);
+    if (el && !el.hasAttribute("data-handler-bound")) {
+      console.error(`Handler missing for ${selector}`);
+    }
+  });
+}
+
+// Initialize bindings on load
+document.addEventListener("DOMContentLoaded", () => {
+  ensureButtonBindings();
+  verifyHandlers();
 });
 
 /* ------------ Expose for inline HTML ------------ */

@@ -388,6 +388,8 @@ button {
   box-shadow: 0 8px 24px rgba(124, 92, 255, 0.35);
   position: relative;
   overflow: hidden;
+  pointer-events: auto;
+  z-index: 1000; /* Ensure buttons are above decorative layers */
 }
 button::before {
   content: "";
@@ -437,6 +439,7 @@ button:active {
   overflow-y: auto;
   padding: 20px;
   box-sizing: border-box;
+  pointer-events: auto;
 }
 .modal {
   background: linear-gradient(145deg, #fff, #f8f9fa);
@@ -822,7 +825,18 @@ button:active {
   }
 }
 
-/* Utilities */
+/* Ensure overlays do not block input */
+.modal-overlay {
+  pointer-events: auto;
+}
+
 .hidden {
   display: none !important;
+  pointer-events: none;
+}
+
+/* Ensure buttons are always interactive */
+button {
+  pointer-events: auto;
+  z-index: 1000; /* Ensure buttons are above decorative layers */
 }
