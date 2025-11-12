@@ -17,10 +17,10 @@
       <div class="modal">
         <h2>Choose Game Mode</h2>
         <p>Select how you want to play SQUARE WARS:</p>
-        <button data-click="setGameMode" data-arg="single">
+        <button id="btnSingle">
           🔴 Single Player<br /><small>vs Computer</small>
         </button>
-        <button data-click="setGameMode" data-arg="multi">
+        <button id="btnMulti">
           🔵 Multiplayer<br /><small>2 Players</small>
         </button>
       </div>
@@ -35,12 +35,12 @@
       <div class="modal">
         <h2>Choose Scoring Style</h2>
 
-        <button data-click="setScoringMode" data-arg="classic">
+        <button id="btnClassic">
           🧱 Classic (Box Points)<br />
           <small>Each captured box is worth <strong>1 point</strong>.</small>
         </button>
 
-        <button data-click="setScoringMode" data-arg="area">
+        <button id="btnArea">
           🗺️ Territory Takedown (Area Mode)<br />
           <small
             >Score the <strong>number of squares</strong> inside a captured
@@ -48,7 +48,7 @@
           >
         </button>
 
-        <button data-click="setScoringMode" data-arg="quickfire">
+        <button id="btnQuickfire">
           ⚡ Quick Fire<br />
           <small>Classic scoring with a win target.</small>
         </button>
@@ -76,14 +76,13 @@
               max="10"
               step="1"
               value="5"
-              data-input="quickfire"
             />
           </div>
         </div>
 
         <div class="qf-actions">
-          <button data-click="confirmQuickfire">Start</button>
-          <button data-click="backFromQuickfire">Back</button>
+          <button id="btnStartQuickfire">Start</button>
+          <button id="btnBackQuickfire">Back</button>
         </div>
       </div>
     </div>
@@ -185,6 +184,6 @@
       <button data-click="startNewGame">🎮 New Game</button>
     </div>
 
-    <script type="module" src="./js/script.js?v=15"></script>
+    <script type="module" src="./js/script.js"></script>
   </body>
 </html>

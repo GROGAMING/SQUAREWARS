@@ -488,181 +488,47 @@ export function updateLabelsForModeUI(
   }
 }
 
-/** Update every cell */
-export function updateAllCellDisplays(
-  grid,
-  blockedCells,
-  lastMovePosition,
-  rows,
-  cols
-) {
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-      if (!cell) continue;
+const screens = {
+  mode: document.getElementById("modeSelectModal"),
+  scoring: document.getElementById("scoringSelectModal"),
+  quickfire: document.getElementById("quickfireSelectModal"),
+  // Add other screens here as needed
+};
 
-      if (cell.dataset.ghost === "1") {
-        cell.className = "cell";
-        continue;
-      }
-
-      cell.classList.remove(CSS.LAST_MOVE);
-
-      if (grid[r][c] === PLAYER.RED) cell.className = "cell red";
-      else if (grid[r][c] === PLAYER.BLUE) cell.className = "cell blue";
-      else cell.className = "cell";
-
-      const key = `${r}-${c}`;
-      if (blockedCells.has(key)) cell.classList.add("blocked");
-      else cell.classList.remove("blocked");
-    }
-  }
-
-  if (
-    lastMovePosition &&
-    !blockedCells.has(`${lastMovePosition.row}-${lastMovePosition.col}`)
-  ) {
-    const last = document.querySelector(
-      `[data-row="${lastMovePosition.row}"][data-col="${lastMovePosition.col}"]`
-    );
-    if (last && last.dataset.ghost !== "1") last.classList.add(CSS.LAST_MOVE);
+function showScreen(name) {
+  Object.values(screens).forEach((el) => el && (el.classList.add("hidden"), el.setAttribute("aria-hidden", "true")));
+  const el = screens[name];
+  if (el) {
+    el.classList.remove("hidden");
+    el.setAttribute("aria-hidden", "false");
   }
 }
 
-/* ------- Modals & labels ------- */
-export function showEndGameModal(winnerLabel, redScore, blueScore) {
-  const modal = document.getElementById(UI_IDS.endGameModal);
-  const title = document.getElementById(UI_IDS.endGameTitle);
-  const subtitle = document.getElementById(UI_IDS.endGameSubtitle);
+export function initUI() {
+  const byId = (id) => document.getElementById(id);
 
-  title.textContent = "Game Over";
+  const btnSingle = byId("btnSingle");
+  if (btnSingle) btnSingle.addEventListener("click", () => showScreen("scoring"));
 
-  if (redScore === blueScore) {
-    subtitle.innerHTML = `<strong style="color: white;">Draw</strong><br>Final Score: ${redScore} - ${blueScore}`;
-  } else if (winnerLabel.includes("Red")) {
-    subtitle.innerHTML = `<strong style="color: #ff4444;">${winnerLabel} Wins!</strong><br>Final Score: ${redScore} - ${blueScore}`;
-  } else {
-    subtitle.innerHTML = `<strong style="color: #4444ff;">${winnerLabel} Wins!</strong><br>Final Score: ${redScore} - ${blueScore}`;
-  }
+  const btnMulti = byId("btnMulti");
+  if (btnMulti) btnMulti.addEventListener("click", () => showScreen("scoring"));
 
-  modal.classList.remove(CSS.HIDDEN);
-  modal.setAttribute("aria-hidden", "false");
+  const btnClassic = byId("btnClassic");
+  if (btnClassic) btnClassic.addEventListener("click", () => showScreen("quickfire"));
+
+  const btnQuickfire = byId("btnQuickfire");
+  if (btnQuickfire) btnQuickfire.addEventListener("click", () => showScreen("quickfire"));
+
+  const btnStartQuickfire = byId("btnStartQuickfire");
+  if (btnStartQuickfire) btnStartQuickfire.addEventListener("click", () => showScreen("mode"));
+
+  const btnBackQuickfire = byId("btnBackQuickfire");
+  if (btnBackQuickfire) btnBackQuickfire.addEventListener("click", () => showScreen("scoring"));
+
+  // Add more button bindings as needed
 }
 
-export function hideEndGameModal() {
-  const modal = document.getElementById(UI_IDS.endGameModal);
-  modal.classList.add(CSS.HIDDEN);
-  modal.setAttribute("aria-hidden", "true");
-}
-
-/** Show instructions text; if Quick Fire, include the chosen target */
-export function showInstructions(scoringMode, quickFireTarget) {
-  const instructionsModal = document.getElementById(UI_IDS.instructionsModal);
-  const body = document.getElementById("instructionsBody");
-
-  const general =
-    "Drop your discs into the grid and try to connect four in a row — horizontally, vertically, or diagonally. When a player connects four, that area of the board becomes blocked off with a glowing outline. The game continues until the board is full.";
-
-  const classic =
-    "<strong>Classic:</strong> each captured box scores <em>1 point</em>.";
-  const area =
-    "<strong>Territory Takedown:</strong> score the <em>number of squares</em> inside the captured zone. Overlaps can <em>steal</em> territory.";
-  const quick = `<strong>Quick Fire:</strong> Classic scoring, but the first player to <em>${quickFireTarget} box${
-    quickFireTarget === 1 ? "" : "es"
-  }</em> wins immediately.`;
-
-  let modeText = classic;
-  if (scoringMode === SCORING_MODES.AREA) modeText = area;
-  else if (scoringMode === SCORING_MODES.QUICKFIRE) modeText = quick;
-
-  body.innerHTML = `${general}<br><br>${modeText}`;
-
-  instructionsModal.classList.remove(CSS.HIDDEN);
-  instructionsModal.setAttribute("aria-hidden", "false");
-}
-
-export function closeInstructionsUI(afterCloseCallback) {
-  const modal = document.getElementById(UI_IDS.instructionsModal);
-  if (!modal) return;
-  modal.classList.add(CSS.HIDDEN);
-  modal.setAttribute("aria-hidden", "true");
-  if (typeof afterCloseCallback === "function") afterCloseCallback();
-}
-
-/** Update title/labels; include Quick Fire target when relevant */
-export function updateLabelsForModeUI(
-  gameMode,
-  aiDifficulty,
-  scoringMode,
-  quickFireTarget
-) {
-  const gameTitle = document.getElementById(UI_IDS.gameTitle);
-  const redLabel = document.getElementById(UI_IDS.redLabel);
-  const blueLabel = document.getElementById(UI_IDS.blueLabel);
-
-  let suffix = " — Classic";
-  if (scoringMode === SCORING_MODES.AREA) suffix = " — Territory Takedown";
-  if (scoringMode === SCORING_MODES.QUICKFIRE) {
-    const n = quickFireTarget ?? 5;
-    suffix = ` — Quick Fire (First to ${n})`;
-  }
-
-  if (gameMode === "single") {
-    gameTitle.textContent = "SQUARE WARS SINGLEPLAYER" + suffix;
-    redLabel.textContent = "You (Red)";
-    if (aiDifficulty) {
-      const difficultyName =
-        aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1);
-      blueLabel.textContent = `Computer (Blue) - ${difficultyName}`;
-    } else {
-      blueLabel.textContent = "Computer (Blue)";
-    }
-  } else if (gameMode === "multi") {
-    gameTitle.textContent = "SQUARE WARS MULTIPLAYER" + suffix;
-    redLabel.textContent = "Player 1 (Red)";
-    blueLabel.textContent = "Player 2 (Blue)";
-  } else {
-    gameTitle.textContent = "SQUARE WARS";
-  }
-}
-
-/** Update every cell */
-export function updateAllCellDisplays(
-  grid,
-  blockedCells,
-  lastMovePosition,
-  rows,
-  cols
-) {
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-      if (!cell) continue;
-
-      if (cell.dataset.ghost === "1") {
-        cell.className = "cell";
-        continue;
-      }
-
-      cell.classList.remove(CSS.LAST_MOVE);
-
-      if (grid[r][c] === PLAYER.RED) cell.className = "cell red";
-      else if (grid[r][c] === PLAYER.BLUE) cell.className = "cell blue";
-      else cell.className = "cell";
-
-      const key = `${r}-${c}`;
-      if (blockedCells.has(key)) cell.classList.add("blocked");
-      else cell.classList.remove("blocked");
-    }
-  }
-
-  if (
-    lastMovePosition &&
-    !blockedCells.has(`${lastMovePosition.row}-${lastMovePosition.col}`)
-  ) {
-    const last = document.querySelector(
-      `[data-row="${lastMovePosition.row}"][data-col="${lastMovePosition.col}"]`
-    );
-    if (last && last.dataset.ghost !== "1") last.classList.add(CSS.LAST_MOVE);
-  }
+// Optional: expose only if HTML still uses inline onclicks
+export function exposeForInline(w) {
+  w.showScreen = showScreen;
 }
