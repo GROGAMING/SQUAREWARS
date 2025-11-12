@@ -9,7 +9,6 @@ import {
   PLAYER,
   SCORING_MODES,
 } from "./constants.js";
-import { SCALE, ROWS, COLS } from "./constants.js";
 
 /** Track which move is the real "last move" to avoid race conditions */
 let uiLastMoveToken = 0;
@@ -66,41 +65,6 @@ export function updateDisplay(
   }
 }
 
-/** Update the runtime scale and apply it to the grid */
-export function updateScale() {
-  const outer = document.getElementById("gridOuter");
-  const inner = document.getElementById("gridContainer");
-  if (!outer || !inner) return;
-
-  const intrinsicWidth = COLS * (CELL + GAP) - GAP;
-  const intrinsicHeight = ROWS * (CELL + GAP) - GAP;
-  const availableWidth = Math.min(window.innerWidth, outer.clientWidth);
-  SCALE = Math.min(1, availableWidth / intrinsicWidth);
-
-  inner.style.width = `${Math.round(intrinsicWidth * SCALE)}px`;
-  inner.style.height = `${Math.round(intrinsicHeight * SCALE)}px`;
-  inner.style.setProperty("--scale", SCALE);
-}
-
-/** Convert logical units to scaled pixels */
-export function px(logical) {
-  return Math.round(logical * SCALE);
-}
-
-/** Map clientX/clientY to logical grid coordinates */
-export function logicalFromClient(clientX, clientY) {
-  const gridRect = document.getElementById("gridContainer").getBoundingClientRect();
-  const logicalX = (clientX - gridRect.left) / SCALE;
-  const logicalY = (clientY - gridRect.top) / SCALE;
-  return { x: logicalX, y: logicalY };
-}
-
-/** Map clientX to a logical column */
-export function colFromClient(clientX) {
-  const { x } = logicalFromClient(clientX, 0);
-  return Math.floor(x / (CELL + GAP));
-}
-
 /** Build grid (delegated click) */
 export function buildGrid(rows, cols, onColumnClick) {
   const gameGrid = document.getElementById(UI_IDS.gameGrid);
@@ -111,19 +75,24 @@ export function buildGrid(rows, cols, onColumnClick) {
     for (let c = 0; c < cols; c++) {
       const cell = document.createElement("div");
       cell.className = "cell";
-      cell.style.width = `${px(CELL)}px`;
-      cell.style.height = `${px(CELL)}px`;
-      cell.style.left = `${px(c * (CELL + GAP))}px`;
-      cell.style.top = `${px(r * (CELL + GAP))}px`;
+      cell.dataset.row = r;
+      cell.dataset.col = c;
       frag.appendChild(cell);
     }
   }
   gameGrid.appendChild(frag);
 
-  gameGrid.addEventListener("click", (e) => {
-    const col = colFromClient(e.clientX);
-    if (col >= 0 && col < cols) onColumnClick(col);
-  });
+  if (gameGrid._delegatedHandler) {
+    gameGrid.removeEventListener("click", gameGrid._delegatedHandler);
+  }
+  const handler = (e) => {
+    const target = e.target.closest(".cell");
+    if (!target || !gameGrid.contains(target)) return;
+    const col = Number(target.dataset.col);
+    if (!Number.isNaN(col)) onColumnClick(col);
+  };
+  gameGrid.addEventListener("click", handler);
+  gameGrid._delegatedHandler = handler;
 
   ensureBoxesSvg();
 }
@@ -154,23 +123,18 @@ export function updateCellDisplay(
   cell.dataset.ghost = "1";
 
   const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
-  const logicalCol = col; // Lock column at the start
-  const startRow = -1; // Start above the grid
-  const endRow = row;
-
-  const startX = px(logicalCol * (CELL + GAP));
-  const startY = px(startRow * (CELL + GAP));
-  const endY = px(endRow * (CELL + GAP));
+  const cellRect = cell.getBoundingClientRect();
+  const layerRect = outlineLayer.getBoundingClientRect();
+  const left = cellRect.left - layerRect.left;
+  const top = cellRect.top - layerRect.top;
 
   const ghost = document.createElement("div");
   ghost.className = `chip-ghost ${
     player === PLAYER.RED ? "red" : "blue"
   } drop-in`;
-  ghost.style.left = `${startX}px`;
-  ghost.style.top = `${startY}px`;
-  ghost.style.width = `${px(CELL)}px`;
-  ghost.style.height = `${px(CELL)}px`;
-
+  ghost.style.left = `${left}px`;
+  ghost.style.top = `${top}px`;
+  ghost.style.setProperty("--drop-y", `${(row + 1) * (CELL + GAP)}px`);
   outlineLayer.appendChild(ghost);
 
   const finish = () => {
@@ -197,17 +161,7 @@ export function updateCellDisplay(
     }
   };
 
-  // Animate the ghost piece
-  ghost.animate(
-    [
-      { transform: `translateY(${startY}px)` },
-      { transform: `translateY(${endY}px)` },
-    ],
-    {
-      duration: 800,
-      easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
-    }
-  ).onfinish = finish;
+  ghost.addEventListener("animationend", finish, { once: true });
 }
 
 /** Update every cell */
@@ -486,65 +440,4 @@ export function updateLabelsForModeUI(
   } else {
     gameTitle.textContent = "SQUARE WARS";
   }
-}
-
-export function showScreen(name) {
-  const screens = document.querySelectorAll("[data-screen], .screen");
-  screens.forEach((screen) => {
-    if (screen.dataset.screen === name || screen.classList.contains(name)) {
-      screen.style.display = "";
-      screen.setAttribute("aria-hidden", "false");
-    } else {
-      screen.style.display = "none";
-      screen.setAttribute("aria-hidden", "true");
-    }
-  });
-}
-
-/** Wire up buttons with delegated click handling */
-export function wireButtons() {
-  document.addEventListener("click", (e) => {
-    const el = e.target.closest("button, a, [role='button']");
-    if (!el) return;
-
-    // Call named function if requested
-    const fnName = el.dataset.click;
-    const arg = el.dataset.arg ?? undefined;
-    if (fnName && typeof window[fnName] === "function") {
-      window[fnName](arg);
-    }
-
-    // Screen switching if requested
-    const target = el.dataset.target;
-    if (target) showScreen(target);
-  });
-}
-
-export function initUI() {
-  const byId = (id) => document.getElementById(id);
-
-  const btnSingle = byId("btnSingle");
-  if (btnSingle) btnSingle.addEventListener("click", () => showScreen("scoring"));
-
-  const btnMulti = byId("btnMulti");
-  if (btnMulti) btnMulti.addEventListener("click", () => showScreen("scoring"));
-
-  const btnClassic = byId("btnClassic");
-  if (btnClassic) btnClassic.addEventListener("click", () => showScreen("quickfire"));
-
-  const btnQuickfire = byId("btnQuickfire");
-  if (btnQuickfire) btnQuickfire.addEventListener("click", () => showScreen("quickfire"));
-
-  const btnStartQuickfire = byId("btnStartQuickfire");
-  if (btnStartQuickfire) btnStartQuickfire.addEventListener("click", () => showScreen("mode"));
-
-  const btnBackQuickfire = byId("btnBackQuickfire");
-  if (btnBackQuickfire) btnBackQuickfire.addEventListener("click", () => showScreen("scoring"));
-
-  // Add more button bindings as needed
-}
-
-// Optional: expose only if HTML still uses inline onclicks
-export function exposeForInline(w) {
-  w.showScreen = showScreen;
 }
