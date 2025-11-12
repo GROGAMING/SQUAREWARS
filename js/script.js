@@ -665,23 +665,29 @@ function bindUI() {
       console.error(`No handler found for data-click="${el.dataset.click}"`);
       el.dataset.bindError = `No handler for ${el.dataset.click}`;
     } else {
-      el.addEventListener('click', () => fn(el));
+      el.removeEventListener('click', el._boundClickHandler); // Remove previous bindings
+      el._boundClickHandler = () => fn(el); // Store the bound handler
+      el.addEventListener('click', el._boundClickHandler);
     }
   });
 
   // Bind Quick Fire input slider
   document.querySelectorAll('[data-input="quickfire"]').forEach((el) => {
-    el.addEventListener('input', () => onQuickfireInput(el));
+    el.removeEventListener('input', el._boundInputHandler); // Remove previous bindings
+    el._boundInputHandler = () => onQuickfireInput(el); // Store the bound handler
+    el.addEventListener('input', el._boundInputHandler);
   });
 
   // Ensure modal close buttons work
   document.querySelectorAll('.modal-overlay').forEach((modal) => {
-    modal.addEventListener('click', (e) => {
+    modal.removeEventListener('click', modal._boundOverlayHandler); // Remove previous bindings
+    modal._boundOverlayHandler = (e) => {
       if (e.target === modal) {
         modal.classList.add(CSS.HIDDEN);
         modal.setAttribute('aria-hidden', 'true');
       }
-    });
+    };
+    modal.addEventListener('click', modal._boundOverlayHandler);
   });
 }
 
