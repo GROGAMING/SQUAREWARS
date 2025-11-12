@@ -13,32 +13,43 @@
   </head>
   <body>
     <!-- Mode Select Modal -->
-    <div id="modeSelectModal" class="modal-overlay" data-screen="mode" aria-hidden="false">
+    <div id="modeSelectModal" class="modal-overlay" aria-hidden="false">
       <div class="modal">
         <h2>Choose Game Mode</h2>
         <p>Select how you want to play SQUARE WARS:</p>
-        <button data-click="setGameMode" data-arg="single" data-target="scoring">
+        <button class="single-player" onclick="setGameMode('single')">
           🔴 Single Player<br /><small>vs Computer</small>
         </button>
-        <button data-click="setGameMode" data-arg="multi" data-target="scoring">
+        <button onclick="setGameMode('multi')">
           🔵 Multiplayer<br /><small>2 Players</small>
         </button>
       </div>
     </div>
 
     <!-- Scoring Select Modal -->
-    <div id="scoringSelectModal" class="modal-overlay hidden" data-screen="scoring" aria-hidden="true">
+    <div
+      id="scoringSelectModal"
+      class="modal-overlay hidden"
+      aria-hidden="true"
+    >
       <div class="modal">
         <h2>Choose Scoring Style</h2>
-        <button data-click="setScoringMode" data-arg="classic" data-target="game">
+
+        <button class="classic-mode" onclick="setScoringMode('classic')">
           🧱 Classic (Box Points)<br />
           <small>Each captured box is worth <strong>1 point</strong>.</small>
         </button>
-        <button data-click="setScoringMode" data-arg="area" data-target="game">
+
+        <button class="area-mode" onclick="setScoringMode('area')">
           🗺️ Territory Takedown (Area Mode)<br />
-          <small>Score the <strong>number of squares</strong> inside a captured zone.</small>
+          <small
+            >Score the <strong>number of squares</strong> inside a captured
+            zone. Overlaps can <strong>steal</strong> territory!</small
+          >
         </button>
-        <button data-click="setScoringMode" data-arg="quickfire" data-target="quickfire">
+
+        <!-- Quick Fire goes to its own screen -->
+        <button class="quickfire-mode" onclick="setScoringMode('quickfire')">
           ⚡ Quick Fire<br />
           <small>Classic scoring with a win target.</small>
         </button>
@@ -46,52 +57,80 @@
     </div>
 
     <!-- Quick Fire target modal -->
-    <div id="quickfireSelectModal" class="modal-overlay hidden" data-screen="quickfire" aria-hidden="true">
+    <div
+      id="quickfireSelectModal"
+      class="modal-overlay hidden"
+      aria-hidden="true"
+    >
       <div class="modal">
         <h2>Quick Fire — Set Win Target</h2>
         <p>Choose how many boxes a player needs to win the match.</p>
+
         <div class="qf-chooser">
           <label for="qfTarget">Target</label>
+
+          <!-- Range + live bubble -->
           <div class="qf-range-wrap">
             <div id="qfBubble" class="qf-bubble">5</div>
-            <input type="range" id="qfTarget" min="1" max="10" step="1" value="5" />
+            <input
+              type="range"
+              id="qfTarget"
+              min="1"
+              max="10"
+              step="1"
+              value="5"
+              oninput="onQuickfireInput(this)"
+            />
           </div>
         </div>
+
         <div class="qf-actions">
-          <button data-click="confirmQuickfire" data-target="difficulty">Start</button>
-          <button data-click="backFromQuickfire" data-target="scoring">Back</button>
+          <button class="qf-start" onclick="confirmQuickfire()">Start</button>
+          <button class="qf-cancel" onclick="backFromQuickfire()">Back</button>
         </div>
       </div>
     </div>
 
     <!-- Difficulty Select Modal -->
-    <div id="difficultySelectModal" class="modal-overlay hidden" data-screen="difficulty" aria-hidden="true">
+    <div
+      id="difficultySelectModal"
+      class="modal-overlay hidden"
+      aria-hidden="true"
+    >
       <div class="modal">
         <h2>Choose Difficulty</h2>
         <p>Select the AI difficulty level:</p>
-        <button data-click="setDifficulty" data-arg="beginner" data-target="game">🟢 Beginner</button>
-        <button data-click="setDifficulty" data-arg="medium" data-target="game">🟡 Medium</button>
-        <button data-click="setDifficulty" data-arg="advanced" data-target="game">🔴 Advanced</button>
-        <button data-click="setDifficulty" data-arg="impossible" data-target="game">🟣 Impossible</button>
+        <button class="beginner" onclick="setDifficulty('beginner')">
+          🟢 Beginner<br /><small>Fast & Friendly</small>
+        </button>
+        <button class="medium" onclick="setDifficulty('medium')">
+          🟡 Medium<br /><small>Balanced Challenge</small>
+        </button>
+        <button class="advanced" onclick="setDifficulty('advanced')">
+          🔴 Advanced<br /><small>Tough Opponent</small>
+        </button>
+        <button class="impossible" onclick="setDifficulty('impossible')">
+          🟣 Impossible<br /><small>Perfect Play</small>
+        </button>
       </div>
     </div>
 
     <!-- Instructions Modal -->
-    <div id="instructionsModal" class="modal-overlay hidden" data-screen="instructions" aria-hidden="true">
+    <div id="instructionsModal" class="modal-overlay hidden" aria-hidden="true">
       <div class="modal">
         <h2 id="instructionsTitle">How to Play SQUARE WARS</h2>
         <p id="instructionsBody"></p>
-        <button data-click="closeInstructions" data-target="game">Got it, let's play!</button>
+        <button onclick="closeInstructions()">Got it, let's play!</button>
       </div>
     </div>
 
     <!-- End Game Modal -->
-    <div id="endGameModal" class="modal-overlay hidden" data-screen="end" aria-hidden="true">
+    <div id="endGameModal" class="modal-overlay hidden" aria-hidden="true">
       <div class="modal">
         <h2 id="endGameTitle">Game Over</h2>
         <p id="endGameSubtitle">Winner: <strong>—</strong></p>
-        <button data-click="startNewGame" data-target="game">🔄 Try Again</button>
-        <button data-click="setGameMode" data-arg="reset" data-target="mode">🛠️ Change Mode</button>
+        <button id="tryAgainBtn">🔄 Try Again</button>
+        <button id="changeModeBtn">🛠️ Change Mode</button>
       </div>
     </div>
 
@@ -130,25 +169,23 @@
       </div>
     </div>
 
-    <div class="grid-outer" id="gridOuter">
-      <div class="grid-container" id="gridContainer">
-        <div class="grid" id="gameGrid"></div>
-        <div
-          id="outlineLayer"
-          style="
-            position: absolute;
-            inset: 12px;
-            pointer-events: none;
-            z-index: 20;
-          "
-        ></div>
-      </div>
+    <div class="grid-container">
+      <div class="grid" id="gameGrid"></div>
+      <div
+        id="outlineLayer"
+        style="
+          position: absolute;
+          inset: 12px;
+          pointer-events: none;
+          z-index: 20;
+        "
+      ></div>
     </div>
 
     <div class="controls">
-      <button data-click="startNewGame">🎮 New Game</button>
+      <button onclick="startNewGame()">🎮 New Game</button>
     </div>
 
-    <script type="module" src="./js/script.js"></script>
+    <script type="module" src="./js/script.js?v=14"></script>
   </body>
 </html>
