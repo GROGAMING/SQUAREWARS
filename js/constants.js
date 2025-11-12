@@ -86,5 +86,3 @@ export const AI = Object.freeze({
   ADVANCED_PICK_SPLITS: Object.freeze({ BEST: 0.85, SECOND: 0.97 }),
   IMPOSSIBLE_DEPTH: 6,
 });
-
-export let SCALE = 1; // Runtime scale factor, updated dynamically
