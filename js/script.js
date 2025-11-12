@@ -25,6 +25,7 @@ import {
   showInstructions as showInstructionsUI,
   closeInstructionsUI,
   updateLabelsForModeUI,
+  applyResponsiveScale,
 } from "./ui.js?v=13";
 
 import { chooseComputerMove } from "./ai.js?v=11";
@@ -184,7 +185,7 @@ function initGame() {
     if (gameMode === GAME_MODES.SINGLE && currentPlayer !== PLAYER.RED) return;
     dropPiece(col);
   });
-
+  applyResponsiveScale();
   ensureControlsUI();
   updateDisplay(
     currentPlayer,
@@ -489,6 +490,7 @@ window.addEventListener("resize", () => {
     const input = document.getElementById("qfTarget");
     onQuickfireInput(input);
   }
+  applyResponsiveScale();
 });
 
 document

@@ -441,3 +441,30 @@ export function updateLabelsForModeUI(
     gameTitle.textContent = "SQUARE WARS";
   }
 }
+
+export function applyResponsiveScale() {
+  const outer = document.getElementById("gridOuter");
+  const inner = document.getElementById("gridContainer");
+  if (!outer || !inner) return;
+  const cols = 30,
+    rows = 20,
+    CELL = 20,
+    GAP = 2;
+  const GRID_PAD = 16,
+    CONTAINER_PAD = 16,
+    CONTAINER_BORDER = 8;
+  const intrinsicW =
+    cols * CELL + (cols - 1) * GAP + GRID_PAD + CONTAINER_PAD + CONTAINER_BORDER; // 698
+  const intrinsicH =
+    rows * CELL + (rows - 1) * GAP + GRID_PAD + CONTAINER_PAD + CONTAINER_BORDER; // 478
+  const vw = Math.max(
+    320,
+    window.innerWidth || document.documentElement.clientWidth || 360
+  );
+  const maxW = vw - 24; // page padding
+  const scale = Math.min(1, maxW / intrinsicW);
+  inner.style.transform = `scale(${scale})`;
+  outer.style.height = `${Math.round(intrinsicH * scale)}px`;
+  outer.style.width = `${Math.round(intrinsicW * scale)}px`;
+  outer.style.margin = "0 auto";
+}
