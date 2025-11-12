@@ -709,3 +709,12 @@ if (document.readyState === 'loading') {
 } else {
   boot();
 }
+
+window.setGameMode = setGameMode;
+window.setScoringMode = setScoringMode;
+window.setDifficulty = setDifficulty;
+window.startNewGame = () => initGame();
+window.closeInstructions = closeInstructions;
+window.confirmQuickfire = confirmQuickfire;
+window.backFromQuickfire = backFromQuickfire;
+window.onQuickfireInput = onQuickfireInput;
