@@ -402,6 +402,50 @@ function ensureControlsUI() {
   };
 }
 
+/* ------------ Navigation Dispatcher ------------ */
+function navigateTo(screenId) {
+  const allScreens = [
+    UI_IDS.modeSelectModal,
+    UI_IDS.scoringSelectModal,
+    UI_IDS.quickfireSelectModal,
+    UI_IDS.difficultySelectModal,
+    UI_IDS.instructionsModal,
+    UI_IDS.endGameModal,
+  ];
+
+  // Hide all screens
+  allScreens.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.add(CSS.HIDDEN);
+      el.setAttribute("aria-hidden", "true");
+    }
+  });
+
+  // Show the target screen
+  const targetScreen = document.getElementById(screenId);
+  if (targetScreen) {
+    targetScreen.classList.remove(CSS.HIDDEN);
+    targetScreen.setAttribute("aria-hidden", "false");
+    console.debug(`Navigated to screen: ${screenId}`);
+  } else {
+    console.error(`Navigation failed: Screen with id "${screenId}" not found.`);
+    showToast(`Error: Unable to navigate to screen.`);
+  }
+}
+
+/* ------------ Toast for Errors ------------ */
+function showToast(message) {
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
 /* ------------ Keyboard & modals ------------ */
 document.addEventListener("keydown", (e) => {
   if (e.key === KEY.ESCAPE) {
@@ -584,16 +628,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const root = document.body;
 
   bindDelegatedEvent(root, '[data-qa="btn-single"]', "pointerup", () =>
-    setGameMode("single")
+    navigateTo(UI_IDS.scoringSelectModal)
   );
   bindDelegatedEvent(root, '[data-qa="btn-multi"]', "pointerup", () =>
-    setGameMode("multi")
-  );
-  bindDelegatedEvent(root, '[data-qa="btn-start"]', "pointerup", () =>
-    initGame()
+    navigateTo(UI_IDS.scoringSelectModal)
   );
   bindDelegatedEvent(root, '[data-qa="btn-back"]', "pointerup", () =>
-    backFromQuickfire()
+    navigateTo(UI_IDS.modeSelectModal)
+  );
+  bindDelegatedEvent(root, '[data-qa="btn-start"]', "pointerup", () =>
+    navigateTo(UI_IDS.difficultySelectModal)
   );
   bindDelegatedEvent(root, '[data-qa="btn-restart"]', "pointerup", () =>
     initGame()
