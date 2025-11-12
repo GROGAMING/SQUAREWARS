@@ -93,8 +93,10 @@ h1 {
   font-size: 34px;
   line-height: 1;
   background: linear-gradient(180deg, #fff, #dfe6ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+background-clip: text;
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+
   text-shadow: 0 6px 24px rgba(124, 92, 255, 0.18);
 }
 .player1 {
