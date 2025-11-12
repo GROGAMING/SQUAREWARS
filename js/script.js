@@ -646,17 +646,42 @@ document.addEventListener("DOMContentLoaded", () => {
   ensureCriticalButtons(); // Verify buttons are not blocked
 });
 
-/* ------------ Expose for inline HTML ------------ */
-window.setGameMode = setGameMode;
-window.setScoringMode = setScoringMode;
-window.setDifficulty = setDifficulty;
-window.startNewGame = () => initGame();
-window.closeInstructions = closeInstructions;
+/* ------------ Event Binding & Initialization ------------ */
+function bindUI() {
+  const clickMap = {
+    setGameMode: (el) => setGameMode(el.dataset.arg),
+    setScoringMode: (el) => setScoringMode(el.dataset.arg),
+    setDifficulty: (el) => setDifficulty(el.dataset.arg),
+    startNewGame: () => initGame(),
+    closeInstructions,
+    confirmQuickfire,
+    backFromQuickfire,
+  };
 
-// Quick Fire modal handlers
-window.confirmQuickfire = confirmQuickfire;
-window.backFromQuickfire = backFromQuickfire;
-window.onQuickfireInput = onQuickfireInput;
+  document.querySelectorAll('[data-click]').forEach((el) => {
+    const fn = clickMap[el.dataset.click];
+    if (!fn) el.dataset.bindError = `No handler for ${el.dataset.click}`;
+    el.addEventListener('click', () => fn && fn(el));
+  });
 
-// initialize buttons on first load
-ensureControlsUI();
+  document.querySelectorAll('[data-input="quickfire"]').forEach((el) => {
+    el.addEventListener('input', () => onQuickfireInput(el));
+  });
+}
+
+function verifyBindings() {
+  const errors = [...document.querySelectorAll('[data-bind-error]')]
+    .map((el) => el.dataset.bindError);
+  if (errors.length) throw new Error('Missing UI handlers: ' + errors.join(', '));
+}
+
+function boot() {
+  bindUI();
+  verifyBindings();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
