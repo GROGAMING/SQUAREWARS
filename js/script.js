@@ -542,10 +542,64 @@ function verifyHandlers() {
   });
 }
 
-// Initialize bindings on load
+/* ------------ Event Delegation & Self-Checks ------------ */
+function bindDelegatedEvent(root, selector, event, handler) {
+  root.addEventListener(event, (e) => {
+    const target = e.target.closest(selector);
+    if (target) handler(e, target);
+  });
+}
+
+function ensureCriticalButtons() {
+  const criticalSelectors = [
+    '[data-qa="btn-single"]',
+    '[data-qa="btn-multi"]',
+    '[data-qa="btn-start"]',
+    '[data-qa="btn-back"]',
+    '[data-qa="btn-restart"]',
+  ];
+
+  criticalSelectors.forEach((selector) => {
+    const el = document.querySelector(selector);
+    if (!el) {
+      console.error(`Critical button missing: ${selector}`);
+      return;
+    }
+
+    const rect = el.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const topElement = document.elementFromPoint(centerX, centerY);
+
+    if (topElement !== el) {
+      console.error(
+        `Button ${selector} is blocked by ${topElement.tagName}`,
+        topElement
+      );
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  ensureButtonBindings();
-  verifyHandlers();
+  const root = document.body;
+
+  bindDelegatedEvent(root, '[data-qa="btn-single"]', "pointerup", () =>
+    setGameMode("single")
+  );
+  bindDelegatedEvent(root, '[data-qa="btn-multi"]', "pointerup", () =>
+    setGameMode("multi")
+  );
+  bindDelegatedEvent(root, '[data-qa="btn-start"]', "pointerup", () =>
+    initGame()
+  );
+  bindDelegatedEvent(root, '[data-qa="btn-back"]', "pointerup", () =>
+    backFromQuickfire()
+  );
+  bindDelegatedEvent(root, '[data-qa="btn-restart"]', "pointerup", () =>
+    initGame()
+  );
+
+  ensureCriticalButtons();
 });
 
 /* ------------ Expose for inline HTML ------------ */

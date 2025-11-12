@@ -5,7 +5,7 @@ test.describe('Button Interactivity', () => {
     await page.goto('http://localhost:3000');
     await page.setViewportSize({ width: 360, height: 640 });
 
-    await page.locator('button.single-player').click();
+    await page.locator('[data-qa="btn-single"]').click();
     await expect(page.locator('#scoringSelectModal')).toBeVisible();
   });
 
@@ -13,8 +13,8 @@ test.describe('Button Interactivity', () => {
     await page.goto('http://localhost:3000');
     await page.setViewportSize({ width: 360, height: 640 });
 
-    await page.locator('button.single-player').click();
-    await page.locator('button.qf-cancel').click();
+    await page.locator('[data-qa="btn-single"]').click();
+    await page.locator('[data-qa="btn-back"]').click();
     await expect(page.locator('#modeSelectModal')).toBeVisible();
   });
 
@@ -22,8 +22,18 @@ test.describe('Button Interactivity', () => {
     await page.goto('http://localhost:3000');
     await page.setViewportSize({ width: 1024, height: 768 });
 
-    await page.locator('button.single-player').click();
+    await page.locator('[data-qa="btn-single"]').click();
     await page.locator('#scoringSelectModal').click();
     await expect(page.locator('#modeSelectModal')).not.toBeVisible();
+  });
+
+  test('Buttons remain interactive after resize', async ({ page }) => {
+    await page.goto('http://localhost:3000');
+    await page.setViewportSize({ width: 360, height: 640 });
+
+    await page.locator('[data-qa="btn-single"]').click();
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.locator('[data-qa="btn-back"]').click();
+    await expect(page.locator('#modeSelectModal')).toBeVisible();
   });
 });
