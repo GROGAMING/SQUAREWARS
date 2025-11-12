@@ -10,6 +10,56 @@ import {
   SCORING_MODES,
 } from "./constants.js";
 
+// Responsive scale
+let SCALE = 1;
+export function getScale() {
+  return SCALE;
+}
+
+export function applyResponsiveScale() {
+  const cols = 30,
+    rows = 20;
+  const CELL0 = 20,
+    GAP0 = 2,
+    PAD = 8,
+    BORDER = 6;
+
+  const intrinsicW = cols * CELL0 + (cols - 1) * GAP0 + PAD * 2 + BORDER * 2;
+  const intrinsicH = rows * CELL0 + (rows - 1) * GAP0 + PAD * 2 + BORDER * 2;
+
+  const vw = Math.max(
+    320,
+    window.innerWidth || document.documentElement.clientWidth || 360
+  );
+  const pagePadding = 24;
+  SCALE = Math.min(1, (vw - pagePadding) / intrinsicW);
+
+  const root = document.documentElement;
+  root.style.setProperty("--scale", String(SCALE));
+
+  const outer = document.getElementById("gridOuter");
+  if (outer) {
+    outer.style.width = Math.round(intrinsicW * SCALE) + "px";
+    outer.style.height = Math.round(intrinsicH * SCALE) + "px";
+  }
+
+  // Keep overlay SVG viewBox in sync with scaled size
+  const layer = document.getElementById(UI_IDS.outlineLayer);
+  if (layer) {
+    const svg = layer.querySelector("#boxesSvg");
+    if (svg) {
+      svg.setAttribute(
+        "viewBox",
+        `0 0 ${layer.clientWidth} ${layer.clientHeight}`
+      );
+    }
+  }
+}
+
+function px(n) {
+  return Math.round(n * SCALE);
+}
+
 /** Track which move is the real "last move" to avoid race conditions */
 let uiLastMoveToken = 0;
 
@@ -82,18 +132,6 @@ export function buildGrid(rows, cols, onColumnClick) {
   }
   gameGrid.appendChild(frag);
 
-  if (gameGrid._delegatedHandler) {
-    gameGrid.removeEventListener("click", gameGrid._delegatedHandler);
-  }
-  const handler = (e) => {
-    const target = e.target.closest(".cell");
-    if (!target || !gameGrid.contains(target)) return;
-    const col = Number(target.dataset.col);
-    if (!Number.isNaN(col)) onColumnClick(col);
-  };
-  gameGrid.addEventListener("click", handler);
-  gameGrid._delegatedHandler = handler;
-
   ensureBoxesSvg();
 }
 
@@ -134,7 +172,7 @@ export function updateCellDisplay(
   } drop-in`;
   ghost.style.left = `${left}px`;
   ghost.style.top = `${top}px`;
-  ghost.style.setProperty("--drop-y", `${(row + 1) * (CELL + GAP)}px`);
+  ghost.style.setProperty("--drop-y", `${px((row + 1) * (CELL + GAP))}px`);
   outlineLayer.appendChild(ghost);
 
   const finish = () => {
@@ -285,10 +323,10 @@ export function drawOutlineRect(minRow, maxRow, minCol, maxCol, player) {
   if (!layer) return;
   const svg = ensureBoxesSvg();
 
-  const x = GRID_PADDING + minCol * (CELL + GAP) - BORDER_WIDTH - 3;
-  const y = GRID_PADDING + minRow * (CELL + GAP) - BORDER_WIDTH - 3;
-  const w = (maxCol - minCol + 1) * (CELL + GAP) - GAP + BORDER_WIDTH + 6;
-  const h = (maxRow - minRow + 1) * (CELL + GAP) - GAP + BORDER_WIDTH + 6;
+  const x = px(GRID_PADDING + minCol * (CELL + GAP) - BORDER_WIDTH - 3);
+  const y = px(GRID_PADDING + minRow * (CELL + GAP) - BORDER_WIDTH - 3);
+  const w = px((maxCol - minCol + 1) * (CELL + GAP) - GAP + BORDER_WIDTH + 6);
+  const h = px((maxRow - minRow + 1) * (CELL + GAP) - GAP + BORDER_WIDTH + 6);
 
   const rect = document.createElementNS(svg.namespaceURI, "rect");
   rect.setAttribute("x", x);
@@ -323,8 +361,8 @@ export function drawWinStrike(winningLine, player) {
   const last = winningLine[winningLine.length - 1];
 
   const centerOf = (r, c) => ({
-    x: GRID_PADDING + c * (CELL + GAP) + CELL / 2,
-    y: GRID_PADDING + r * (CELL + GAP) + CELL / 2,
+    x: px(GRID_PADDING + c * (CELL + GAP) + CELL / 2),
+    y: px(GRID_PADDING + r * (CELL + GAP) + CELL / 2),
   });
 
   const p1 = centerOf(first.row, first.col);

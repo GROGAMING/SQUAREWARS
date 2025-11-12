@@ -11,6 +11,8 @@ import {
   KEY,
   AI,
   QUICKFIRE_DEFAULT,
+  CELL_PX,
+  GAP_PX,
 } from "./constants.js?v=13";
 
 import {
@@ -25,6 +27,8 @@ import {
   showInstructions as showInstructionsUI,
   closeInstructionsUI,
   updateLabelsForModeUI,
+  applyResponsiveScale,
+  getScale,
 } from "./ui.js?v=13";
 
 import { chooseComputerMove } from "./ai.js?v=11";
@@ -46,6 +50,24 @@ let quickFireTarget = QUICKFIRE_DEFAULT;
 let ownership = Object.create(null);
 let moveToken = 0;
 
+/* ------------ Scale helpers ------------ */
+function px(n) {
+  return Math.round(n * getScale());
+}
+function logicalFromClient(clientX, clientY) {
+  const grid = document.getElementById(UI_IDS.gameGrid);
+  const rect = grid.getBoundingClientRect();
+  const s = getScale();
+  const x = (clientX - rect.left) / s;
+  const y = (clientY - rect.top) / s;
+  return { x, y };
+}
+function colFromClient(clientX) {
+  const { x } = logicalFromClient(clientX, 0);
+  const step = CELL_PX + GAP_PX;
+  return Math.max(0, Math.min(COLS - 1, Math.floor(x / step)));
+}
+
 /* ------------ Mode, scoring & difficulty ------------ */
 function setGameMode(mode) {
   gameMode = mode;
@@ -54,6 +76,8 @@ function setGameMode(mode) {
   const scoringModal = document.getElementById(UI_IDS.scoringSelectModal);
   scoringModal.classList.remove(CSS.HIDDEN);
   scoringModal.setAttribute("aria-hidden", "false");
+  // After grid is ready, compute scale
+  applyResponsiveScale();
 }
 
 function setScoringMode(mode) {
@@ -179,11 +203,23 @@ function initGame() {
   const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
   if (outlineLayer) outlineLayer.innerHTML = "";
 
-  buildGrid(ROWS, COLS, (col) => {
+  buildGrid(ROWS, COLS, () => {});
+
+  // Scale-aware click/touch handlers
+  const gameGrid = document.getElementById(UI_IDS.gameGrid);
+  const handlePick = (clientX) => {
+    const col = colFromClient(clientX);
     if (!gameActive) return;
     if (gameMode === GAME_MODES.SINGLE && currentPlayer !== PLAYER.RED) return;
     dropPiece(col);
-  });
+  };
+  if (gameGrid) {
+    gameGrid.onclick = (e) => handlePick(e.clientX);
+    gameGrid.ontouchstart = (e) => {
+      const t = e.touches && e.touches[0];
+      if (t) handlePick(t.clientX);
+    };
+  }
 
   ensureControlsUI();
   updateDisplay(
@@ -484,6 +520,9 @@ document.addEventListener("keydown", (e) => {
 });
 
 window.addEventListener("resize", () => {
+  // Maintain board scaling on resize
+  applyResponsiveScale();
+
   const modal = document.getElementById(UI_IDS.quickfireSelectModal);
   if (modal && !modal.classList.contains(CSS.HIDDEN)) {
     const input = document.getElementById("qfTarget");
@@ -571,3 +610,4 @@ window.onQuickfireInput = onQuickfireInput;
 
 // initialize buttons on first load
 ensureControlsUI();
+applyResponsiveScale();

@@ -67,6 +67,10 @@ export const GAP = 2;
 export const GRID_PADDING = 8;
 export const BORDER_WIDTH = 1;
 
+// Logical sizes (unscaled) for gameplay math and UI mapping
+export const CELL_PX = 20; // logical cell size (unscaled)
+export const GAP_PX = 2;   // logical gap size (unscaled)
+
 export const DIRECTIONS = Object.freeze([
   [0, 1],
   [1, 0],
