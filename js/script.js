@@ -25,9 +25,6 @@ import {
   showInstructions as showInstructionsUI,
   closeInstructionsUI,
   updateLabelsForModeUI,
-  applyResponsiveScale,
-  updateScale,
-  colFromClient,
 } from "./ui.js?v=13";
 
 import { chooseComputerMove } from "./ai.js?v=11";
@@ -176,15 +173,29 @@ function initGame() {
   blueGames = 0;
   gameActive = true;
   lastMovePosition = null;
+  ownership = Object.create(null);
+  moveToken = 0;
+
+  const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
+  if (outlineLayer) outlineLayer.innerHTML = "";
 
   buildGrid(ROWS, COLS, (col) => {
     if (!gameActive) return;
+    if (gameMode === GAME_MODES.SINGLE && currentPlayer !== PLAYER.RED) return;
     dropPiece(col);
   });
-  updateScale();
+
+  ensureControlsUI();
+  updateDisplay(
+    currentPlayer,
+    gameMode,
+    aiDifficulty,
+    scoringMode,
+    redGames,
+    blueGames
+  );
 }
 
-/* Update dropPiece to use colFromClient for input mapping */
 function dropPiece(col) {
   if (!gameActive) return;
 
@@ -192,11 +203,55 @@ function dropPiece(col) {
     if (grid[row][col] === 0 && !blockedCells.has(`${row}-${col}`)) {
       grid[row][col] = currentPlayer;
       lastMovePosition = { row, col };
-      updateCellDisplay(grid, blockedCells, lastMovePosition, row, col);
-      currentPlayer = currentPlayer === PLAYER.RED ? PLAYER.BLUE : PLAYER.RED;
+
+      const token = ++moveToken;
+      updateCellDisplay(grid, blockedCells, lastMovePosition, row, col, token);
+
+      const didWin = checkForWin(row, col);
+      if (didWin) {
+        if (
+          scoringMode === SCORING_MODES.CLASSIC ||
+          scoringMode === SCORING_MODES.QUICKFIRE
+        ) {
+          if (currentPlayer === PLAYER.RED) redGames++;
+          else blueGames++;
+        }
+        currentPlayer = currentPlayer === PLAYER.RED ? PLAYER.BLUE : PLAYER.RED;
+      } else {
+        currentPlayer = currentPlayer === PLAYER.RED ? PLAYER.BLUE : PLAYER.RED;
+      }
+
+      updateDisplay(
+        currentPlayer,
+        gameMode,
+        aiDifficulty,
+        scoringMode,
+        redGames,
+        blueGames
+      );
+      checkEndOfGame();
+
+      if (
+        gameMode === GAME_MODES.SINGLE &&
+        currentPlayer === PLAYER.BLUE &&
+        gameActive
+      ) {
+        setTimeout(makeComputerMove, AI.COMPUTER_THINK_DELAY);
+      }
       return;
     }
   }
+}
+
+function makeComputerMove() {
+  if (
+    !gameActive ||
+    currentPlayer !== PLAYER.BLUE ||
+    gameMode !== GAME_MODES.SINGLE
+  )
+    return;
+  const col = chooseComputerMove({ grid, blockedCells, aiDifficulty });
+  if (col !== -1) dropPiece(col);
 }
 
 /* ------------ Rules & helpers ------------ */
@@ -402,50 +457,6 @@ function ensureControlsUI() {
   };
 }
 
-/* ------------ Navigation Dispatcher ------------ */
-function navigateTo(screenId) {
-  const allScreens = [
-    UI_IDS.modeSelectModal,
-    UI_IDS.scoringSelectModal,
-    UI_IDS.quickfireSelectModal,
-    UI_IDS.difficultySelectModal,
-    UI_IDS.instructionsModal,
-    UI_IDS.endGameModal,
-  ];
-
-  // Hide all screens
-  allScreens.forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.classList.add(CSS.HIDDEN);
-      el.setAttribute("aria-hidden", "true");
-    }
-  });
-
-  // Show the target screen
-  const targetScreen = document.getElementById(screenId);
-  if (targetScreen) {
-    targetScreen.classList.remove(CSS.HIDDEN);
-    targetScreen.setAttribute("aria-hidden", "false");
-    console.debug(`Navigated to screen: ${screenId}`);
-  } else {
-    console.error(`Navigation failed: Screen with id "${screenId}" not found.`);
-    showToast(`Error: Unable to navigate to screen.`);
-  }
-}
-
-/* ------------ Toast for Errors ------------ */
-function showToast(message) {
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
-}
-
 /* ------------ Keyboard & modals ------------ */
 document.addEventListener("keydown", (e) => {
   if (e.key === KEY.ESCAPE) {
@@ -478,7 +489,6 @@ window.addEventListener("resize", () => {
     const input = document.getElementById("qfTarget");
     onQuickfireInput(input);
   }
-  updateScale();
 });
 
 document
@@ -509,216 +519,55 @@ document
   .getElementById(UI_IDS.endGameModal)
   .addEventListener("click", () => {});
 
-/* ------------ Event Binding Enhancements ------------ */
-function bindEvent(selector, event, handler) {
-  const elements = document.querySelectorAll(selector);
-  elements.forEach((el) => {
-    el.removeEventListener(event, handler); // Prevent duplicate bindings
-    el.addEventListener(event, handler);
-  });
-}
-
-function logUnhandledInteraction(event) {
-  console.warn(`Unhandled interaction on ${event.target.id || event.target}`);
-}
-
-// Bind pointerup with fallback to click
-function bindPointerEvent(selector, handler) {
-  bindEvent(selector, "pointerup", handler);
-  bindEvent(selector, "click", handler);
-}
-
-// Ensure all critical buttons are bound
-function ensureButtonBindings() {
-  bindPointerEvent("#tryAgainBtn", () => {
-    hideEndGameModal();
-    redGames = 0;
-    blueGames = 0;
-    initGame();
-    updateDisplay(
-      currentPlayer,
-      gameMode,
-      aiDifficulty,
-      scoringMode,
-      redGames,
-      blueGames
-    );
-  });
-
-  bindPointerEvent("#changeModeBtn", () => {
-    hideEndGameModal();
-    const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
-    if (outlineLayer) outlineLayer.innerHTML = "";
-    redGames = 0;
-    blueGames = 0;
-    gameActive = false;
-    gameMode = null;
-    aiDifficulty = null;
-    const modeModal = document.getElementById(UI_IDS.modeSelectModal);
-    modeModal.classList.remove(CSS.HIDDEN);
-    modeModal.setAttribute("aria-hidden", "false");
-    updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
-    updateDisplay(
-      currentPlayer,
-      gameMode,
-      aiDifficulty,
-      scoringMode,
-      redGames,
-      blueGames
-    );
-  });
-
-  bindPointerEvent("#qfTarget", (e) => onQuickfireInput(e.target));
-}
-
-// Verify handlers are registered
-function verifyHandlers() {
-  const criticalButtons = [
-    "#tryAgainBtn",
-    "#changeModeBtn",
-    "#qfTarget",
-  ];
-  criticalButtons.forEach((selector) => {
-    const el = document.querySelector(selector);
-    if (el && !el.hasAttribute("data-handler-bound")) {
-      console.error(`Handler missing for ${selector}`);
-    }
-  });
-}
-
-/* ------------ Event Delegation & Self-Checks ------------ */
-function bindDelegatedEvent(root, selector, event, handler) {
-  root.addEventListener(event, (e) => {
-    const target = e.target.closest(selector);
-    if (target) handler(e, target);
-  });
-}
-
-function ensureCriticalButtons() {
-  const criticalSelectors = [
-    '[data-qa="btn-single"]',
-    '[data-qa="btn-multi"]',
-    '[data-qa="btn-start"]',
-    '[data-qa="btn-back"]',
-    '[data-qa="btn-restart"]',
-  ];
-
-  criticalSelectors.forEach((selector) => {
-    const el = document.querySelector(selector);
-    if (!el) {
-      console.error(`Critical button missing: ${selector}`);
-      return;
-    }
-
-    const rect = el.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const topElement = document.elementFromPoint(centerX, centerY);
-
-    if (topElement !== el) {
-      console.error(
-        `Button ${selector} is blocked by ${topElement.tagName}`,
-        topElement
-      );
-    }
-  });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const root = document.body;
-
-  bindDelegatedEvent(root, '[data-qa="btn-single"]', "click", () =>
-    navigateTo(UI_IDS.scoringSelectModal)
+document.getElementById(UI_IDS.tryAgainBtn).addEventListener("click", () => {
+  hideEndGameModal();
+  redGames = 0;
+  blueGames = 0;
+  initGame();
+  updateDisplay(
+    currentPlayer,
+    gameMode,
+    aiDifficulty,
+    scoringMode,
+    redGames,
+    blueGames
   );
-  bindDelegatedEvent(root, '[data-qa="btn-multi"]', "click", () =>
-    navigateTo(UI_IDS.scoringSelectModal)
-  );
-  bindDelegatedEvent(root, '[data-qa="btn-back"]', "click", () =>
-    navigateTo(UI_IDS.modeSelectModal)
-  );
-  bindDelegatedEvent(root, '[data-qa="btn-start"]', "click", () =>
-    navigateTo(UI_IDS.difficultySelectModal)
-  );
-  bindDelegatedEvent(root, '[data-qa="btn-restart"]', "click", () =>
-    initGame()
-  );
-
-  ensureCriticalButtons(); // Verify buttons are not blocked
 });
 
-/* ------------ Event Binding & Initialization ------------ */
-function bindUI() {
-  const clickMap = {
-    setGameMode: (el) => setGameMode(el.dataset.arg),
-    setScoringMode: (el) => setScoringMode(el.dataset.arg),
-    setDifficulty: (el) => setDifficulty(el.dataset.arg),
-    startNewGame: () => initGame(),
-    closeInstructions,
-    confirmQuickfire,
-    backFromQuickfire,
-  };
+document.getElementById(UI_IDS.changeModeBtn).addEventListener("click", () => {
+  hideEndGameModal();
+  const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
+  if (outlineLayer) outlineLayer.innerHTML = "";
+  redGames = 0;
+  blueGames = 0;
+  gameActive = false;
+  gameMode = null;
+  aiDifficulty = null;
+  const modeModal = document.getElementById(UI_IDS.modeSelectModal);
+  modeModal.classList.remove(CSS.HIDDEN);
+  modeModal.setAttribute("aria-hidden", "false");
+  updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
+  updateDisplay(
+    currentPlayer,
+    gameMode,
+    aiDifficulty,
+    scoringMode,
+    redGames,
+    blueGames
+  );
+});
 
-  // Bind all buttons with data-click attributes
-  document.querySelectorAll('[data-click]').forEach((el) => {
-    const fn = clickMap[el.dataset.click];
-    if (!fn) {
-      console.error(`No handler found for data-click="${el.dataset.click}"`);
-      el.dataset.bindError = `No handler for ${el.dataset.click}`;
-    } else {
-      el.removeEventListener('click', el._boundClickHandler); // Remove previous bindings
-      el._boundClickHandler = () => fn(el); // Store the bound handler
-      el.addEventListener('click', el._boundClickHandler);
-    }
-  });
-
-  // Bind Quick Fire input slider
-  document.querySelectorAll('[data-input="quickfire"]').forEach((el) => {
-    el.removeEventListener('input', el._boundInputHandler); // Remove previous bindings
-    el._boundInputHandler = () => onQuickfireInput(el); // Store the bound handler
-    el.addEventListener('input', el._boundInputHandler);
-  });
-
-  // Ensure modal close buttons work
-  document.querySelectorAll('.modal-overlay').forEach((modal) => {
-    modal.removeEventListener('click', modal._boundOverlayHandler); // Remove previous bindings
-    modal._boundOverlayHandler = (e) => {
-      if (e.target === modal) {
-        modal.classList.add(CSS.HIDDEN);
-        modal.setAttribute('aria-hidden', 'true');
-      }
-    };
-    modal.addEventListener('click', modal._boundOverlayHandler);
-  });
-}
-
-function verifyBindings() {
-  const errors = [...document.querySelectorAll('[data-bind-error]')]
-    .map((el) => el.dataset.bindError);
-  if (errors.length) throw new Error('Missing UI handlers: ' + errors.join(', '));
-}
-
-// Ensure all buttons are bound and verify bindings
-function boot() {
-  bindUI();
-  verifyBindings();
-}
-
-// Initialize the game when the DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', boot);
-} else {
-  boot();
-}
-
+/* ------------ Expose for inline HTML ------------ */
 window.setGameMode = setGameMode;
 window.setScoringMode = setScoringMode;
 window.setDifficulty = setDifficulty;
 window.startNewGame = () => initGame();
 window.closeInstructions = closeInstructions;
+
+// Quick Fire modal handlers
 window.confirmQuickfire = confirmQuickfire;
 window.backFromQuickfire = backFromQuickfire;
 window.onQuickfireInput = onQuickfireInput;
 
-window.addEventListener("DOMContentLoaded", () => {
-  if (typeof wireButtons === "function") wireButtons();
-});
+// initialize buttons on first load
+ensureControlsUI();
