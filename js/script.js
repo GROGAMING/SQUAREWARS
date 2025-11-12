@@ -658,14 +658,30 @@ function bindUI() {
     backFromQuickfire,
   };
 
+  // Bind all buttons with data-click attributes
   document.querySelectorAll('[data-click]').forEach((el) => {
     const fn = clickMap[el.dataset.click];
-    if (!fn) el.dataset.bindError = `No handler for ${el.dataset.click}`;
-    el.addEventListener('click', () => fn && fn(el));
+    if (!fn) {
+      console.error(`No handler found for data-click="${el.dataset.click}"`);
+      el.dataset.bindError = `No handler for ${el.dataset.click}`;
+    } else {
+      el.addEventListener('click', () => fn(el));
+    }
   });
 
+  // Bind Quick Fire input slider
   document.querySelectorAll('[data-input="quickfire"]').forEach((el) => {
     el.addEventListener('input', () => onQuickfireInput(el));
+  });
+
+  // Ensure modal close buttons work
+  document.querySelectorAll('.modal-overlay').forEach((modal) => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.add(CSS.HIDDEN);
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    });
   });
 }
 
@@ -675,11 +691,13 @@ function verifyBindings() {
   if (errors.length) throw new Error('Missing UI handlers: ' + errors.join(', '));
 }
 
+// Ensure all buttons are bound and verify bindings
 function boot() {
   bindUI();
   verifyBindings();
 }
 
+// Initialize the game when the DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', boot);
 } else {
