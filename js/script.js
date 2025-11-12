@@ -26,6 +26,8 @@ import {
   closeInstructionsUI,
   updateLabelsForModeUI,
   applyResponsiveScale,
+  updateScale,
+  colFromClient,
 } from "./ui.js?v=13";
 
 import { chooseComputerMove } from "./ai.js?v=11";
@@ -174,29 +176,15 @@ function initGame() {
   blueGames = 0;
   gameActive = true;
   lastMovePosition = null;
-  ownership = Object.create(null);
-  moveToken = 0;
-
-  const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
-  if (outlineLayer) outlineLayer.innerHTML = "";
 
   buildGrid(ROWS, COLS, (col) => {
     if (!gameActive) return;
-    if (gameMode === GAME_MODES.SINGLE && currentPlayer !== PLAYER.RED) return;
     dropPiece(col);
   });
-  applyResponsiveScale();
-  ensureControlsUI();
-  updateDisplay(
-    currentPlayer,
-    gameMode,
-    aiDifficulty,
-    scoringMode,
-    redGames,
-    blueGames
-  );
+  updateScale();
 }
 
+/* Update dropPiece to use colFromClient for input mapping */
 function dropPiece(col) {
   if (!gameActive) return;
 
@@ -204,55 +192,11 @@ function dropPiece(col) {
     if (grid[row][col] === 0 && !blockedCells.has(`${row}-${col}`)) {
       grid[row][col] = currentPlayer;
       lastMovePosition = { row, col };
-
-      const token = ++moveToken;
-      updateCellDisplay(grid, blockedCells, lastMovePosition, row, col, token);
-
-      const didWin = checkForWin(row, col);
-      if (didWin) {
-        if (
-          scoringMode === SCORING_MODES.CLASSIC ||
-          scoringMode === SCORING_MODES.QUICKFIRE
-        ) {
-          if (currentPlayer === PLAYER.RED) redGames++;
-          else blueGames++;
-        }
-        currentPlayer = currentPlayer === PLAYER.RED ? PLAYER.BLUE : PLAYER.RED;
-      } else {
-        currentPlayer = currentPlayer === PLAYER.RED ? PLAYER.BLUE : PLAYER.RED;
-      }
-
-      updateDisplay(
-        currentPlayer,
-        gameMode,
-        aiDifficulty,
-        scoringMode,
-        redGames,
-        blueGames
-      );
-      checkEndOfGame();
-
-      if (
-        gameMode === GAME_MODES.SINGLE &&
-        currentPlayer === PLAYER.BLUE &&
-        gameActive
-      ) {
-        setTimeout(makeComputerMove, AI.COMPUTER_THINK_DELAY);
-      }
+      updateCellDisplay(grid, blockedCells, lastMovePosition, row, col);
+      currentPlayer = currentPlayer === PLAYER.RED ? PLAYER.BLUE : PLAYER.RED;
       return;
     }
   }
-}
-
-function makeComputerMove() {
-  if (
-    !gameActive ||
-    currentPlayer !== PLAYER.BLUE ||
-    gameMode !== GAME_MODES.SINGLE
-  )
-    return;
-  const col = chooseComputerMove({ grid, blockedCells, aiDifficulty });
-  if (col !== -1) dropPiece(col);
 }
 
 /* ------------ Rules & helpers ------------ */
@@ -490,7 +434,7 @@ window.addEventListener("resize", () => {
     const input = document.getElementById("qfTarget");
     onQuickfireInput(input);
   }
-  applyResponsiveScale();
+  updateScale();
 });
 
 document
