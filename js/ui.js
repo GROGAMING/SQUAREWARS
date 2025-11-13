@@ -163,16 +163,28 @@ export function updateCellDisplay(
   const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
   const cellRect = cell.getBoundingClientRect();
   const layerRect = outlineLayer.getBoundingClientRect();
+
   const left = cellRect.left - layerRect.left;
   const top = cellRect.top - layerRect.top;
+
+  // Compute fall distance from the grid content top (accounts for border+padding)
+  const gridEl = document.getElementById(UI_IDS.gameGrid);
+  const gridRect = gridEl.getBoundingClientRect();
+  const cs = getComputedStyle(gridEl);
+  const borderTop = parseFloat(cs.borderTopWidth) || 0;
+  const padTop = parseFloat(cs.paddingTop) || 0;
+  const contentTop = gridRect.top + borderTop + padTop;
+  const stepPx = Math.round((CELL + GAP) * getScale());
+  const dropDistance = Math.max(0, Math.round(cellRect.top - contentTop));
+  const dropY = Math.max(dropDistance, stepPx); // ensure visible drop even for row 0
 
   const ghost = document.createElement("div");
   ghost.className = `chip-ghost ${
     player === PLAYER.RED ? "red" : "blue"
   } drop-in`;
-  ghost.style.left = `${left}px`;
-  ghost.style.top = `${top}px`;
-  ghost.style.setProperty("--drop-y", `${px((row + 1) * (CELL + GAP))}px`);
+  ghost.style.left = `${Math.round(left)}px`;
+  ghost.style.top = `${Math.round(top)}px`;
+  ghost.style.setProperty("--drop-y", `${dropY}px`);
   outlineLayer.appendChild(ghost);
 
   const finish = () => {

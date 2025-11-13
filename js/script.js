@@ -62,10 +62,23 @@ function logicalFromClient(clientX, clientY) {
   const y = (clientY - rect.top) / s;
   return { x, y };
 }
+/* REPLACED: column calc now accounts for scaled border and padding */
 function colFromClient(clientX) {
-  const { x } = logicalFromClient(clientX, 0);
-  const step = CELL_PX + GAP_PX;
-  return Math.max(0, Math.min(COLS - 1, Math.floor(x / step)));
+  const gridEl = document.getElementById(UI_IDS.gameGrid);
+  const rect = gridEl.getBoundingClientRect();
+  const cs = getComputedStyle(gridEl);
+  const borderL = parseFloat(cs.borderLeftWidth) || 0;
+  const padL = parseFloat(cs.paddingLeft) || 0;
+  const s = getScale();
+
+  // local x inside the grid content box
+  const xLocal = clientX - rect.left - borderL - padL;
+
+  // scaled step (cell + gap)
+  const step = (CELL_PX + GAP_PX) * s;
+
+  const rawCol = Math.floor(xLocal / step);
+  return Math.max(0, Math.min(COLS - 1, rawCol));
 }
 
 /* ------------ Mode, scoring & difficulty ------------ */
@@ -214,11 +227,26 @@ function initGame() {
     dropPiece(col);
   };
   if (gameGrid) {
-    gameGrid.onclick = (e) => handlePick(e.clientX);
-    gameGrid.ontouchstart = (e) => {
-      const t = e.touches && e.touches[0];
-      if (t) handlePick(t.clientX);
-    };
+    // remove previous direct handlers (if any)
+    gameGrid.onclick = null;
+    gameGrid.ontouchstart = null;
+
+    gameGrid.addEventListener("click", (e) => {
+      handlePick(e.clientX);
+    });
+
+    // prevent duplicate click after touch and ensure fast taps map correctly
+    gameGrid.addEventListener(
+      "touchstart",
+      (e) => {
+        const t = e.touches && e.touches[0];
+        if (t) {
+          e.preventDefault();
+          handlePick(t.clientX);
+        }
+      },
+      { passive: false }
+    );
   }
 
   ensureControlsUI();
@@ -446,11 +474,41 @@ function boxOffConnectedArea(winningLine, player) {
   }
 
   updateAllCellDisplays(grid, blockedCells, lastMovePosition, ROWS, COLS);
+
+  // Shade exactly 4 winning cells containing the last placed piece
+  shadeWinningFour(winningLine, player);
+
   drawWinStrike(winningLine, player);
   drawOutlineRect(minRow, maxRow, minCol, maxCol, player);
 }
 
-/* ------------ Controls: Reset + Change Mode ------------ */
+/* NEW: compute and tint the 4 winning cells that include the last move */
+function shadeWinningFour(winningLine, player) {
+  // Remove any previous win shading
+  document
+    .querySelectorAll(".cell.win-red, .cell.win-blue")
+    .forEach((el) => {
+      el.classList.remove("win-red", "win-blue");
+    });
+
+  if (!lastMovePosition) return;
+
+  const idx = winningLine.findIndex(
+    (p) => p.row === lastMovePosition.row && p.col === lastMovePosition.col
+  );
+  const n = winningLine.length;
+  if (idx === -1 || n < 4) return;
+
+  const start = Math.min(Math.max(idx - 3, 0), n - 4);
+  const segment = winningLine.slice(start, start + 4);
+
+  for (const { row, col } of segment) {
+    const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+    if (cell) cell.classList.add(player === PLAYER.RED ? "win-red" : "win-blue");
+  }
+}
+
+/* ------------ Controls, keyboard, modals, exports ------------ */
 function ensureControlsUI() {
   const controls = document.querySelector(".controls");
   if (!controls) return;
