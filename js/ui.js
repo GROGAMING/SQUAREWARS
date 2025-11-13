@@ -335,16 +335,34 @@ export function drawOutlineRect(minRow, maxRow, minCol, maxCol, player) {
   if (!layer) return;
   const svg = ensureBoxesSvg();
 
-  const x = px(GRID_PADDING + minCol * (CELL + GAP) - BORDER_WIDTH - 3);
-  const y = px(GRID_PADDING + minRow * (CELL + GAP) - BORDER_WIDTH - 3);
-  const w = px((maxCol - minCol + 1) * (CELL + GAP) - GAP + BORDER_WIDTH + 6);
-  const h = px((maxRow - minRow + 1) * (CELL + GAP) - GAP + BORDER_WIDTH + 6);
+  // Scaled values from CSS custom properties (already include --scale)
+  const root = getComputedStyle(document.documentElement);
+  const pad = parseFloat(root.getPropertyValue("--grid-pad")) || 0;
+  const border = parseFloat(root.getPropertyValue("--border")) || 0;
+  const cell = parseFloat(root.getPropertyValue("--cell")) || 20 * getScale();
+  const gap = parseFloat(root.getPropertyValue("--gap")) || 2 * getScale();
+
+  const colsSpan = maxCol - minCol + 1;
+  const rowsSpan = maxRow - minRow + 1;
+
+  // Base box (outer edge of the cells span)
+  const xBase = border + pad + minCol * (cell + gap);
+  const yBase = border + pad + minRow * (cell + gap);
+  const wBase = colsSpan * cell + (colsSpan - 1) * gap;
+  const hBase = rowsSpan * cell + (rowsSpan - 1) * gap;
+
+  // Stroke kept inside the cell bounds (avoid visual overhang)
+  const strokeWidth = Math.max(1, Math.round(getScale() * 2));
+  const x = xBase + strokeWidth / 2;
+  const y = yBase + strokeWidth / 2;
+  const w = wBase - strokeWidth;
+  const h = hBase - strokeWidth;
 
   const rect = document.createElementNS(svg.namespaceURI, "rect");
-  rect.setAttribute("x", x);
-  rect.setAttribute("y", y);
-  rect.setAttribute("width", w);
-  rect.setAttribute("height", h);
+  rect.setAttribute("x", Math.round(x));
+  rect.setAttribute("y", Math.round(y));
+  rect.setAttribute("width", Math.round(w));
+  rect.setAttribute("height", Math.round(h));
   rect.setAttribute(
     "fill",
     player === PLAYER.RED ? "url(#hatch-red)" : "url(#hatch-blue)"
@@ -357,12 +375,11 @@ export function drawOutlineRect(minRow, maxRow, minCol, maxCol, player) {
     "stroke",
     player === PLAYER.RED ? "rgba(255,107,107,.9)" : "rgba(77,171,247,.9)"
   );
-  rect.setAttribute("stroke-width", "3");
-  rect.setAttribute("rx", "8");
-  rect.setAttribute("ry", "8");
+  rect.setAttribute("stroke-width", String(strokeWidth));
+  rect.setAttribute("rx", Math.round(4 * getScale()));
+  rect.setAttribute("ry", Math.round(4 * getScale()));
 
-  const group = svg.querySelector("#boxesGroup");
-  group.appendChild(rect);
+  svg.querySelector("#boxesGroup").appendChild(rect);
 }
 
 export function drawWinStrike(winningLine, player) {
