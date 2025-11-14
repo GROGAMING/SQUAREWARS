@@ -335,32 +335,61 @@ export function drawOutlineRect(minRow, maxRow, minCol, maxCol, player) {
   if (!layer) return;
   const svg = ensureBoxesSvg();
 
-  // Scaled CSS variable values (already include global scale)
-  const cs = getComputedStyle(document.documentElement);
-  const pad = parseFloat(cs.getPropertyValue("--grid-pad")) || 0;
-  const border = parseFloat(cs.getPropertyValue("--border")) || 0;
-  const cell = parseFloat(cs.getPropertyValue("--cell")) || 20 * getScale();
-  const gap = parseFloat(cs.getPropertyValue("--gap")) || 2 * getScale();
+  // Prefer exact DOM geometry so we match the rendered, scaled grid precisely.
+  const firstCell = document.querySelector(
+    `[data-row="${minRow}"][data-col="${minCol}"]`
+  );
+  const lastCell = document.querySelector(
+    `[data-row="${maxRow}"][data-col="${maxCol}"]`
+  );
 
-  const colsSpan = maxCol - minCol + 1;
-  const rowsSpan = maxRow - minRow + 1;
+  let xBase, yBase, wBase, hBase;
 
-  // Exact top-left aligned to first winning cell outer edge
-  const x = border + pad + minCol * (cell + gap);
-  const y = border + pad + minRow * (cell + gap);
+  if (firstCell && lastCell) {
+    const layerRect = layer.getBoundingClientRect();
+    const a = firstCell.getBoundingClientRect();
+    const b = lastCell.getBoundingClientRect();
 
-  // Width/height spanning only the winning cells area
-  const w = colsSpan * (cell + gap) - gap;
-  const h = rowsSpan * (cell + gap) - gap;
+    // Outer bounds of the selected block of cells
+    const left = a.left - layerRect.left;
+    const top = a.top - layerRect.top;
+    const right = b.right - layerRect.left;
+    const bottom = b.bottom - layerRect.top;
 
-  // Stroke kept thin so it visually sits on grid lines (no inward offset)
+    xBase = left;
+    yBase = top;
+    wBase = right - left;
+    hBase = bottom - top;
+  } else {
+    // Fallback to CSS-var math (should rarely be needed)
+    const root = getComputedStyle(document.documentElement);
+    const pad = parseFloat(root.getPropertyValue("--grid-pad")) || 0;
+    const border = parseFloat(root.getPropertyValue("--border")) || 0;
+    const cell = parseFloat(root.getPropertyValue("--cell")) || 20 * getScale();
+    const gap = parseFloat(root.getPropertyValue("--gap")) || 2 * getScale();
+
+    const colsSpan = maxCol - minCol + 1;
+    const rowsSpan = maxRow - minRow + 1;
+
+    xBase = border + pad + minCol * (cell + gap);
+    yBase = border + pad + minRow * (cell + gap);
+    wBase = colsSpan * cell + (colsSpan - 1) * gap;
+    hBase = rowsSpan * cell + (rowsSpan - 1) * gap;
+  }
+
+  // Keep stroke fully inside the cell bounds to avoid overlap onto neighbors.
   const strokeWidth = Math.max(1, Math.round(getScale() * 2));
+  const x = xBase + strokeWidth / 2;
+  const y = yBase + strokeWidth / 2;
+  const w = Math.max(0, wBase - strokeWidth);
+  const h = Math.max(0, hBase - strokeWidth);
 
   const rect = document.createElementNS(svg.namespaceURI, "rect");
-  rect.setAttribute("x", String(Math.round(x)));
-  rect.setAttribute("y", String(Math.round(y)));
-  rect.setAttribute("width", String(Math.round(w)));
-  rect.setAttribute("height", String(Math.round(h)));
+  // Use subpixel values to avoid rounding drift; no Math.round here.
+  rect.setAttribute("x", String(x));
+  rect.setAttribute("y", String(y));
+  rect.setAttribute("width", String(w));
+  rect.setAttribute("height", String(h));
   rect.setAttribute(
     "fill",
     player === PLAYER.RED ? "url(#hatch-red)" : "url(#hatch-blue)"
@@ -374,8 +403,8 @@ export function drawOutlineRect(minRow, maxRow, minCol, maxCol, player) {
     player === PLAYER.RED ? "rgba(255,107,107,.9)" : "rgba(77,171,247,.9)"
   );
   rect.setAttribute("stroke-width", String(strokeWidth));
-  rect.setAttribute("rx", String(Math.max(0, 4 * getScale())));
-  rect.setAttribute("ry", String(Math.max(0, 4 * getScale())));
+  rect.setAttribute("rx", Math.max(0, 4 * getScale()));
+  rect.setAttribute("ry", Math.max(0, 4 * getScale()));
 
   svg.querySelector("#boxesGroup").appendChild(rect);
 }
