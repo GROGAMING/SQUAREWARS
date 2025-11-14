@@ -55,13 +55,6 @@ const TAP_SLOP_PX = 8; // movement threshold in CSS px
 let suppressNextClick = false;
 let touchTrack = { active: false, id: null, startX: 0, startY: 0, moved: false };
 
-// --- NEW: persistent listener refs so we can remove them between inits ---
-let onGridClick = null;
-let onGridTouchStart = null;
-let onGridTouchMove = null;
-let onGridTouchEnd = null;
-let onGridTouchCancel = null;
-
 /* ------------ Scale helpers ------------ */
 function px(n) {
   return Math.round(n * getScale());
@@ -246,82 +239,91 @@ function initGame() {
     gameGrid.ontouchend = null;
     gameGrid.ontouchcancel = null;
 
-    // NEW: remove previously attached event listeners to prevent duplicates
-    if (onGridClick) gameGrid.removeEventListener("click", onGridClick);
-    if (onGridTouchStart) gameGrid.removeEventListener("touchstart", onGridTouchStart);
-    if (onGridTouchMove) gameGrid.removeEventListener("touchmove", onGridTouchMove);
-    if (onGridTouchEnd) gameGrid.removeEventListener("touchend", onGridTouchEnd);
-    if (onGridTouchCancel) gameGrid.removeEventListener("touchcancel", onGridTouchCancel);
-
     // Keep desktop click behavior; suppress synthetic click after a handled tap
-    onGridClick = (e) => {
+    gameGrid.addEventListener("click", (e) => {
       if (suppressNextClick) {
         suppressNextClick = false;
         return;
       }
       handlePick(e.clientX);
-    };
-    gameGrid.addEventListener("click", onGridClick);
+    });
 
-    // Tap detection with movement threshold; do not block scrolling
-    onGridTouchStart = (e) => {
-      if (e.touches.length !== 1) {
-        touchTrack.active = false;
-        return;
-      }
-      const t = e.touches[0];
-      touchTrack.active = true;
-      touchTrack.id = t.identifier;
-      touchTrack.startX = t.clientX;
-      touchTrack.startY = t.clientY;
-      touchTrack.moved = false;
-    };
-    gameGrid.addEventListener("touchstart", onGridTouchStart, { passive: true });
-
-    onGridTouchMove = (e) => {
-      if (!touchTrack.active) return;
-      if (e.touches.length !== 1) {
-        touchTrack.moved = true;
-        return;
-      }
-      const t = e.touches[0];
-      const dx = t.clientX - touchTrack.startX;
-      const dy = t.clientY - touchTrack.startY;
-      if (dx * dx + dy * dy > TAP_SLOP_PX * TAP_SLOP_PX) {
-        touchTrack.moved = true;
-      }
-    };
-    gameGrid.addEventListener("touchmove", onGridTouchMove, { passive: true });
-
-    onGridTouchEnd = (e) => {
-      if (!touchTrack.active) return;
-      let t = null;
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        if e.changedTouches[i].identifier === touchTrack.id) {
-          t = e.changedTouches[i];
-          break;
+    // NEW: Tap detection with movement threshold; do not block scrolling
+    gameGrid.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.touches.length !== 1) {
+          touchTrack.active = false;
+          return;
         }
-      }
-      if (!t && e.changedTouches.length) t = e.changedTouches[0];
+        const t = e.touches[0];
+        touchTrack.active = true;
+        touchTrack.id = t.identifier;
+        touchTrack.startX = t.clientX;
+        touchTrack.startY = t.clientY;
+        touchTrack.moved = false;
+      },
+      { passive: true }
+    );
 
-      const wasCleanTap = t && !touchTrack.moved;
-      touchTrack.active = false;
-      touchTrack.id = null;
+    gameGrid.addEventListener(
+      "touchmove",
+      (e) => {
+        if (!touchTrack.active) return;
+        // if multiple fingers appear, treat as not-a-tap
+        if (e.touches.length !== 1) {
+          touchTrack.moved = true;
+          return;
+        }
+        const t = e.touches[0];
+        const dx = t.clientX - touchTrack.startX;
+        const dy = t.clientY - touchTrack.startY;
+        if (dx * dx + dy * dy > TAP_SLOP_PX * TAP_SLOP_PX) {
+          touchTrack.moved = true;
+        }
+      },
+      { passive: true }
+    );
 
-      if (wasCleanTap) {
-        handlePick(t.clientX);
-        suppressNextClick = true;
-        setTimeout(() => (suppressNextClick = false), 400);
-      }
-    };
-    gameGrid.addEventListener("touchend", onGridTouchEnd, { passive: true });
+    gameGrid.addEventListener(
+      "touchend",
+      (e) => {
+        if (!touchTrack.active) return;
+        // find the touch that ended that matches our tracked id
+        let t = null;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === touchTrack.id) {
+            t = e.changedTouches[i];
+            break;
+          }
+        }
+        // fallback to first changed touch if id not found
+        if (!t && e.changedTouches.length) t = e.changedTouches[0];
 
-    onGridTouchCancel = () => {
-      touchTrack.active = false;
-      touchTrack.id = null;
-      touchTrack.moved = false;
-    };
-    gameGrid.addEventListener("touchcancel", onGridTouchCancel, { passive: true });
+        const wasCleanTap = t && !touchTrack.moved;
+        // reset tracking before potentially placing a piece
+        touchTrack.active = false;
+        touchTrack.id = null;
+
+        if (wasCleanTap) {
+          handlePick(t.clientX);
+          // prevent the following synthetic click from triggering another move
+          suppressNextClick = true;
+          setTimeout(() => (suppressNextClick = false), 400);
+        }
+      },
+      { passive: true }
+    );
+
+    gameGrid.addEventListener(
+      "touchcancel",
+      () => {
+        touchTrack.active = false;
+        touchTrack.id = null;
+        touchTrack.moved = false;
+      },
+      { passive: true }
+    );
   }
 
   ensureControlsUI();
