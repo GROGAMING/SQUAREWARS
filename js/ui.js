@@ -364,47 +364,24 @@ export function drawOutlineRect(minRow, maxRow, minCol, maxCol, player) {
   if (!layer) return;
   const svg = ensureBoxesSvg();
 
-  // Prefer exact DOM geometry so we match the rendered, scaled grid precisely.
-  const firstCell = document.querySelector(
-    `[data-row="${minRow}"][data-col="${minCol}"]`
-  );
-  const lastCell = document.querySelector(
-    `[data-row="${maxRow}"][data-col="${maxCol}"]`
-  );
+  // Compute geometry directly from the canvas metrics and its offset
+  const canvas = document.getElementById("boardCanvas") || ensureCanvas();
+  const layerRect = layer.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
+  const offsetX = canvasRect.left - layerRect.left;
+  const offsetY = canvasRect.top - layerRect.top;
 
-  let xBase, yBase, wBase, hBase;
+  const rows = (cachedGrid && cachedGrid.length) || 20;
+  const cols = (cachedGrid && cachedGrid[0] && cachedGrid[0].length) || 30;
+  const { cell, gap, step } = computeCanvasMetrics(rows, cols);
 
-  if (firstCell && lastCell) {
-    const layerRect = layer.getBoundingClientRect();
-    const a = firstCell.getBoundingClientRect();
-    const b = lastCell.getBoundingClientRect();
+  const colsSpan = maxCol - minCol + 1;
+  const rowsSpan = maxRow - minRow + 1;
 
-    // Outer bounds of the selected block of cells
-    const left = a.left - layerRect.left;
-    const top = a.top - layerRect.top;
-    const right = b.right - layerRect.left;
-    const bottom = b.bottom - layerRect.top;
-
-    xBase = left;
-    yBase = top;
-    wBase = right - left;
-    hBase = bottom - top;
-  } else {
-    // Fallback to CSS-var math (should rarely be needed)
-    const root = getComputedStyle(document.documentElement);
-    const pad = parseFloat(root.getPropertyValue("--grid-pad")) || 0;
-    const border = parseFloat(root.getPropertyValue("--border")) || 0;
-    const cell = parseFloat(root.getPropertyValue("--cell")) || 20 * getScale();
-    const gap = parseFloat(root.getPropertyValue("--gap")) || 2 * getScale();
-
-    const colsSpan = maxCol - minCol + 1;
-    const rowsSpan = maxRow - minRow + 1;
-
-    xBase = border + pad + minCol * (cell + gap);
-    yBase = border + pad + minRow * (cell + gap);
-    wBase = colsSpan * cell + (colsSpan - 1) * gap;
-    hBase = rowsSpan * cell + (rowsSpan - 1) * gap;
-  }
+  const xBase = offsetX + minCol * step;
+  const yBase = offsetY + minRow * step;
+  const wBase = colsSpan * cell + (colsSpan - 1) * gap;
+  const hBase = rowsSpan * cell + (rowsSpan - 1) * gap;
 
   // Keep stroke fully inside the cell bounds to avoid overlap onto neighbors.
   const strokeWidth = Math.max(1, Math.round(getScale() * 2));
