@@ -54,10 +54,132 @@ export function applyResponsiveScale() {
       );
     }
   }
+
+  if (typeof redrawFromCache === "function") redrawFromCache();
 }
 
 function px(n) {
   return Math.round(n * SCALE);
+}
+
+let boardCanvas = null;
+let boardCtx = null;
+let cachedGrid = null;
+let cachedBlocked = null;
+let cachedLastMove = null;
+
+function ensureCanvas() {
+  if (!boardCanvas) {
+    boardCanvas = document.createElement("canvas");
+    boardCanvas.id = "boardCanvas";
+    boardCanvas.style.display = "block";
+  }
+  const host = document.getElementById(UI_IDS.gameGrid);
+  if (host && boardCanvas.parentElement !== host) host.appendChild(boardCanvas);
+  if (!boardCtx) boardCtx = boardCanvas.getContext("2d");
+  return boardCanvas;
+}
+
+function computeCanvasMetrics(rows, cols) {
+  const s = getScale();
+  const cell = CELL * s;
+  const gap = GAP * s;
+  const step = cell + gap;
+  const width = cols * step - gap;
+  const height = rows * step - gap;
+  return { cell, gap, step, width, height };
+}
+
+function drawBoardFromState(grid, blockedCells, lastMove) {
+  const rows = grid?.length || 20;
+  const cols = grid?.[0]?.length || 30;
+  const c = ensureCanvas();
+  const ctx = boardCtx;
+  const { cell, gap, step, width, height } = computeCanvasMetrics(rows, cols);
+
+  if (c.width !== Math.ceil(width) || c.height !== Math.ceil(height)) {
+    c.width = Math.ceil(width);
+    c.height = Math.ceil(height);
+    c.style.width = c.width + "px";
+    c.style.height = c.height + "px";
+  }
+
+  ctx.clearRect(0, 0, width, height);
+
+  const baseA = "#f8f9fa";
+  const baseB = "#e9ecef";
+  const redA = getComputedStyle(document.documentElement).getPropertyValue("--p1").trim() || "#ff6b6b";
+  const redB = "#ff5252";
+  const blueA = getComputedStyle(document.documentElement).getPropertyValue("--p2").trim() || "#4dabf7";
+  const blueB = "#2796f3";
+  const borderCol = "rgba(255,255,255,0.35)";
+  const hl = getComputedStyle(document.documentElement).getPropertyValue("--highlight").trim() || "#ffd166";
+
+  let hatchPattern = null;
+  (function () {
+    const p = document.createElement("canvas");
+    p.width = 8;
+    p.height = 8;
+    const pctx = p.getContext("2d");
+    pctx.fillStyle = "rgba(0,0,0,0.06)";
+    pctx.fillRect(0, 0, 8, 8);
+    pctx.strokeStyle = "rgba(255,255,255,0.12)";
+    pctx.lineWidth = 2;
+    pctx.beginPath();
+    pctx.moveTo(-2, 8);
+    pctx.lineTo(8, -2);
+    pctx.stroke();
+    hatchPattern = ctx.createPattern(p, "repeat");
+  })();
+
+  for (let r = 0; r < rows; r++) {
+    const y = r * step;
+    for (let col = 0; col < cols; col++) {
+      const x = col * step;
+      const val = grid ? grid[r][col] : 0;
+
+      let g;
+      if (val === 1) {
+        g = ctx.createLinearGradient(x, y, x + cell, y + cell);
+        g.addColorStop(0, redA);
+        g.addColorStop(1, redB);
+      } else if (val === 2) {
+        g = ctx.createLinearGradient(x, y, x + cell, y + cell);
+        g.addColorStop(0, blueA);
+        g.addColorStop(1, blueB);
+      } else {
+        g = ctx.createLinearGradient(x, y, x + cell, y + cell);
+        g.addColorStop(0, baseA);
+        g.addColorStop(1, baseB);
+      }
+
+      ctx.fillStyle = g;
+      ctx.fillRect(x, y, cell, cell);
+      ctx.strokeStyle = borderCol;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + 0.5, y + 0.5, cell - 1, cell - 1);
+
+      const key = r + "-" + col;
+      if (blockedCells && blockedCells.has && blockedCells.has(key)) {
+        ctx.fillStyle = hatchPattern;
+        ctx.fillRect(x, y, cell, cell);
+      }
+    }
+  }
+
+  if (lastMove && (!blockedCells || !blockedCells.has(`${lastMove.row}-${lastMove.col}`))) {
+    const x = lastMove.col * step;
+    const y = lastMove.row * step;
+    ctx.lineWidth = Math.max(2, Math.round(getScale() * 3));
+    ctx.strokeStyle = hl;
+    ctx.strokeRect(x + 1, y + 1, cell - 2, cell - 2);
+  }
+}
+
+function redrawFromCache() {
+  if (boardCanvas && cachedGrid) {
+    drawBoardFromState(cachedGrid, cachedBlocked || new Set(), cachedLastMove || null);
+  }
 }
 
 /** Track which move is the real "last move" to avoid race conditions */
@@ -119,19 +241,14 @@ export function updateDisplay(
 export function buildGrid(rows, cols, onColumnClick) {
   const gameGrid = document.getElementById(UI_IDS.gameGrid);
   gameGrid.innerHTML = "";
-
-  const frag = document.createDocumentFragment();
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const cell = document.createElement("div");
-      cell.className = "cell";
-      cell.dataset.row = r;
-      cell.dataset.col = c;
-      frag.appendChild(cell);
-    }
-  }
-  gameGrid.appendChild(frag);
-
+  const c = ensureCanvas();
+  const { width, height } = computeCanvasMetrics(rows, cols);
+  c.width = width;
+  c.height = height;
+  c.style.width = width + "px";
+  c.style.height = height + "px";
+  const empty = Array.from({ length: rows }, () => Array(cols).fill(0));
+  drawBoardFromState(empty, new Set(), null);
   ensureBoxesSvg();
 }
 
@@ -147,71 +264,10 @@ export function updateCellDisplay(
   token
 ) {
   uiLastMoveToken = token;
-
-  document.querySelectorAll(".cell.last-move").forEach((el) => {
-    el.classList.remove(CSS.LAST_MOVE);
-    el.style.border = "";
-  });
-
-  const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-  if (!cell) return;
-
-  const player = grid[row][col];
-  cell.className = "cell";
-  cell.dataset.ghost = "1";
-
-  const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
-  const cellRect = cell.getBoundingClientRect();
-  const layerRect = outlineLayer.getBoundingClientRect();
-
-  const left = cellRect.left - layerRect.left;
-  const top = cellRect.top - layerRect.top;
-
-  // Compute fall distance from the grid content top (accounts for border+padding)
-  const gridEl = document.getElementById(UI_IDS.gameGrid);
-  const gridRect = gridEl.getBoundingClientRect();
-  const cs = getComputedStyle(gridEl);
-  const borderTop = parseFloat(cs.borderTopWidth) || 0;
-  const padTop = parseFloat(cs.paddingTop) || 0;
-  const contentTop = gridRect.top + borderTop + padTop;
-  const stepPx = Math.round((CELL + GAP) * getScale());
-  const dropDistance = Math.max(0, Math.round(cellRect.top - contentTop));
-  const dropY = Math.max(dropDistance, stepPx); // ensure visible drop even for row 0
-
-  const ghost = document.createElement("div");
-  ghost.className = `chip-ghost ${
-    player === PLAYER.RED ? "red" : "blue"
-  } drop-in`;
-  ghost.style.left = `${Math.round(left)}px`;
-  ghost.style.top = `${Math.round(top)}px`;
-  ghost.style.setProperty("--drop-y", `${dropY}px`);
-  outlineLayer.appendChild(ghost);
-
-  const finish = () => {
-    ghost.remove();
-    delete cell.dataset.ghost;
-
-    if (grid[row][col] === PLAYER.RED) cell.className = "cell red";
-    else if (grid[row][col] === PLAYER.BLUE) cell.className = "cell blue";
-    else cell.className = "cell";
-
-    const key = `${row}-${col}`;
-    const isBlocked = blockedCells.has(key);
-    if (isBlocked) {
-      cell.classList.add("blocked");
-      cell.style.border = "1px solid rgba(255,255,255,.4)";
-    } else {
-      cell.classList.remove("blocked");
-      if (token === uiLastMoveToken) {
-        document
-          .querySelectorAll(".cell.last-move")
-          .forEach((el) => el.classList.remove(CSS.LAST_MOVE));
-        cell.classList.add(CSS.LAST_MOVE);
-      }
-    }
-  };
-
-  ghost.addEventListener("animationend", finish, { once: true });
+  cachedGrid = grid;
+  cachedBlocked = blockedCells;
+  cachedLastMove = _prevLastMove;
+  drawBoardFromState(grid, blockedCells, _prevLastMove);
 }
 
 /** Update every cell */
@@ -222,37 +278,10 @@ export function updateAllCellDisplays(
   rows,
   cols
 ) {
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-      if (!cell) continue;
-
-      if (cell.dataset.ghost === "1") {
-        cell.className = "cell";
-        continue;
-      }
-
-      cell.classList.remove(CSS.LAST_MOVE);
-
-      if (grid[r][c] === PLAYER.RED) cell.className = "cell red";
-      else if (grid[r][c] === PLAYER.BLUE) cell.className = "cell blue";
-      else cell.className = "cell";
-
-      const key = `${r}-${c}`;
-      if (blockedCells.has(key)) cell.classList.add("blocked");
-      else cell.classList.remove("blocked");
-    }
-  }
-
-  if (
-    lastMovePosition &&
-    !blockedCells.has(`${lastMovePosition.row}-${lastMovePosition.col}`)
-  ) {
-    const last = document.querySelector(
-      `[data-row="${lastMovePosition.row}"][data-col="${lastMovePosition.col}"]`
-    );
-    if (last && last.dataset.ghost !== "1") last.classList.add(CSS.LAST_MOVE);
-  }
+  cachedGrid = grid;
+  cachedBlocked = blockedCells;
+  cachedLastMove = lastMovePosition;
+  drawBoardFromState(grid, blockedCells, lastMovePosition);
 }
 
 /* ---------- Single SVG overlay for boxes ---------- */
