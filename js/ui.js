@@ -29,10 +29,23 @@ export function applyResponsiveScale() {
 
   const vw = Math.max(
     320,
-    window.innerWidth || document.documentElement.clientWidth || 360
+    (window.visualViewport && window.visualViewport.width) ||
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      360
   );
-  const pagePadding = 24;
-  SCALE = Math.min(1, (vw - pagePadding) / intrinsicW);
+  const vh = Math.max(
+    320,
+    (window.visualViewport && window.visualViewport.height) ||
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      480
+  );
+  const pagePaddingX = 24;
+  const pagePaddingY = 24;
+  const wScale = (vw - pagePaddingX) / intrinsicW;
+  const hScale = (vh - pagePaddingY) / intrinsicH;
+  SCALE = Math.min(1, Math.max(0, Math.min(wScale, hScale)));
 
   const root = document.documentElement;
   root.style.setProperty("--scale", String(SCALE));
