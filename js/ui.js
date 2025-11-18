@@ -44,7 +44,21 @@ export function applyResponsiveScale() {
   const pagePaddingX = 24;
   const pagePaddingY = 24;
   const wScale = (vw - pagePaddingX) / intrinsicW;
-  const hScale = (vh - pagePaddingY) / intrinsicH;
+  const titleEl = document.getElementById(UI_IDS.gameTitle);
+  const infoEl = document.querySelector(".game-info");
+  const controlsEl = document.querySelector(".controls");
+  const tRect = titleEl ? titleEl.getBoundingClientRect() : { height: 0 };
+  const iRect = infoEl ? infoEl.getBoundingClientRect() : { height: 0 };
+  const cRect = controlsEl ? controlsEl.getBoundingClientRect() : { height: 0 };
+  const tCS = titleEl ? getComputedStyle(titleEl) : null;
+  const iCS = infoEl ? getComputedStyle(infoEl) : null;
+  const cCS = controlsEl ? getComputedStyle(controlsEl) : null;
+  const tH = tRect.height + (tCS ? (parseFloat(tCS.marginTop) || 0) + (parseFloat(tCS.marginBottom) || 0) : 0);
+  const iH = iRect.height + (iCS ? (parseFloat(iCS.marginTop) || 0) + (parseFloat(iCS.marginBottom) || 0) : 0);
+  const cH = cRect.height + (cCS ? (parseFloat(cCS.marginTop) || 0) + (parseFloat(cCS.marginBottom) || 0) : 0);
+  const reservedY = tH + iH + cH;
+  const availableH = Math.max(0, vh - pagePaddingY - reservedY);
+  const hScale = availableH / intrinsicH;
   SCALE = Math.min(1, Math.max(0, Math.min(wScale, hScale)));
 
   const root = document.documentElement;
