@@ -55,6 +55,9 @@ const TAP_SLOP_PX = 8; // movement threshold in CSS px
 let suppressNextClick = false;
 let touchTrack = { active: false, id: null, startX: 0, startY: 0, moved: false };
 
+let inputHandlersBound = false;
+let inputHandlePick = (clientX) => {};
+
 /* ------------ Scale helpers ------------ */
 function px(n) {
   return Math.round(n * getScale());
@@ -225,13 +228,13 @@ function initGame() {
 
   // Scale-aware click/touch handlers
   const gameGrid = document.getElementById(UI_IDS.gameGrid);
-  const handlePick = (clientX) => {
+  inputHandlePick = (clientX) => {
     const col = colFromClient(clientX);
     if (!gameActive) return;
     if (gameMode === GAME_MODES.SINGLE && currentPlayer !== PLAYER.RED) return;
     dropPiece(col);
   };
-  if (gameGrid) {
+  if (gameGrid && !inputHandlersBound) {
     // remove previous direct handlers (if any)
     gameGrid.onclick = null;
     gameGrid.ontouchstart = null;
@@ -245,7 +248,7 @@ function initGame() {
         suppressNextClick = false;
         return;
       }
-      handlePick(e.clientX);
+      inputHandlePick(e.clientX);
     });
 
     // NEW: Tap detection with movement threshold; do not block scrolling
@@ -306,7 +309,7 @@ function initGame() {
         touchTrack.id = null;
 
         if (wasCleanTap) {
-          handlePick(t.clientX);
+          inputHandlePick(t.clientX);
           // prevent the following synthetic click from triggering another move
           suppressNextClick = true;
           setTimeout(() => (suppressNextClick = false), 400);
@@ -324,6 +327,8 @@ function initGame() {
       },
       { passive: true }
     );
+
+    inputHandlersBound = true;
   }
 
   ensureControlsUI();
