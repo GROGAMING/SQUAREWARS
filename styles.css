@@ -529,8 +529,8 @@ button:active {
 /* --- existing styles remain --- */
 /* Quick Fire button look */
 .modal button.quickfire-mode {
-  background: linear-gradient(145deg, #ff9f1c, #ff7a00);
-  box-shadow: 0 8px 24px rgba(255, 159, 28, 0.35);
+  background: linear-gradient(145deg, #ffe259, #ffc107);
+  box-shadow: 0 8px 24px rgba(255, 226, 89, 0.35);
 }
 
 /* Quick Fire dedicated modal layout */
