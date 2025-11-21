@@ -1,3 +1,49 @@
+// AI wrapper delegating to Web Worker. Original search/eval logic moved to aiWorker.js.
+// Public API: chooseComputerMove(args) -> Promise<number>
+// NOTE: Game code must handle asynchronous result; search logic untouched in worker.
+
+let aiWorker = null;
+let nextId = 1;
+const pending = new Map();
+
+function ensureWorker() {
+  if (!aiWorker) {
+    aiWorker = new Worker("./js/aiWorker.js", { type: "module" });
+    aiWorker.onmessage = (e) => {
+      const { type, id } = e.data || {};
+      if (!id) return;
+      const entry = pending.get(id);
+      if (!entry) return;
+      if (type === "chooseResult") {
+        entry.resolve(e.data.col);
+      } else if (type === "chooseError") {
+        entry.reject(new Error(e.data.error || "AI worker error"));
+      }
+      pending.delete(id);
+    };
+    aiWorker.onerror = (err) => {
+      // Propagate error to all pending promises
+      for (const [id, entry] of pending.entries()) {
+        entry.reject(err.error || new Error("AI worker failure"));
+      }
+      pending.clear();
+    };
+  }
+}
+
+export function chooseComputerMove({ grid, blockedCells, aiDifficulty }) {
+  ensureWorker();
+  return new Promise((resolve, reject) => {
+    const id = nextId++;
+    pending.set(id, { resolve, reject });
+    aiWorker.postMessage({
+      type: "choose",
+      id,
+      args: { grid, blockedCells, aiDifficulty },
+    });
+  });
+}
+
 // File: src/ai.js
 // Square Wars — Connect-4 variant AI (30x20), rules-correct search with section-closing.
 // IMPOSSIBLE hardened: zero-tolerance on handing Red an immediate 4-in-a-row

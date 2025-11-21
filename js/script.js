@@ -396,8 +396,14 @@ function makeComputerMove() {
     gameMode !== GAME_MODES.SINGLE
   )
     return;
-  const col = chooseComputerMove({ grid, blockedCells, aiDifficulty });
-  if (col !== -1) dropPiece(col);
+  // Now asynchronous via Web Worker
+  chooseComputerMove({ grid, blockedCells, aiDifficulty })
+    .then((col) => {
+      if (col !== -1) dropPiece(col);
+    })
+    .catch((err) => {
+      console.error("AI worker error", err);
+    });
 }
 
 /* ------------ Rules & helpers ------------ */
