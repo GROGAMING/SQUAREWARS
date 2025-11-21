@@ -443,10 +443,58 @@ function checkEndOfGame() {
 
 function checkForWin(row, col) {
   const player = grid[row][col];
+  if (!player) return false;
+
+  // Only examine lines passing through the last move.
   for (let [dr, dc] of DIRECTIONS) {
-    const line = getLine(row, col, dr, dc, player);
-    if (line.length >= 4) {
-      boxOffConnectedArea(line, player);
+    // Count contiguous pieces in the negative direction
+    let back = 0;
+    let r = row - dr;
+    let c = col - dc;
+    while (
+      r >= 0 &&
+      r < ROWS &&
+      c >= 0 &&
+      c < COLS &&
+      grid[r][c] === player &&
+      !blockedCells.has(`${r}-${c}`)
+    ) {
+      back++;
+      r -= dr;
+      c -= dc;
+    }
+
+    // Count contiguous pieces in the positive direction
+    let fwd = 0;
+    r = row + dr;
+    c = col + dc;
+    while (
+      r >= 0 &&
+      r < ROWS &&
+      c >= 0 &&
+      c < COLS &&
+      grid[r][c] === player &&
+      !blockedCells.has(`${r}-${c}`)
+    ) {
+      fwd++;
+      r += dr;
+      c += dc;
+    }
+
+    const total = 1 + back + fwd;
+    if (total >= 4) {
+      // Build exactly four contiguous cells that include the last move
+      // Choose a 4-length window within [-back, fwd] that contains 0 (the last move)
+      let k = Math.min(0, fwd - 3);
+      if (k < -back) k = -back;
+
+      const winningLine = [];
+      for (let i = 0; i < 4; i++) {
+        const rr = row + (k + i) * dr;
+        const cc = col + (k + i) * dc;
+        winningLine.push({ row: rr, col: cc });
+      }
+      boxOffConnectedArea(winningLine, player);
       return true;
     }
   }
