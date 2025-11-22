@@ -23,9 +23,9 @@
         </div>
       </div>
     </div>
-    <!-- Mode Select Modal -->
-    <div id="modeSelectModal" class="modal-overlay hidden" aria-hidden="true">
-      <div class="modal">
+    <!-- Mode Select Screen (full-screen) -->
+    <div id="modeSelectModal" class="menu-screen hidden" aria-hidden="true">
+      <div class="menu-wrap">
         <h2>Choose Game Mode</h2>
         <p>Select how you want to play SQUARE WARS:</p>
         <button class="single-player" onclick="setGameMode('single')">
@@ -37,13 +37,9 @@
       </div>
     </div>
 
-    <!-- Scoring Select Modal -->
-    <div
-      id="scoringSelectModal"
-      class="modal-overlay hidden"
-      aria-hidden="true"
-    >
-      <div class="modal">
+    <!-- Scoring Select Screen (full-screen) -->
+    <div id="scoringSelectModal" class="menu-screen hidden" aria-hidden="true">
+      <div class="menu-wrap">
         <h2>Choose Scoring Style</h2>
 
         <button class="classic-mode" onclick="setScoringMode('classic')">
@@ -67,13 +63,9 @@
       </div>
     </div>
 
-    <!-- Quick Fire target modal -->
-    <div
-      id="quickfireSelectModal"
-      class="modal-overlay hidden"
-      aria-hidden="true"
-    >
-      <div class="modal">
+    <!-- Quick Fire target Screen (full-screen) -->
+    <div id="quickfireSelectModal" class="menu-screen hidden" aria-hidden="true">
+      <div class="menu-wrap">
         <h2>Quick Fire — Set Win Target</h2>
         <p>Choose how many boxes a player needs to win the match.</p>
 
@@ -102,13 +94,9 @@
       </div>
     </div>
 
-    <!-- Difficulty Select Modal -->
-    <div
-      id="difficultySelectModal"
-      class="modal-overlay hidden"
-      aria-hidden="true"
-    >
-      <div class="modal">
+    <!-- Difficulty Select Screen (full-screen) -->
+    <div id="difficultySelectModal" class="menu-screen hidden" aria-hidden="true">
+      <div class="menu-wrap">
         <h2>Choose Difficulty</h2>
         <p>Select the AI difficulty level:</p>
         <button class="beginner" onclick="setDifficulty('beginner')">
@@ -126,9 +114,9 @@
       </div>
     </div>
 
-    <!-- Instructions Modal -->
-    <div id="instructionsModal" class="modal-overlay hidden" aria-hidden="true">
-      <div class="modal">
+    <!-- Instructions Screen (full-screen) -->
+    <div id="instructionsModal" class="menu-screen hidden" aria-hidden="true">
+      <div class="menu-wrap">
         <h2 id="instructionsTitle">How to Play SQUARE WARS</h2>
         <p id="instructionsBody"></p>
         <button onclick="closeInstructions()">Got it, let's play!</button>
@@ -194,7 +182,7 @@
     <div id="inGameMenuOverlay" class="modal-overlay hidden" aria-hidden="true">
       <div class="modal in-game-menu">
         <h2>Menu</h2>
-        <button onclick="startNewGame()">🔄 Reset Game</button>
+        <button onclick="resetGameAndCloseMenu()">🔄 Reset Game</button>
         <button onclick="openModeSelect()">🛠️ Change Game Mode</button>
         <button onclick="goToMainMenu()">🏠 Main Menu</button>
         <button onclick="closeInGameMenu()">✖ Close</button>

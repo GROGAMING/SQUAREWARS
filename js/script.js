@@ -835,6 +835,20 @@ window.openModeSelect = openModeSelect;
 window.openInGameMenu = openInGameMenu;
 window.closeInGameMenu = closeInGameMenu;
 window.goToMainMenu = goToMainMenu;
+function resetGameAndCloseMenu() {
+  // Use existing reset, then close the in-game overlay.
+  initGame();
+  updateDisplay(
+    currentPlayer,
+    gameMode,
+    aiDifficulty,
+    scoringMode,
+    redGames,
+    blueGames
+  );
+  closeInGameMenu();
+}
+window.resetGameAndCloseMenu = resetGameAndCloseMenu;
 
 // initialize buttons on first load
 ensureControlsUI();
