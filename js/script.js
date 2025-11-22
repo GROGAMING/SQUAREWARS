@@ -85,6 +85,7 @@ function navigateTo(id) {
   const current = menuStack[menuStack.length - 1];
   if (current === id) return;
   if (current) setScreenVisibility(current, false);
+  hideGameScreen();
   setScreenVisibility(id, true);
   menuStack.push(id);
 }
@@ -769,6 +770,7 @@ function hideMainMenu() {
 function showMainMenu() {
   const m = document.getElementById("mainMenuScreen");
   if (m) {
+    hideGameScreen();
     m.classList.remove(CSS.HIDDEN);
     m.setAttribute("aria-hidden", "false");
   }
@@ -790,6 +792,7 @@ function closeInGameMenu() {
 function openModeSelect() {
   closeInGameMenu();
   hideMainMenu();
+  hideGameScreen();
   const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
   if (outlineLayer) outlineLayer.innerHTML = "";
   redGames = 0;
@@ -832,6 +835,7 @@ function goToMainMenu() {
       el.setAttribute("aria-hidden", "true");
     }
   }
+  hideGameScreen();
   showMainMenu();
 }
 
@@ -845,6 +849,7 @@ function startGameFromMenu() {
   // Reset stack to root
   menuStack = ['mainMenuScreen'];
   hideMainMenu();
+  showGameScreen();
   initGame();
 }
 
@@ -867,6 +872,22 @@ function openTutorial() {
 function closeTutorial() {
   const wrap = document.querySelector('#mainMenuScreen .menu-wrap');
   if (wrap) wrap.classList.remove('show-tutorial');
+}
+
+// Ensure game screen visibility toggles with menu
+function showGameScreen() {
+  const g = document.getElementById('gameScreen');
+  if (g) {
+    g.classList.remove(CSS.HIDDEN);
+    g.setAttribute('aria-hidden', 'false');
+  }
+}
+function hideGameScreen() {
+  const g = document.getElementById('gameScreen');
+  if (g) {
+    g.classList.add(CSS.HIDDEN);
+    g.setAttribute('aria-hidden', 'true');
+  }
 }
 
 // Expose new UI helpers
