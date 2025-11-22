@@ -3,10 +3,12 @@
 // This file retains the original logic; only a message handler was added at the end.
 
 import { ROWS, COLS, PLAYER, DIRECTIONS, AI as AI_IN } from "./constants.js";
+import { chooseComputerMoveCore } from "./aiCore.js";
 
 /* -------------------------------------------------------------------------- */
 /* Public API (internal to worker)                                            */
 /* -------------------------------------------------------------------------- */
+/*
 
 function chooseComputerMove({ grid, blockedCells, aiDifficulty }) {
   const AI = withDefaults(AI_IN);
@@ -710,7 +712,7 @@ function isHandingImmediateClose(grid, blocked, colAfterOurMove, hashBase = 0) {
   grid[row][colAfterOurMove] = 0;
   return threats.length > 0;
 }
-
+*/
 /* -------------------------------------------------------------------------- */
 /* Worker message handling                                                    */
 /* -------------------------------------------------------------------------- */
@@ -720,7 +722,7 @@ self.onmessage = (e) => {
   if (!data) return;
   if (data.type === "choose") {
     try {
-      const col = chooseComputerMove(data.args);
+      const col = chooseComputerMoveCore(data.args);
       self.postMessage({ type: "chooseResult", id: data.id, col });
     } catch (err) {
       self.postMessage({
