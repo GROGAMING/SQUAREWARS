@@ -6,6 +6,17 @@
   --border: calc(6px * var(--scale));
 }
 
+/* In-game menu mild reductions for small viewport heights */
+@media (max-height: 600px) {
+  .in-game-menu {
+    padding: 18px 14px;
+    border-radius: 14px;
+    max-height: min(88vh, 88svh, 88dvh);
+  }
+  .in-game-menu h2 { margin-bottom: 8px; font-size: clamp(1.05rem, 1.1vw + 0.85rem, 1.35rem); }
+  .in-game-menu button { margin: 6px 0; padding: 10px 14px; min-height: 40px; }
+}
+
 /* Grid outer wrapper to size exact scaled board */
 .grid-outer { width:100%; max-width:100vw; margin:0 auto; position:relative; }
 #gridContainer { position:relative; transform:none !important; }
@@ -173,11 +184,14 @@
   padding-bottom: max(16px, env(safe-area-inset-bottom));
   padding-left: max(16px, env(safe-area-inset-left));
   padding-right: max(16px, env(safe-area-inset-right));
+  overflow-y: hidden; /* prevent overlay scroll; use card internal scroll instead */
 }
 .in-game-menu {
-  width: min(92vw, 460px);
+  width: min(90vw, 600px);
   max-height: min(90vh, 90svh, 90dvh);
   padding: 22px 18px; /* override modal default */
+  overflow-y: auto; /* internal scroll if absolutely necessary */
+  box-sizing: border-box;
 }
 .in-game-menu h2 {
   margin-top: 0;
