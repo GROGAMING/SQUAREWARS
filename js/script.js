@@ -209,6 +209,18 @@ function closeInstructions() {
   closeInstructionsUI(initGame);
 }
 
+/* ------------ Expose for inline HTML (placed early to avoid init-order issues) ------------ */
+window.setGameMode = setGameMode;
+window.setScoringMode = setScoringMode;
+window.setDifficulty = setDifficulty;
+window.startNewGame = () => initGame();
+window.closeInstructions = closeInstructions;
+
+// Quick Fire modal handlers
+window.confirmQuickfire = confirmQuickfire;
+window.backFromQuickfire = backFromQuickfire;
+window.onQuickfireInput = onQuickfireInput;
+
 /* ------------ Game init & grid ------------ */
 function initGame() {
   grid = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
@@ -724,83 +736,93 @@ window.addEventListener("resize", () => {
   }
 });
 
-document
-  .getElementById(UI_IDS.instructionsModal)
-  .addEventListener("click", (e) => {
-    if (e.target === e.currentTarget) closeInstructions();
-  });
+{
+  const el = document.getElementById(UI_IDS.instructionsModal);
+  if (el) {
+    el.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) closeInstructions();
+    });
+  }
+}
 
-document
-  .getElementById(UI_IDS.difficultySelectModal)
-  .addEventListener("click", (e) => {
-    if (e.target === e.currentTarget) {
-      e.currentTarget.classList.add(CSS.HIDDEN);
-      e.currentTarget.setAttribute("aria-hidden", "True");
-    }
-  });
+{
+  const el = document.getElementById(UI_IDS.difficultySelectModal);
+  if (el) {
+    el.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) {
+        e.currentTarget.classList.add(CSS.HIDDEN);
+        e.currentTarget.setAttribute("aria-hidden", "True");
+      }
+    });
+  }
+}
 
-document
-  .getElementById(UI_IDS.scoringSelectModal)
-  .addEventListener("click", (e) => {
-    if (e.target === e.currentTarget) {
-      e.currentTarget.classList.add(CSS.HIDDEN);
-      e.currentTarget.setAttribute("aria-hidden", "True");
-    }
-  });
+{
+  const el = document.getElementById(UI_IDS.scoringSelectModal);
+  if (el) {
+    el.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) {
+        e.currentTarget.classList.add(CSS.HIDDEN);
+        e.currentTarget.setAttribute("aria-hidden", "True");
+      }
+    });
+  }
+}
 
-document
-  .getElementById(UI_IDS.endGameModal)
-  .addEventListener("click", () => {});
+{
+  const el = document.getElementById(UI_IDS.endGameModal);
+  if (el) {
+    el.addEventListener("click", () => {});
+  }
+}
 
-document.getElementById(UI_IDS.tryAgainBtn).addEventListener("click", () => {
-  hideEndGameModal();
-  redGames = 0;
-  blueGames = 0;
-  initGame();
-  updateDisplay(
-    currentPlayer,
-    gameMode,
-    aiDifficulty,
-    scoringMode,
-    redGames,
-    blueGames
-  );
-});
+{
+  const btn = document.getElementById(UI_IDS.tryAgainBtn);
+  if (btn) {
+    btn.addEventListener("click", () => {
+      hideEndGameModal();
+      redGames = 0;
+      blueGames = 0;
+      initGame();
+      updateDisplay(
+        currentPlayer,
+        gameMode,
+        aiDifficulty,
+        scoringMode,
+        redGames,
+        blueGames
+      );
+    });
+  }
+}
 
-document.getElementById(UI_IDS.changeModeBtn).addEventListener("click", () => {
-  hideEndGameModal();
-  const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
-  if (outlineLayer) outlineLayer.innerHTML = "";
-  redGames = 0;
-  blueGames = 0;
-  gameActive = false;
-  gameMode = null;
-  aiDifficulty = null;
-  const modeModal = document.getElementById(UI_IDS.modeSelectModal);
-  modeModal.classList.remove(CSS.HIDDEN);
-  modeModal.setAttribute("aria-hidden", "false");
-  updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
-  updateDisplay(
-    currentPlayer,
-    gameMode,
-    aiDifficulty,
-    scoringMode,
-    redGames,
-    blueGames
-  );
-});
-
-/* ------------ Expose for inline HTML ------------ */
-window.setGameMode = setGameMode;
-window.setScoringMode = setScoringMode;
-window.setDifficulty = setDifficulty;
-window.startNewGame = () => initGame();
-window.closeInstructions = closeInstructions;
-
-// Quick Fire modal handlers
-window.confirmQuickfire = confirmQuickfire;
-window.backFromQuickfire = backFromQuickfire;
-window.onQuickfireInput = onQuickfireInput;
+{
+  const btn = document.getElementById(UI_IDS.changeModeBtn);
+  if (btn) {
+    btn.addEventListener("click", () => {
+      hideEndGameModal();
+      const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
+      if (outlineLayer) outlineLayer.innerHTML = "";
+      redGames = 0;
+      blueGames = 0;
+      gameActive = false;
+      gameMode = null;
+      aiDifficulty = null;
+      const modeModal = document.getElementById(UI_IDS.modeSelectModal);
+      modeModal.classList.remove(CSS.HIDDEN);
+      modeModal.setAttribute("aria-hidden", "false");
+      updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
+      updateDisplay(
+        currentPlayer,
+        gameMode,
+        aiDifficulty,
+        scoringMode,
+        redGames,
+        blueGames
+      );
+    });
+  }
+}
 
 // initialize buttons on first load
 ensureControlsUI();
