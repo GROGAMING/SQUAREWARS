@@ -177,36 +177,48 @@
 
 /* In-game options modal tweaks */
 #inGameMenuOverlay {
-  /* Full viewport with safe area */
-  width: 100vw;
-  height: 100vh;
-  padding-top: max(16px, env(safe-area-inset-top));
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
-  padding-left: max(16px, env(safe-area-inset-left));
-  padding-right: max(16px, env(safe-area-inset-right));
-  overflow-y: hidden; /* prevent overlay scroll; use card internal scroll instead */
+  /* Compact dropdown anchored near top-left */
+  position: fixed; /* override .modal-overlay */
+  top: calc(max(8px, env(safe-area-inset-top)) + 36px); /* below top bar */
+  left: max(8px, env(safe-area-inset-left));
+  width: auto; /* size to panel */
+  height: auto;
+  padding: 0; /* no overlay padding */
+  background: transparent; /* no dim backdrop */
+  backdrop-filter: none;
+  display: block; /* disable flex centering from .modal-overlay */
+  z-index: 1300;
 }
-.in-game-menu {
-  width: min(90vw, 600px);
-  max-height: min(90vh, 90svh, 90dvh);
-  padding: 22px 18px; /* override modal default */
+#inGameMenuOverlay .in-game-menu {
+  /* Floating panel look, consistent with app theme */
+  background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04)); /* override .modal */
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+  border-radius: 12px;
+  width: min(86vw, 340px);
+  max-height: min(80vh, 80svh, 80dvh);
+  padding: 12px 10px;
   overflow-y: auto; /* internal scroll if absolutely necessary */
   box-sizing: border-box;
+  text-align: left;
 }
-.in-game-menu h2 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: clamp(1.2rem, 1.5vw + 0.9rem, 1.6rem);
+#inGameMenuOverlay .in-game-menu h2 {
+  margin: 6px 8px 8px;
+  font-size: clamp(1rem, 1vw + 0.75rem, 1.25rem);
 }
-.in-game-menu button {
+#inGameMenuOverlay .in-game-menu button {
   width: 100%;
-  margin: 8px 0;
-  white-space: normal;
-  line-height: 1.25;
-  min-height: 44px;
-  padding: 12px 16px;
-  font-size: clamp(14px, 1.2vw + 11px, 16px);
   max-width: 100%;
+  min-width: 0; /* override .modal button min-width */
+  display: block;
+  text-align: left;
+  margin: 6px 0;
+  padding: 10px 12px;
+  min-height: 40px;
+  white-space: normal;
+  line-height: 1.2;
+  border-radius: 10px;
+  font-size: clamp(13px, 1vw + 10px, 15px);
 }
 
 /* Tutorial panel inside main menu */
@@ -227,9 +239,9 @@
   .menu-back { padding: 8px 10px; font-size: 14px; }
   /* In-game menu tweaks on small width */
   #inGameMenuOverlay { padding-top: max(12px, env(safe-area-inset-top)); padding-bottom: max(12px, env(safe-area-inset-bottom)); }
-  .in-game-menu { padding: 18px 14px; }
-  .in-game-menu h2 { margin-bottom: 8px; font-size: clamp(1.1rem, 1.5vw + 0.8rem, 1.4rem); }
-  .in-game-menu button { margin: 6px 0; padding: 10px 14px; min-height: 40px; font-size: clamp(13px, 1.2vw + 10px, 15px); }
+  #inGameMenuOverlay .in-game-menu { padding: 10px 8px; width: min(88vw, 320px); }
+  #inGameMenuOverlay .in-game-menu h2 { margin: 4px 6px 6px; font-size: clamp(0.95rem, 1vw + 0.7rem, 1.15rem); }
+  #inGameMenuOverlay .in-game-menu button { margin: 4px 0; padding: 9px 10px; min-height: 36px; font-size: clamp(12px, 1vw + 10px, 14px); }
 }
 
 /* Landscape / small-height optimizations */
@@ -240,9 +252,9 @@
   .menu-screen .menu-wrap > p { margin: 0 0 4px; font-size: clamp(0.85rem, 1vw + 0.55rem, 0.95rem); line-height: 1.28; }
   .menu-screen .menu-wrap > button { padding: 9px 12px; min-height: 38px; line-height: 1.2; }
   /* In-game menu low-height tweaks */
-  .in-game-menu { padding: 14px 12px; max-height: min(86vh, 86svh, 86dvh); }
-  .in-game-menu h2 { margin-bottom: 6px; font-size: clamp(1rem, 1.1vw + 0.8rem, 1.3rem); }
-  .in-game-menu button { margin: 4px 0; padding: 9px 12px; min-height: 36px; font-size: clamp(13px, 1vw + 10px, 14px); }
+  #inGameMenuOverlay .in-game-menu { padding: 10px 8px; max-height: min(78vh, 78svh, 78dvh); }
+  #inGameMenuOverlay .in-game-menu h2 { margin: 4px 6px 6px; font-size: clamp(0.95rem, 0.9vw + 0.7rem, 1.15rem); }
+  #inGameMenuOverlay .in-game-menu button { margin: 4px 0; padding: 8px 10px; min-height: 34px; font-size: clamp(12px, 0.9vw + 10px, 14px); }
 }
 
 @media (orientation: landscape) and (max-height: 420px) {
@@ -255,9 +267,9 @@
   .qf-chooser { grid-template-columns: 70px 1fr; gap: 8px; }
   .qf-bubble { top: -28px; font-size: 14px; padding: 4px 8px; }
   /* In-game menu landscape */
-  .in-game-menu { padding: 12px 12px; border-radius: 16px; }
-  .in-game-menu h2 { margin-bottom: 6px; font-size: clamp(1rem, 1vw + 0.7rem, 1.2rem); }
-  .in-game-menu button { margin: 4px 0; padding: 8px 10px; min-height: 34px; font-size: clamp(12px, 0.9vw + 10px, 14px); }
+  #inGameMenuOverlay .in-game-menu { padding: 8px 8px; border-radius: 10px; }
+  #inGameMenuOverlay .in-game-menu h2 { margin: 4px 6px 4px; font-size: clamp(0.95rem, 0.9vw + 0.65rem, 1.1rem); }
+  #inGameMenuOverlay .in-game-menu button { margin: 3px 0; padding: 8px 9px; min-height: 32px; font-size: clamp(12px, 0.9vw + 10px, 13px); }
 }
 
 @media (orientation: landscape) and (max-height: 360px) {
@@ -266,9 +278,9 @@
   .menu-screen .menu-wrap > h2 { font-size: clamp(0.9rem, 0.8vw + 0.6rem, 1.05rem); }
   .menu-screen .menu-wrap > button { padding: 6px 10px; min-height: 32px; }
   /* In-game menu extreme small-height */
-  .in-game-menu { padding: 10px 10px; }
-  .in-game-menu h2 { font-size: clamp(0.95rem, 0.8vw + 0.65rem, 1.05rem); }
-  .in-game-menu button { padding: 6px 10px; min-height: 32px; }
+  #inGameMenuOverlay .in-game-menu { padding: 6px 6px; }
+  #inGameMenuOverlay .in-game-menu h2 { font-size: clamp(0.9rem, 0.8vw + 0.6rem, 1.0rem); }
+  #inGameMenuOverlay .in-game-menu button { padding: 6px 8px; min-height: 30px; }
 }
 body {
   font-family: "Poppins", sans-serif;
