@@ -57,12 +57,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100vw; /* ensure full width */
+  height: 100vh; /* fallback */
+  min-height: 100dvh; /* handle mobile browser UI */
   background: radial-gradient(120% 120% at 0% 0%, rgba(255,255,255,0.06), rgba(0,0,0,0.15)),
     linear-gradient(135deg, #0e1228, #272e52 60%, #1a2040);
 }
 .menu-wrap {
   text-align: center;
-  padding: 28px;
+  padding: 24px 22px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -70,22 +73,43 @@
   backdrop-filter: blur(6px);
   max-width: min(560px, 92vw);
   width: 100%;
-  max-height: calc(100vh - 48px);
+  max-height: calc(100vh - 32px); /* fallback */
+  max-height: min(92svh, 92dvh, calc(100vh - 32px));
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 12px;
+  gap: 10px;
+  box-sizing: border-box;
 }
 .menu-title {
-  font-size: clamp(1.6rem, 2.5vw + 1rem, 2.2rem);
-  margin: 0 0 18px;
+  font-size: clamp(1.5rem, 2vw + 0.9rem, 2.1rem);
+  margin: 0 0 14px;
   letter-spacing: 2px;
   text-shadow: 0 6px 16px rgba(0,0,0,0.35);
 }
 .menu-actions { display: grid; gap: 12px; }
+.menu-screen .menu-wrap > h2 {
+  margin: 6px 0 6px;
+  font-size: clamp(1.1rem, 1.6vw + 0.8rem, 1.5rem);
+}
+.menu-screen .menu-wrap > p {
+  margin: 0 0 6px;
+  font-size: clamp(0.9rem, 1.2vw + 0.6rem, 1rem);
+  line-height: 1.35;
+}
+.menu-screen .menu-wrap > button {
+  display: block;
+  width: 100%;
+  white-space: normal; /* allow wrapping */
+  line-height: 1.25;
+  padding: 12px 18px;
+  min-height: 42px;
+  border-radius: 12px;
+}
+.menu-screen .menu-wrap > button small { display: block; line-height: 1.2; opacity: 0.95; }
 .menu-primary {
-  padding: 14px 26px;
-  font-size: clamp(15px, 1.2vw + 12px, 18px);
+  padding: 12px 22px;
+  font-size: clamp(14px, 1.2vw + 11px, 18px);
   font-weight: 700;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.18);
@@ -94,8 +118,8 @@
   box-shadow: 0 10px 28px rgba(124, 92, 255, 0.35);
 }
 .menu-secondary {
-  padding: 12px 22px;
-  font-size: clamp(14px, 1vw + 11px, 16px);
+  padding: 10px 18px;
+  font-size: clamp(13px, 1vw + 10px, 16px);
   font-weight: 600;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.14);
@@ -149,7 +173,7 @@
 
 /* Tutorial panel inside main menu */
 .menu-tutorial { display: none; text-align: left; }
-.menu-tutorial h3 { margin: 6px 0 8px; font-size: clamp(1.1rem, 2vw + .6rem, 1.4rem); }
+.menu-tutorial h3 { margin: 4px 0 6px; font-size: clamp(1rem, 1.6vw + .6rem, 1.3rem); }
 .menu-tutorial p { margin: 0; font-size: clamp(13px, .9vw + 10px, 15px); line-height: 1.35; }
 .menu-wrap.show-tutorial .menu-actions { display: none; }
 .menu-wrap.show-tutorial .menu-tutorial { display: block; }
@@ -157,11 +181,39 @@
 
 /* Responsive scaling for menu screens */
 @media (max-width: 600px) {
-  .menu-title { font-size: 1.8rem; }
-  .menu-wrap { padding: 18px; gap: 10px; max-height: calc(100vh - 32px); }
-  .menu-primary { padding: 12px 18px; font-size: 16px; }
-  .menu-secondary { padding: 10px 16px; font-size: 15px; }
+  .menu-title { font-size: 1.6rem; }
+  .menu-wrap { padding: 18px 16px; gap: 8px; max-height: calc(100vh - 24px); }
+  .menu-screen .menu-wrap > button { padding: 10px 14px; min-height: 40px; }
+  .menu-primary { padding: 10px 16px; font-size: 15px; }
+  .menu-secondary { padding: 9px 14px; font-size: 14px; }
   .menu-back { padding: 8px 10px; font-size: 14px; }
+}
+
+/* Landscape / small-height optimizations */
+@media (max-height: 520px) {
+  .menu-wrap { padding: 14px 14px; gap: 8px; max-height: min(90svh, 90dvh, calc(100vh - 20px)); }
+  .menu-title { margin-bottom: 8px; font-size: clamp(1.3rem, 1.4vw + 0.8rem, 1.6rem); }
+  .menu-screen .menu-wrap > h2 { margin: 4px 0 4px; font-size: clamp(1rem, 1.1vw + 0.7rem, 1.3rem); }
+  .menu-screen .menu-wrap > p { margin: 0 0 4px; font-size: clamp(0.85rem, 1vw + 0.55rem, 0.95rem); line-height: 1.28; }
+  .menu-screen .menu-wrap > button { padding: 9px 12px; min-height: 38px; line-height: 1.2; }
+}
+
+@media (orientation: landscape) and (max-height: 420px) {
+  .menu-wrap { padding: 10px 12px; gap: 6px; border-radius: 12px; }
+  .menu-title { margin-bottom: 6px; font-size: clamp(1.1rem, 1vw + 0.7rem, 1.4rem); }
+  .menu-back { padding: 6px 8px; font-size: 13px; margin-bottom: 2px; }
+  .menu-screen .menu-wrap > h2 { margin: 2px 0 2px; font-size: clamp(0.95rem, 0.9vw + 0.65rem, 1.15rem); }
+  .menu-screen .menu-wrap > p { margin: 0 0 2px; font-size: clamp(0.8rem, 0.9vw + 0.5rem, 0.9rem); line-height: 1.22; }
+  .menu-screen .menu-wrap > button { padding: 8px 10px; min-height: 34px; font-size: clamp(12px, 0.9vw + 10px, 14px); }
+  .qf-chooser { grid-template-columns: 70px 1fr; gap: 8px; }
+  .qf-bubble { top: -28px; font-size: 14px; padding: 4px 8px; }
+}
+
+@media (orientation: landscape) and (max-height: 360px) {
+  .menu-wrap { padding: 8px 10px; gap: 6px; }
+  .menu-title { font-size: clamp(1rem, 0.9vw + 0.7rem, 1.25rem); margin-bottom: 4px; }
+  .menu-screen .menu-wrap > h2 { font-size: clamp(0.9rem, 0.8vw + 0.6rem, 1.05rem); }
+  .menu-screen .menu-wrap > button { padding: 6px 10px; min-height: 32px; }
 }
 body {
   font-family: "Poppins", sans-serif;
