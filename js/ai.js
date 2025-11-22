@@ -55,7 +55,7 @@ import { ROWS, COLS, PLAYER, DIRECTIONS, AI as AI_IN } from "./constants.js";
 /* Public API                                                                */
 /* -------------------------------------------------------------------------- */
 
-export function chooseComputerMove({ grid, blockedCells, aiDifficulty }) {
+function chooseComputerMoveLegacy({ grid, blockedCells, aiDifficulty }) {
   const AI = withDefaults(AI_IN);
   const { blockedMask, hashBase } = materializeState(grid, blockedCells);
 
@@ -1306,3 +1306,4 @@ function isHandingImmediateClose(grid, blocked, colAfterOurMove, hashBase = 0) {
   undoMove(grid, blocked, m, hashBase, false);
   return danger;
 }
+
