@@ -26,6 +26,7 @@
     <!-- Mode Select Screen (full-screen) -->
     <div id="modeSelectModal" class="menu-screen hidden" aria-hidden="true">
       <div class="menu-wrap">
+        <button class="menu-back" onclick="menuBack()">← Back</button>
         <h2>Choose Game Mode</h2>
         <p>Select how you want to play SQUARE WARS:</p>
         <button class="single-player" onclick="setGameMode('single')">
@@ -40,6 +41,7 @@
     <!-- Scoring Select Screen (full-screen) -->
     <div id="scoringSelectModal" class="menu-screen hidden" aria-hidden="true">
       <div class="menu-wrap">
+        <button class="menu-back" onclick="menuBack()">← Back</button>
         <h2>Choose Scoring Style</h2>
 
         <button class="classic-mode" onclick="setScoringMode('classic')">
@@ -97,6 +99,7 @@
     <!-- Difficulty Select Screen (full-screen) -->
     <div id="difficultySelectModal" class="menu-screen hidden" aria-hidden="true">
       <div class="menu-wrap">
+        <button class="menu-back" onclick="menuBack()">← Back</button>
         <h2>Choose Difficulty</h2>
         <p>Select the AI difficulty level:</p>
         <button class="beginner" onclick="setDifficulty('beginner')">
@@ -117,6 +120,7 @@
     <!-- Instructions Screen (full-screen) -->
     <div id="instructionsModal" class="menu-screen hidden" aria-hidden="true">
       <div class="menu-wrap">
+        <button class="menu-back" onclick="menuBack()">← Back</button>
         <h2 id="instructionsTitle">How to Play SQUARE WARS</h2>
         <p id="instructionsBody"></p>
         <button onclick="closeInstructions()">Got it, let's play!</button>

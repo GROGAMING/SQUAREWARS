@@ -57,6 +57,45 @@ let touchTrack = { active: false, id: null, startX: 0, startY: 0, moved: false }
 
 let inputHandlersBound = false;
 let inputHandlePick = (clientX) => {};
+// Menu navigation stack for full-screen menu screens
+let menuStack = [];
+
+function setScreenVisibility(id, visible) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (visible) {
+    el.classList.remove(CSS.HIDDEN);
+    el.setAttribute("aria-hidden", "false");
+  } else {
+    el.classList.add(CSS.HIDDEN);
+    el.setAttribute("aria-hidden", "true");
+  }
+}
+
+function initMenuNav() {
+  if (menuStack.length) return;
+  const screens = Array.from(document.querySelectorAll('.menu-screen'));
+  const visible = screens.find((el) => !el.classList.contains(CSS.HIDDEN));
+  if (visible && visible.id) menuStack.push(visible.id);
+  else if (document.getElementById('mainMenuScreen')) menuStack.push('mainMenuScreen');
+}
+
+function navigateTo(id) {
+  initMenuNav();
+  const current = menuStack[menuStack.length - 1];
+  if (current === id) return;
+  if (current) setScreenVisibility(current, false);
+  setScreenVisibility(id, true);
+  menuStack.push(id);
+}
+
+function menuBack() {
+  if (menuStack.length <= 1) return; // root has no back
+  const current = menuStack.pop();
+  setScreenVisibility(current, false);
+  const prev = menuStack[menuStack.length - 1];
+  if (prev) setScreenVisibility(prev, true);
+}
 
 /* ------------ Scale helpers ------------ */
 function px(n) {
@@ -92,40 +131,28 @@ function colFromClient(clientX) {
 /* ------------ Mode, scoring & difficulty ------------ */
 function setGameMode(mode) {
   gameMode = mode;
-  document.getElementById(UI_IDS.modeSelectModal).classList.add(CSS.HIDDEN);
-
-  const scoringModal = document.getElementById(UI_IDS.scoringSelectModal);
-  scoringModal.classList.remove(CSS.HIDDEN);
-  scoringModal.setAttribute("aria-hidden", "false");
+  // Navigate to Scoring screen in full-screen flow
+  navigateTo(UI_IDS.scoringSelectModal);
   // After grid is ready, compute scale
   applyResponsiveScale();
 }
 
 function setScoringMode(mode) {
   scoringMode = mode;
-  const scoringModal = document.getElementById(UI_IDS.scoringSelectModal);
-
   if (mode === SCORING_MODES.QUICKFIRE) {
-    scoringModal.classList.add(CSS.HIDDEN);
-    scoringModal.setAttribute("aria-hidden", "true");
     openQuickfireModal();
     return;
   }
 
   // Classic / Area continue as normal
   ownership = Object.create(null);
-  scoringModal.classList.add(CSS.HIDDEN);
-  scoringModal.setAttribute("aria-hidden", "true");
 
   if (gameMode === GAME_MODES.SINGLE) {
-    const difficultyModal = document.getElementById(
-      UI_IDS.difficultySelectModal
-    );
-    difficultyModal.classList.remove(CSS.HIDDEN);
-    difficultyModal.setAttribute("aria-hidden", "false");
+    navigateTo(UI_IDS.difficultySelectModal);
   } else {
     updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
     showInstructionsUI(scoringMode, quickFireTarget);
+    navigateTo(UI_IDS.instructionsModal);
   }
 }
 
@@ -149,61 +176,45 @@ function onQuickfireInput(inputEl) {
 }
 
 function openQuickfireModal() {
-  const modal = document.getElementById(UI_IDS.quickfireSelectModal);
   const input = document.getElementById("qfTarget");
   const bubble = document.getElementById("qfBubble");
   if (input) input.value = String(quickFireTarget);
   if (bubble) bubble.textContent = String(quickFireTarget);
-  modal.classList.remove(CSS.HIDDEN);
-  modal.setAttribute("aria-hidden", "false");
+  navigateTo(UI_IDS.quickfireSelectModal);
   // position once visible
   requestAnimationFrame(() => onQuickfireInput(input));
 }
 
 function backFromQuickfire() {
-  const qf = document.getElementById(UI_IDS.quickfireSelectModal);
-  qf.classList.add(CSS.HIDDEN);
-  qf.setAttribute("aria-hidden", "true");
-
-  const scoring = document.getElementById(UI_IDS.scoringSelectModal);
-  scoring.classList.remove(CSS.HIDDEN);
-  scoring.setAttribute("aria-hidden", "false");
+  // Back to previous menu screen in stack
+  menuBack();
 }
 
 function confirmQuickfire() {
   const input = document.getElementById("qfTarget");
   const val = Number(input.value || 5);
   quickFireTarget = Math.max(1, Math.min(10, val));
-
-  const qf = document.getElementById(UI_IDS.quickfireSelectModal);
-  qf.classList.add(CSS.HIDDEN);
-  qf.setAttribute("aria-hidden", "true");
-
   ownership = Object.create(null);
 
   if (gameMode === GAME_MODES.SINGLE) {
-    const difficultyModal = document.getElementById(
-      UI_IDS.difficultySelectModal
-    );
-    difficultyModal.classList.remove(CSS.HIDDEN);
-    difficultyModal.setAttribute("aria-hidden", "false");
+    navigateTo(UI_IDS.difficultySelectModal);
   } else {
     updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
     showInstructionsUI(scoringMode, quickFireTarget);
+    navigateTo(UI_IDS.instructionsModal);
   }
 }
 
 function setDifficulty(difficulty) {
   aiDifficulty = difficulty;
-  const m = document.getElementById(UI_IDS.difficultySelectModal);
-  m.classList.add(CSS.HIDDEN);
-  m.setAttribute("aria-hidden", "true");
   updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
   showInstructionsUI(scoringMode, quickFireTarget);
+  navigateTo(UI_IDS.instructionsModal);
 }
 
 function showInstructions() {
   showInstructionsUI(scoringMode, quickFireTarget);
+  navigateTo(UI_IDS.instructionsModal);
 }
 function closeInstructions() {
   closeInstructionsUI(initGame);
@@ -787,11 +798,7 @@ function openModeSelect() {
   gameActive = false;
   gameMode = null;
   aiDifficulty = null;
-  const modeModal = document.getElementById(UI_IDS.modeSelectModal);
-  if (modeModal) {
-    modeModal.classList.remove(CSS.HIDDEN);
-    modeModal.setAttribute("aria-hidden", "false");
-  }
+  navigateTo(UI_IDS.modeSelectModal);
   updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
   updateDisplay(
     currentPlayer,
@@ -835,6 +842,7 @@ window.openModeSelect = openModeSelect;
 window.openInGameMenu = openInGameMenu;
 window.closeInGameMenu = closeInGameMenu;
 window.goToMainMenu = goToMainMenu;
+window.menuBack = menuBack;
 function resetGameAndCloseMenu() {
   // Use existing reset, then close the in-game overlay.
   initGame();
