@@ -13,7 +13,7 @@ import {
   QUICKFIRE_DEFAULT,
   CELL_PX,
   GAP_PX,
-} from "./constants.js?v=13";
+} from "./constants.js";
 
 import {
   updateDisplay,
@@ -29,9 +29,9 @@ import {
   updateLabelsForModeUI,
   applyResponsiveScale,
   getScale,
-} from "./ui.js?v=13";
+} from "./ui.js";
 
-import { chooseComputerMove } from "./ai.js?v=11";
+import { chooseComputerMove } from "./ai.js";
 
 let grid = [];
 let currentPlayer = PLAYER.RED;
