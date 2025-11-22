@@ -151,8 +151,7 @@ function setScoringMode(mode) {
     navigateTo(UI_IDS.difficultySelectModal);
   } else {
     updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
-    showInstructionsUI(scoringMode, quickFireTarget);
-    navigateTo(UI_IDS.instructionsModal);
+    startGameFromMenu();
   }
 }
 
@@ -200,21 +199,18 @@ function confirmQuickfire() {
     navigateTo(UI_IDS.difficultySelectModal);
   } else {
     updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
-    showInstructionsUI(scoringMode, quickFireTarget);
-    navigateTo(UI_IDS.instructionsModal);
+    startGameFromMenu();
   }
 }
 
 function setDifficulty(difficulty) {
   aiDifficulty = difficulty;
   updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
-  showInstructionsUI(scoringMode, quickFireTarget);
-  navigateTo(UI_IDS.instructionsModal);
+  startGameFromMenu();
 }
 
 function showInstructions() {
-  showInstructionsUI(scoringMode, quickFireTarget);
-  navigateTo(UI_IDS.instructionsModal);
+  openTutorial();
 }
 function closeInstructions() {
   closeInstructionsUI(initGame);
@@ -681,11 +677,14 @@ window.addEventListener("resize", () => {
   }
 });
 
-document
-  .getElementById(UI_IDS.instructionsModal)
-  .addEventListener("click", (e) => {
-    if (e.target === e.currentTarget) closeInstructions();
-  });
+{
+  const instr = document.getElementById(UI_IDS.instructionsModal);
+  if (instr) {
+    instr.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) closeInstructions();
+    });
+  }
+}
 
 document
   .getElementById(UI_IDS.difficultySelectModal)
@@ -836,6 +835,40 @@ function goToMainMenu() {
   showMainMenu();
 }
 
+function startGameFromMenu() {
+  // Hide all menu screens and start the game.
+  const screens = document.querySelectorAll('.menu-screen');
+  screens.forEach((el) => {
+    el.classList.add(CSS.HIDDEN);
+    el.setAttribute('aria-hidden', 'true');
+  });
+  // Reset stack to root
+  menuStack = ['mainMenuScreen'];
+  hideMainMenu();
+  initGame();
+}
+
+function openTutorial() {
+  // Reuse existing instructions content without adding another screen in the flow.
+  showInstructionsUI(scoringMode, quickFireTarget);
+  const instrModal = document.getElementById(UI_IDS.instructionsModal);
+  const body = document.getElementById('instructionsBody');
+  const target = document.getElementById('tutorialContent');
+  if (body && target) target.innerHTML = body.innerHTML;
+  // Immediately hide the instructions modal if it was shown
+  if (instrModal) {
+    instrModal.classList.add(CSS.HIDDEN);
+    instrModal.setAttribute('aria-hidden', 'true');
+  }
+  const wrap = document.querySelector('#mainMenuScreen .menu-wrap');
+  if (wrap) wrap.classList.add('show-tutorial');
+}
+
+function closeTutorial() {
+  const wrap = document.querySelector('#mainMenuScreen .menu-wrap');
+  if (wrap) wrap.classList.remove('show-tutorial');
+}
+
 // Expose new UI helpers
 window.quickStart = quickStart;
 window.openModeSelect = openModeSelect;
@@ -843,6 +876,9 @@ window.openInGameMenu = openInGameMenu;
 window.closeInGameMenu = closeInGameMenu;
 window.goToMainMenu = goToMainMenu;
 window.menuBack = menuBack;
+window.startGameFromMenu = startGameFromMenu;
+window.openTutorial = openTutorial;
+window.closeTutorial = closeTutorial;
 function resetGameAndCloseMenu() {
   // Use existing reset, then close the in-game overlay.
   initGame();

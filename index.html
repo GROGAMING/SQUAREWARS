@@ -19,7 +19,12 @@
         <div class="menu-actions">
           <button class="menu-primary" onclick="quickStart()">▶ Play</button>
           <button class="menu-secondary" onclick="openModeSelect()">Game Mode</button>
-          <button class="menu-secondary" onclick="showInstructions()">How to Play</button>
+          <button class="menu-secondary" onclick="openTutorial()">Tutorial</button>
+        </div>
+        <div class="menu-tutorial">
+          <button class="menu-back" onclick="closeTutorial()">← Back</button>
+          <h3>Tutorial</h3>
+          <p id="tutorialContent"></p>
         </div>
       </div>
     </div>
