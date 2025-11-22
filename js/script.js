@@ -748,6 +748,94 @@ window.confirmQuickfire = confirmQuickfire;
 window.backFromQuickfire = backFromQuickfire;
 window.onQuickfireInput = onQuickfireInput;
 
+// --- Full-screen main menu & in-game menu (UI-only) ---
+function hideMainMenu() {
+  const m = document.getElementById("mainMenuScreen");
+  if (m) {
+    m.classList.add(CSS.HIDDEN);
+    m.setAttribute("aria-hidden", "true");
+  }
+}
+function showMainMenu() {
+  const m = document.getElementById("mainMenuScreen");
+  if (m) {
+    m.classList.remove(CSS.HIDDEN);
+    m.setAttribute("aria-hidden", "false");
+  }
+}
+function openInGameMenu() {
+  const overlay = document.getElementById("inGameMenuOverlay");
+  if (overlay) {
+    overlay.classList.remove(CSS.HIDDEN);
+    overlay.setAttribute("aria-hidden", "false");
+  }
+}
+function closeInGameMenu() {
+  const overlay = document.getElementById("inGameMenuOverlay");
+  if (overlay) {
+    overlay.classList.add(CSS.HIDDEN);
+    overlay.setAttribute("aria-hidden", "true");
+  }
+}
+function openModeSelect() {
+  closeInGameMenu();
+  hideMainMenu();
+  const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
+  if (outlineLayer) outlineLayer.innerHTML = "";
+  redGames = 0;
+  blueGames = 0;
+  gameActive = false;
+  gameMode = null;
+  aiDifficulty = null;
+  const modeModal = document.getElementById(UI_IDS.modeSelectModal);
+  if (modeModal) {
+    modeModal.classList.remove(CSS.HIDDEN);
+    modeModal.setAttribute("aria-hidden", "false");
+  }
+  updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
+  updateDisplay(
+    currentPlayer,
+    gameMode,
+    aiDifficulty,
+    scoringMode,
+    redGames,
+    blueGames
+  );
+}
+function quickStart() {
+  // Hide main menu. If no mode selected yet, guide user into mode selection.
+  hideMainMenu();
+  if (!gameMode) {
+    openModeSelect();
+  }
+}
+function goToMainMenu() {
+  // Close any in-game overlays, then show main menu screen.
+  closeInGameMenu();
+  const modals = [
+    UI_IDS.instructionsModal,
+    UI_IDS.difficultySelectModal,
+    UI_IDS.scoringSelectModal,
+    UI_IDS.quickfireSelectModal,
+    UI_IDS.endGameModal,
+  ];
+  for (const id of modals) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.add(CSS.HIDDEN);
+      el.setAttribute("aria-hidden", "true");
+    }
+  }
+  showMainMenu();
+}
+
+// Expose new UI helpers
+window.quickStart = quickStart;
+window.openModeSelect = openModeSelect;
+window.openInGameMenu = openInGameMenu;
+window.closeInGameMenu = closeInGameMenu;
+window.goToMainMenu = goToMainMenu;
+
 // initialize buttons on first load
 ensureControlsUI();
 applyResponsiveScale();
