@@ -212,10 +212,12 @@ export function updateDisplay(
 
   const redScoreEl = document.getElementById(UI_IDS.redScore);
   const blueScoreEl = document.getElementById(UI_IDS.blueScore);
-  redScoreEl.classList.remove(CSS.LEADING);
-  blueScoreEl.classList.remove(CSS.LEADING);
-  if (redScore > blueScore) redScoreEl.classList.add(CSS.LEADING);
-  else if (blueScore > redScore) blueScoreEl.classList.add(CSS.LEADING);
+  if (redScoreEl && blueScoreEl) {
+    redScoreEl.classList.remove(CSS.LEADING);
+    blueScoreEl.classList.remove(CSS.LEADING);
+    if (redScore > blueScore) redScoreEl.classList.add(CSS.LEADING);
+    else if (blueScore > redScore) blueScoreEl.classList.add(CSS.LEADING);
+  }
 
   const total = Math.max(1, redScore + blueScore);
   const pctR = (redScore / total) * 100;
@@ -228,25 +230,25 @@ export function updateDisplay(
   }
 
   const currentPlayerSpan = document.getElementById(UI_IDS.currentPlayer);
-  const currentPlayerBanner = document.getElementById(
-    UI_IDS.currentPlayerBanner
-  );
-  currentPlayerBanner.classList.remove(CSS.PLAYER1_TURN, CSS.PLAYER2_TURN);
+  const currentPlayerBanner = document.getElementById(UI_IDS.currentPlayerBanner);
+  if (currentPlayerSpan && currentPlayerBanner) {
+    currentPlayerBanner.classList.remove(CSS.PLAYER1_TURN, CSS.PLAYER2_TURN);
 
-  if (currentPlayer === PLAYER.RED) {
-    currentPlayerSpan.textContent =
-      gameMode === "single" ? "You (Red)" : "Player 1 (Red)";
-    currentPlayerSpan.className = CSS.PLAYER1;
-    currentPlayerBanner.classList.add(CSS.PLAYER1_TURN);
-  } else {
-    if (gameMode === "single") {
-      currentPlayerSpan.textContent = "Computer (Blue)";
-      currentPlayerSpan.className = `${CSS.PLAYER2} ${CSS.COMPUTER_TURN}`;
+    if (currentPlayer === PLAYER.RED) {
+      currentPlayerSpan.textContent =
+        gameMode === "single" ? "You (Red)" : "Player 1 (Red)";
+      currentPlayerSpan.className = CSS.PLAYER1;
+      currentPlayerBanner.classList.add(CSS.PLAYER1_TURN);
     } else {
-      currentPlayerSpan.textContent = "Player 2 (Blue)";
-      currentPlayerSpan.className = CSS.PLAYER2;
+      if (gameMode === "single") {
+        currentPlayerSpan.textContent = "Computer (Blue)";
+        currentPlayerSpan.className = `${CSS.PLAYER2} ${CSS.COMPUTER_TURN}`;
+      } else {
+        currentPlayerSpan.textContent = "Player 2 (Blue)";
+        currentPlayerSpan.className = CSS.PLAYER2;
+      }
+      currentPlayerBanner.classList.add(CSS.PLAYER2_TURN);
     }
-    currentPlayerBanner.classList.add(CSS.PLAYER2_TURN);
   }
 }
 
@@ -535,6 +537,9 @@ export function updateLabelsForModeUI(
     const n = quickFireTarget ?? 5;
     suffix = ` — Quick Fire (First to ${n})`;
   }
+
+  // If these elements aren't present (thin header design), skip without error.
+  if (!gameTitle || !redLabel || !blueLabel) return;
 
   if (gameMode === "single") {
     gameTitle.textContent = "SQUARE WARS SINGLEPLAYER" + suffix;
