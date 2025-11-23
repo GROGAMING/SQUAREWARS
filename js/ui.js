@@ -229,6 +229,19 @@ export function updateDisplay(
     meterB.style.width = pctB + "%";
   }
 
+  // Update thin bar Blue label with AI difficulty in single-player
+  const thinBlue = document.getElementById(UI_IDS.thinBlueLabel);
+  if (thinBlue) {
+    if (gameMode === "single") {
+      const name = aiDifficulty
+        ? aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)
+        : null;
+      thinBlue.textContent = name ? `Blue — ${name} AI` : "Blue — AI";
+    } else {
+      thinBlue.textContent = "Blue";
+    }
+  }
+
   const currentPlayerSpan = document.getElementById(UI_IDS.currentPlayer);
   const currentPlayerBanner = document.getElementById(UI_IDS.currentPlayerBanner);
   if (currentPlayerSpan && currentPlayerBanner) {
@@ -531,6 +544,33 @@ export function updateLabelsForModeUI(
   const redLabel = document.getElementById(UI_IDS.redLabel);
   const blueLabel = document.getElementById(UI_IDS.blueLabel);
 
+  // Compose center mode text for thin bar
+  let centerMode = "Classic (Box Points)";
+  if (scoringMode === SCORING_MODES.AREA) centerMode = "Territory Takedown (Area Mode)";
+  if (scoringMode === SCORING_MODES.QUICKFIRE) {
+    const n = quickFireTarget ?? 5;
+    centerMode = `Quick Fire — First to ${n}`;
+  }
+
+  const thinModeEl = document.getElementById(UI_IDS.thinMode);
+  if (thinModeEl) thinModeEl.textContent = centerMode;
+
+  // Update Blue label in thin bar for single-player AI
+  const thinBlue = document.getElementById(UI_IDS.thinBlueLabel);
+  if (thinBlue) {
+    if (gameMode === "single") {
+      const difficultyName = aiDifficulty
+        ? aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)
+        : null;
+      thinBlue.textContent = difficultyName
+        ? `Blue — ${difficultyName} AI`
+        : "Blue — AI";
+    } else {
+      thinBlue.textContent = "Blue";
+    }
+  }
+
+  // Update legacy big header elements only if present
   let suffix = " — Classic";
   if (scoringMode === SCORING_MODES.AREA) suffix = " — Territory Takedown";
   if (scoringMode === SCORING_MODES.QUICKFIRE) {
@@ -538,24 +578,23 @@ export function updateLabelsForModeUI(
     suffix = ` — Quick Fire (First to ${n})`;
   }
 
-  // If these elements aren't present (thin header design), skip without error.
-  if (!gameTitle || !redLabel || !blueLabel) return;
-
-  if (gameMode === "single") {
-    gameTitle.textContent = "SQUARE WARS SINGLEPLAYER" + suffix;
-    redLabel.textContent = "You (Red)";
-    if (aiDifficulty) {
-      const difficultyName =
-        aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1);
-      blueLabel.textContent = `Computer (Blue) - ${difficultyName}`;
+  if (gameTitle && redLabel && blueLabel) {
+    if (gameMode === "single") {
+      gameTitle.textContent = "SQUARE WARS SINGLEPLAYER" + suffix;
+      redLabel.textContent = "You (Red)";
+      if (aiDifficulty) {
+        const difficultyName =
+          aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1);
+        blueLabel.textContent = `Computer (Blue) - ${difficultyName}`;
+      } else {
+        blueLabel.textContent = "Computer (Blue)";
+      }
+    } else if (gameMode === "multi") {
+      gameTitle.textContent = "SQUARE WARS MULTIPLAYER" + suffix;
+      redLabel.textContent = "Player 1 (Red)";
+      blueLabel.textContent = "Player 2 (Blue)";
     } else {
-      blueLabel.textContent = "Computer (Blue)";
+      gameTitle.textContent = "SQUARE WARS";
     }
-  } else if (gameMode === "multi") {
-    gameTitle.textContent = "SQUARE WARS MULTIPLAYER" + suffix;
-    redLabel.textContent = "Player 1 (Red)";
-    blueLabel.textContent = "Player 2 (Blue)";
-  } else {
-    gameTitle.textContent = "SQUARE WARS";
   }
 }

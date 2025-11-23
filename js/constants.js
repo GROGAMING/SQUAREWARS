@@ -34,6 +34,11 @@ export const UI_IDS = Object.freeze({
   endGameTitle: "endGameTitle",
   endGameSubtitle: "endGameSubtitle",
 
+  thinScoreBar: "thinScoreBar",
+  thinMode: "thinMode",
+  thinRedLabel: "thinRedLabel",
+  thinBlueLabel: "thinBlueLabel",
+
   gameTitle: "gameTitle",
   redLabel: "redLabel",
   blueLabel: "blueLabel",
