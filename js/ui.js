@@ -177,14 +177,16 @@ function computeCanvasMetrics(rows, cols) {
     if (contentW > 0 && contentH > 0) {
       const baseW = cols * CELL + (cols - 1) * GAP;
       const baseH = rows * CELL + (rows - 1) * GAP;
-      // Calculate scale from the measured content box; width & height should match
-      const s = contentW / baseW; // height should be equivalent since both use the same CSS var scale
+      // Calculate scale from the measured content box; ensure square cells using min of both axes
+      const sW = contentW / baseW;
+      const sH = contentH / baseH;
+      const s = Math.min(sW, sH);
       const cell = CELL * s;
       const gap = GAP * s;
       const step = cell + gap;
-      // Use measured content size to ensure perfect edge fit
-      const width = Math.round(contentW);
-      const height = Math.round(contentH);
+      // Use measured content size to ensure perfect edge fit (round to integers for CSS pixels)
+      const width = Math.round(cols * step - gap);
+      const height = Math.round(rows * step - gap);
       return { cell, gap, step, width, height };
     }
   }
@@ -206,12 +208,17 @@ function drawBoardFromState(grid, blockedCells, lastMove) {
   const ctx = boardCtx;
   const { cell, gap, step, width, height } = computeCanvasMetrics(rows, cols);
 
-  if (c.width !== Math.ceil(width) || c.height !== Math.ceil(height)) {
-    c.width = Math.ceil(width);
-    c.height = Math.ceil(height);
-    c.style.width = c.width + "px";
-    c.style.height = c.height + "px";
+  // Ensure crisp drawing by matching canvas backing store to device pixels
+  const dpr = (window.devicePixelRatio || 1);
+  const targetW = Math.ceil(width * dpr);
+  const targetH = Math.ceil(height * dpr);
+  if (c.width !== targetW || c.height !== targetH) {
+    c.width = targetW;
+    c.height = targetH;
   }
+  c.style.width = width + "px";
+  c.style.height = height + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
   ctx.clearRect(0, 0, width, height);
 
@@ -221,7 +228,7 @@ function drawBoardFromState(grid, blockedCells, lastMove) {
   const redB = "#ff5252";
   const blueA = getComputedStyle(document.documentElement).getPropertyValue("--p2").trim() || "#4dabf7";
   const blueB = "#2796f3";
-  const borderCol = "rgba(255,255,255,0.35)";
+  const borderCol = "rgba(255,255,255,0.30)";
   const hl = getComputedStyle(document.documentElement).getPropertyValue("--highlight").trim() || "#ffd166";
 
   let hatchPattern = null;
@@ -262,11 +269,47 @@ function drawBoardFromState(grid, blockedCells, lastMove) {
         g.addColorStop(1, baseB);
       }
 
+      // Base fill with slight translucency to keep grid visible
+      ctx.save();
+      ctx.globalAlpha = val ? 0.92 : 1.0;
+      // Soft outer glow per piece color
+      if (val === 1) {
+        ctx.shadowColor = "rgba(255, 80, 80, 0.45)";
+        ctx.shadowBlur = Math.max(6, cell * 0.25);
+      } else if (val === 2) {
+        ctx.shadowColor = "rgba(77, 171, 247, 0.45)";
+        ctx.shadowBlur = Math.max(6, cell * 0.25);
+      } else {
+        ctx.shadowBlur = 0;
+      }
       ctx.fillStyle = g;
       ctx.fillRect(x, y, cell, cell);
+      ctx.restore();
+
+      // Inner shadow for depth
+      if (val === 1 || val === 2) {
+        ctx.save();
+        ctx.strokeStyle = "rgba(0,0,0,0.18)";
+        ctx.lineWidth = Math.max(1, Math.round(cell * 0.04));
+        ctx.strokeRect(x + ctx.lineWidth / 2, y + ctx.lineWidth / 2, cell - ctx.lineWidth, cell - ctx.lineWidth);
+        ctx.restore();
+
+        // Gloss highlight at the top-left as white curved gradient overlay
+        ctx.save();
+        const gloss = ctx.createRadialGradient(x + cell * 0.28, y + cell * 0.22, cell * 0.1, x + cell * 0.28, y + cell * 0.22, cell * 0.7);
+        gloss.addColorStop(0, "rgba(255,255,255,0.35)");
+        gloss.addColorStop(0.4, "rgba(255,255,255,0.15)");
+        gloss.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = gloss;
+        ctx.globalCompositeOperation = "lighter";
+        ctx.fillRect(x, y, cell, cell);
+        ctx.restore();
+      }
+
+      // Subtle border to separate cells
       ctx.strokeStyle = borderCol;
       ctx.lineWidth = 1;
-      ctx.strokeRect(x + 0.5, y + 0.5, cell - 1, cell - 1);
+      ctx.strokeRect(x, y, cell, cell);
 
       const key = r + "-" + col;
       if (blockedCells && blockedCells.has && blockedCells.has(key)) {
@@ -279,7 +322,7 @@ function drawBoardFromState(grid, blockedCells, lastMove) {
   if (lastMove && (!blockedCells || !blockedCells.has(`${lastMove.row}-${lastMove.col}`))) {
     const x = lastMove.col * step;
     const y = lastMove.row * step;
-    ctx.lineWidth = Math.max(2, Math.round(getScale() * 3));
+    ctx.lineWidth = Math.max(2, Math.round(cell * 0.12));
     ctx.strokeStyle = hl;
     ctx.strokeRect(x + 1, y + 1, cell - 2, cell - 2);
   }
@@ -311,19 +354,22 @@ function showPopAtCell(row, col, color) {
     const y = offsetY + row * step;
 
     const el = document.createElement("div");
-    el.className = `pop-cell ${color === "red" ? "red" : "blue"}`;
+    el.className = `pop-cell ${color === "red" ? "red" : "blue"} drop-in`;
     el.style.left = `${Math.round(x)}px`;
     el.style.top = `${Math.round(y)}px`;
     el.style.width = `${Math.round(cell)}px`;
     el.style.height = `${Math.round(cell)}px`;
+    // Start drop just above the grid border with a bounce distance scaled to cell
+    const dropY = Math.max(16, Math.round(cell * 0.9));
+    el.style.setProperty('--drop-y', `${dropY}px`);
     layer.appendChild(el);
 
     const remove = () => {
       if (el && el.parentElement) el.parentElement.removeChild(el);
     };
     el.addEventListener("animationend", remove, { once: true });
-    // Fallback removal
-    setTimeout(remove, 260);
+    // Fallback removal (longer than animation duration)
+    setTimeout(remove, 650);
   } catch {}
 }
 
@@ -655,33 +701,46 @@ export function drawOutlineRect(minRow, maxRow, minCol, maxCol, player) {
 }
 
 export function drawWinStrike(winningLine, player) {
-  const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
-  if (!outlineLayer) return;
+  const layer = document.getElementById(UI_IDS.outlineLayer);
+  const canvas = document.getElementById("boardCanvas") || ensureCanvas();
+  if (!layer || !canvas) return;
+
+  const layerRect = layer.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
+  const offsetX = canvasRect.left - layerRect.left;
+  const offsetY = canvasRect.top - layerRect.top;
+
+  const rows = (cachedGrid && cachedGrid.length) || 20;
+  const cols = (cachedGrid && cachedGrid[0] && cachedGrid[0].length) || 30;
+  const { cell, gap, step } = computeCanvasMetrics(rows, cols);
 
   const first = winningLine[0];
   const last = winningLine[winningLine.length - 1];
 
   const centerOf = (r, c) => ({
-    x: px(GRID_PADDING + c * (CELL + GAP) + CELL / 2),
-    y: px(GRID_PADDING + r * (CELL + GAP) + CELL / 2),
+    x: offsetX + c * step + cell / 2,
+    y: offsetY + r * step + cell / 2,
   });
 
   const p1 = centerOf(first.row, first.col);
   const p2 = centerOf(last.row, last.col);
 
-  const dx = p2.x - p1.x,
-    dy = p2.y - p1.y;
-  const len = Math.sqrt(dx * dx + dy * dy) + 2;
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  const len = Math.sqrt(dx * dx + dy * dy);
   const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+  const thickness = Math.max(3, Math.round(cell * 0.18));
 
   const line = document.createElement("div");
   line.className = `win-strike ${player === PLAYER.RED ? "red" : "blue"}`;
+  line.style.position = "absolute";
   line.style.left = `${p1.x}px`;
-  line.style.top = `${p1.y - 2}px`;
+  line.style.top = `${p1.y - thickness / 2}px`;
   line.style.width = `${len}px`;
+  line.style.height = `${thickness}px`;
   line.style.transformOrigin = "left center";
   line.style.transform = `rotate(${angle}deg)`;
-  outlineLayer.appendChild(line);
+  layer.appendChild(line);
 }
 
 /* ------- Modals & labels ------- */
