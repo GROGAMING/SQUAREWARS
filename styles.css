@@ -154,18 +154,17 @@
 
 /* In-game top bar */
 .topbar {
-  position: sticky;
-  top: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 8px;
-  z-index: 900;
+  position: fixed;
+  top: max(6px, env(safe-area-inset-top));
+  left: max(6px, env(safe-area-inset-left));
+  width: auto;
+  display: block;
+  margin: 0;
+  z-index: 1400;
 }
 .menu-btn {
-  margin-left: 4px;
-  padding: 8px 12px;
+  margin: 0;
+  padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.15);
   background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
@@ -181,42 +180,51 @@
   max-width: 100vw;
   margin: 4px auto 6px;
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 8px;
   padding: 8px 12px;
   border-radius: 12px;
   background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
   border: 1px solid rgba(255,255,255,0.14);
   box-shadow: 0 8px 22px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.04);
 }
-.thin-score-bar .side {
+.thin-score-bar .scorebox,
+.thin-score-bar .modebox {
+  flex: 1 1 0;
+  min-width: 0; /* allow truncation */
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  font-size: clamp(12px, 0.8vw + 11px, 14px);
-  font-weight: 600;
-  opacity: 0.95;
-  min-width: 0; /* enable flex truncation */
-}
-.thin-score-bar .side.left { margin-right: auto; }
-.thin-score-bar .side.right { margin-left: auto; }
-.thin-score-bar .center {
-  flex: 0 1 50%;
-  min-width: 0;
-  text-align: center;
-  font-weight: 600;
-  font-size: clamp(12px, 0.9vw + 10px, 15px);
-  color: var(--text);
-  opacity: 0.9;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(255,255,255,0.05);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.thin-score-bar .scorebox.left { justify-content: flex-start; }
+.thin-score-bar .modebox.center { justify-content: center; }
+.thin-score-bar .scorebox.right { justify-content: flex-end; }
+.thin-score-bar .modebox span { 
+  font-weight: 600;
+  font-size: clamp(12px, 0.9vw + 9px, 15px);
+  opacity: .95;
+}
+.thin-score-bar .scorebox .name {
+  font-weight: 600;
+  font-size: clamp(12px, 0.8vw + 10px, 14px);
+  opacity: 0.95;
 }
 .thin-score-bar .label { opacity: 0.9; }
 .thin-score-bar .value {
   margin: 0 2px;
   font-weight: 800;
-  font-size: clamp(14px, 1vw + 12px, 18px);
+  font-size: clamp(14px, 0.9vw + 11px, 17px);
   letter-spacing: 0.2px;
   background: linear-gradient(180deg, #fff, #e9efff);
   -webkit-background-clip: text;
@@ -231,23 +239,29 @@
 }
 .thin-score-bar .dot-red { background: var(--p1); }
 .thin-score-bar .dot-blue { background: var(--p2); }
-.thin-score-bar .divider {
-  width: 1px;
-  height: 16px;
-  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.45), transparent);
-  opacity: 0.7;
-}
-/* Highlight the leading side subtly */
-.thin-score-bar .side.leading .value {
+.thin-score-bar .scorebox.leading .value {
   text-shadow: 0 6px 18px rgba(124, 92, 255, 0.22);
   filter: brightness(1.06);
+}
+
+/* Responsive tweaks for small screens */
+@media (max-width: 600px) {
+  .thin-score-bar { gap: 6px; padding: 6px 8px; }
+  .thin-score-bar .scorebox, .thin-score-bar .modebox { gap: 6px; padding: 5px 8px; }
+  .thin-score-bar .scorebox .name { font-size: clamp(12px, 1.2vw + 9px, 13px); }
+  .thin-score-bar .modebox span { font-size: clamp(12px, 1.2vw + 8px, 14px); }
+  .menu-btn { padding: 7px 9px; }
+}
+@media (max-width: 400px) {
+  .thin-score-bar { gap: 4px; padding: 5px 6px; }
+  .thin-score-bar .scorebox, .thin-score-bar .modebox { padding: 4px 6px; gap: 5px; }
 }
 
 /* In-game options modal tweaks */
 #inGameMenuOverlay {
   /* Compact dropdown anchored near top-left */
   position: fixed; /* override .modal-overlay */
-  top: calc(max(8px, env(safe-area-inset-top)) + 36px); /* below top bar */
+  top: calc(max(8px, env(safe-area-inset-top)) + 44px); /* below fixed menu button */
   left: max(8px, env(safe-area-inset-left));
   width: auto; /* size to panel */
   height: auto;

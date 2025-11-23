@@ -150,20 +150,20 @@
       <button id="menuBtn" class="menu-btn" onclick="openInGameMenu()" aria-label="Open Menu">☰</button>
     </div>
 
-    <!-- Thin, minimal leaderboard directly above the grid -->
+    <!-- Thin, minimal scoreboard: three compact boxes in one row -->
     <div id="thinScoreBar" class="thin-score-bar" aria-label="Scores">
-      <div id="redScore" class="side left" role="group" aria-label="Red score">
+      <div id="redScore" class="scorebox left" role="group" aria-label="Red score">
         <span class="dot dot-red" aria-hidden="true"></span>
-        <span class="label" id="thinRedLabel">Red</span>
+        <span class="name" id="thinRedLabel">Red</span>
         <span class="value" id="redGames">0</span>
       </div>
-      <div class="center" aria-live="polite" aria-atomic="true">
+      <div id="modeBox" class="modebox center" aria-live="polite" aria-atomic="true">
         <span id="thinMode"></span>
       </div>
-      <div id="blueScore" class="side right" role="group" aria-label="Blue score">
-        <span class="value" id="blueGames">0</span>
-        <span class="label" id="thinBlueLabel">Blue</span>
+      <div id="blueScore" class="scorebox right" role="group" aria-label="Blue score">
         <span class="dot dot-blue" aria-hidden="true"></span>
+        <span class="name" id="thinBlueLabel">Blue</span>
+        <span class="value" id="blueGames">0</span>
       </div>
     </div>
 
