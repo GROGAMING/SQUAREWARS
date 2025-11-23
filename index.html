@@ -122,17 +122,21 @@
         <button class="menu-back" onclick="menuBack()">← Back</button>
         <h2>Choose Difficulty</h2>
         <p>Select the AI difficulty level:</p>
-        <button class="beginner" onclick="setDifficulty('beginner')">
-          Beginner<br /><small>Fast & Friendly</small>
+        <button class="beginner theme-opt" onclick="setDifficulty('beginner')">
+          <span class="thumb theme-classroom" aria-hidden="true"></span>
+          <span class="txt"><span class="title">Classroom</span><br /><small>Relaxed, learner-friendly mode</small></span>
         </button>
-        <button class="medium" onclick="setDifficulty('medium')">
-          Medium<br /><small>Balanced Challenge</small>
+        <button class="medium theme-opt" onclick="setDifficulty('medium')">
+          <span class="thumb theme-warroom" aria-hidden="true"></span>
+          <span class="txt"><span class="title">War Room</span><br /><small>Tactical challenge</small></span>
         </button>
-        <button class="advanced" onclick="setDifficulty('advanced')">
-          Advanced<br /><small>Tough Opponent</small>
+        <button class="advanced theme-opt" onclick="setDifficulty('advanced')">
+          <span class="thumb theme-hitech" aria-hidden="true"></span>
+          <span class="txt"><span class="title">High-Tech Command</span><br /><small>Serious strategic battle</small></span>
         </button>
-        <button class="impossible" onclick="setDifficulty('impossible')">
-          Impossible<br /><small>Perfect Play</small>
+        <button class="impossible theme-opt" onclick="setDifficulty('impossible')">
+          <span class="thumb theme-space" aria-hidden="true"></span>
+          <span class="txt"><span class="title">Space Arena</span><br /><small>Ultimate challenge</small></span>
         </button>
       </div>
     </div>
@@ -189,6 +193,8 @@
       </div>
       <div class="grid" id="gameGrid"></div>
       <div id="outlineLayer"></div>
+      <!-- Visual-only scanning line (shown in High-Tech theme) -->
+      <div class="scan-line" aria-hidden="true"></div>
       <div id="boardControlsRight" class="board-controls side right" aria-label="Right board controls">
         <button id="btnDrop" class="ctrl-btn ctrl-drop" type="button">Drop</button>
         <button id="btnArrowRight" class="ctrl-btn ctrl-arrow" type="button" aria-label="Move right">▶</button>

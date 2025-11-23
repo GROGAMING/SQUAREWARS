@@ -215,6 +215,8 @@ function confirmQuickfire() {
 
 function setDifficulty(difficulty) {
   aiDifficulty = difficulty;
+  // Apply visual theme mapped to difficulty (UI-only; no logic change)
+  applyThemeForDifficulty(aiDifficulty);
   updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
   startGameFromMenu();
 }
@@ -896,6 +898,8 @@ function startGameFromMenu() {
   resetBoardUI();
   showGameScreen();
   initGame();
+  // Re-apply theme after game screen shows (in case of navigation)
+  if (aiDifficulty) applyThemeForDifficulty(aiDifficulty);
 }
 
 function openTutorial() {
@@ -945,6 +949,27 @@ window.menuBack = menuBack;
 window.startGameFromMenu = startGameFromMenu;
 window.openTutorial = openTutorial;
 window.closeTutorial = closeTutorial;
+// Expose theme applier for UI-only skin switching
+window.applyThemeForDifficulty = applyThemeForDifficulty;
+
+// UI-only: map difficulty to theme class on body
+function applyThemeForDifficulty(diff) {
+  try {
+    const themeMap = {
+      beginner: 'theme-classroom',
+      easy: 'theme-classroom',
+      medium: 'theme-warroom',
+      advanced: 'theme-hitech',
+      impossible: 'theme-space',
+    };
+    const cls = themeMap[diff];
+    const root = document.body;
+    if (!root) return;
+    const all = ['theme-classroom','theme-warroom','theme-hitech','theme-space'];
+    root.classList.remove(...all);
+    if (cls) root.classList.add(cls);
+  } catch {}
+}
 function resetGameAndCloseMenu() {
   // Use existing reset, then close the in-game overlay.
   resetBoardUI();

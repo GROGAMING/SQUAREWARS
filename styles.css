@@ -39,6 +39,29 @@
   background: radial-gradient(120% 100% at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.18) 100%);
   z-index: 0;
 }
+/* Hidden by default: a scanning line shown only by specific theme */
+.grid-outer .scan-line {
+  display: none;
+  position: absolute;
+  left: var(--grid-pad);
+  right: var(--grid-pad);
+  top: calc(var(--grid-pad) + var(--border));
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(124,70,255,0), rgba(124,70,255,0.8), rgba(124,70,255,0));
+  box-shadow: 0 0 10px rgba(124,70,255,0.35);
+  opacity: 0.5;
+  transform: translateX(-120%);
+  animation: scanSweep 20s ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes scanSweep {
+  0%   { transform: translateX(-120%); opacity: 0; }
+  45%  { transform: translateX(-120%); opacity: 0; }
+  50%  { transform: translateX(120%);  opacity: 0.6; }
+  55%  { transform: translateX(120%);  opacity: 0; }
+  100% { transform: translateX(120%);  opacity: 0; }
+}
 .grid-outer::before {
   content: "";
   position: absolute;
@@ -1479,3 +1502,109 @@ button:active {
 .hidden {
   display: none !important;
 }
+
+/* Themed Environment Skins */
+.environment-skin {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.environment-skin:hover {
+  transform: scale(1.1);
+}
+
+.environment-skin img {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* Difficulty Selector Thumbnails */
+.difficulty-thumbnail {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.difficulty-thumbnail:hover {
+  transform: scale(1.1);
+}
+
+.difficulty-thumbnail img {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* Difficulty selection themed buttons */
+.theme-opt {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 18px 32px rgba(0,0,0,0.28), 0 8px 14px rgba(0,0,0,0.18), inset 0 2px 4px rgba(255,255,255,0.08), inset 0 -3px 8px rgba(0,0,0,0.22);
+  text-align: left;
+}
+.theme-opt .txt .title { font-weight: 700; letter-spacing: 0.2px; }
+.theme-opt .thumb {
+  width: 56px; height: 56px; border-radius: 10px; position: relative; overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 6px 14px rgba(0,0,0,0.25);
+}
+.theme-opt .thumb::after { /* icon overlay */
+  content: ""; position: absolute; inset: 0; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: 24px 24px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+}
+
+/* Thumbnail backgrounds + icons */
+.theme-opt .thumb.theme-classroom { background: linear-gradient(145deg, #f7e6c3, #d8ecff); }
+.theme-opt .thumb.theme-classroom::after { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='14' rx='2' ry='2'/><path d='M7 20l5-3 5 3'/></svg>"); }
+
+.theme-opt .thumb.theme-warroom { background: radial-gradient(110% 140% at 20% 20%, #0b1430, #0a0f26); }
+.theme-opt .thumb.theme-warroom::after { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 3v2M12 19v2M3 12h2M19 12h2'/><circle cx='12' cy='12' r='1'/></svg>"); }
+
+.theme-opt .thumb.theme-hitech { background: linear-gradient(145deg, #0a0d1f, #12163a 60%, #23154d); }
+.theme-opt .thumb.theme-hitech::after { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='8' y='8' width='8' height='8'/><path d='M3 12h5M16 12h5M12 3v5M12 16v5'/></svg>"); }
+
+.theme-opt .thumb.theme-space { background: radial-gradient(100% 120% at 50% 30%, #0b0f2b, #030514 70%); }
+.theme-opt .thumb.theme-space::after { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3'/><path d='M2 12a10 10 0 0 0 20 0 10 4 0 0 1-20 0z'/></svg>"); }
+
+/* Theme classes — visual overrides only */
+/* Classroom (Easy) */
+body.theme-classroom::before { background: radial-gradient(120% 100% at 20% 10%, #f7e6c3, #d8ecff 70%, rgba(255,255,255,0)); animation: bgDrift 40s ease-in-out infinite alternate; }
+body.theme-classroom::after { opacity: 0.10; filter: none; mix-blend-mode: normal; }
+body.theme-classroom #gridOuter { background: linear-gradient(180deg, #254c3f, #183a31); box-shadow: 0 28px 60px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.22), inset 0 -4px 10px rgba(0,0,0,0.35); }
+body.theme-classroom #gameGrid { border-color: rgba(255,255,255,0.35); background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(0,0,0,0.08)); }
+body.theme-classroom #gridOuter::before { background: radial-gradient(60% 90% at 50% 30%, rgba(255,255,255,0.18), rgba(0,0,0,0)); filter: blur(20px); }
+
+/* War Room (Medium) */
+body.theme-warroom::before { background: radial-gradient(120% 100% at 50% 45%, rgba(44,61,110,0.4), rgba(5,7,26,0.0)), linear-gradient(160deg, #060a1c, #0b1430); animation: bgDrift 42s ease-in-out infinite alternate; }
+body.theme-warroom #gridOuter { background: linear-gradient(180deg, #0f1a33, #0c1226); box-shadow: 0 28px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(47,140,255,0.25), inset 0 -6px 16px rgba(0,0,0,0.5); }
+body.theme-warroom #gameGrid { border-color: rgba(47,140,255,0.35); }
+/* Tactical map overlay */
+body.theme-warroom #gridOuter::after { background: radial-gradient(120% 100% at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.22) 100%), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='340' height='200' viewBox='0 0 340 200' opacity='0.12'><g stroke='white' stroke-width='0.5' fill='none'><circle cx='60' cy='60' r='30'/><circle cx='280' cy='120' r='40'/><path d='M10 180L330 20'/></g></svg>") center/cover no-repeat; opacity: 1; }
+
+/* High-Tech Command (Advanced) */
+body.theme-hitech::before { background: linear-gradient(125deg, rgba(124,70,255,0.25), rgba(47,140,255,0.2) 40%, rgba(5,7,26,0.0) 70%), radial-gradient(70% 90% at 15% 10%, rgba(124,70,255,0.16), rgba(0,0,0,0) 60%), radial-gradient(60% 80% at 85% 20%, rgba(47,140,255,0.16), rgba(0,0,0,0) 60%); animation: bgDrift 36s ease-in-out infinite alternate; }
+body.theme-hitech #gridOuter { background: linear-gradient(180deg, rgba(16,21,50,0.85), rgba(24,30,61,0.85)); box-shadow: 0 36px 70px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(124,70,255,0.35), inset 0 0 0 2px rgba(47,140,255,0.25), inset 0 -8px 20px rgba(0,0,0,0.5); backdrop-filter: blur(16px); }
+body.theme-hitech #gameGrid { border-color: rgba(124,70,255,0.35); }
+/* Scanning line */
+body.theme-hitech #gridOuter > .scan-line { display: block; }
+body.theme-hitech #gridOuter::after { animation: frameShimmer 20s ease-in-out infinite; }
+
+/* Space Arena (Impossible) */
+body.theme-space::before { background: radial-gradient(120% 100% at 50% 30%, rgba(20,25,60,0.35), rgba(0,0,0,0) 70%), radial-gradient(80% 100% at 70% 10%, rgba(10,16,42,0.35), rgba(0,0,0,0) 70%), linear-gradient(180deg, #040617, #030414); animation: bgDrift 50s ease-in-out infinite alternate; }
+body.theme-space::after { opacity: 0.12; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'><g fill='white' opacity='0.5'><circle cx='10' cy='20' r='1'/><circle cx='50' cy='10' r='1.2'/><circle cx='70' cy='50' r='0.8'/><circle cx='90' cy='80' r='1.4'/><circle cx='30' cy='90' r='1.1'/></g></svg>"); background-size: 256px 256px; mix-blend-mode: screen; }
+body.theme-space #gridOuter { background: linear-gradient(180deg, #0b0f2b, #05071a); box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(120,160,255,0.35), inset 0 0 24px rgba(120,160,255,0.35), inset 0 -10px 26px rgba(0,0,0,0.6); }
+body.theme-space #gameGrid { border-color: rgba(120,160,255,0.45); }
