@@ -35,10 +35,10 @@
         <h2>Choose Game Mode</h2>
         <p>Select how you want to play SQUARE WARS:</p>
         <button class="single-player" onclick="setGameMode('single')">
-          🔴 Single Player<br /><small>vs Computer</small>
+          Single Player<br /><small>vs Computer</small>
         </button>
         <button onclick="setGameMode('multi')">
-          🔵 Multiplayer<br /><small>2 Players</small>
+          Multiplayer<br /><small>2 Players</small>
         </button>
       </div>
     </div>
@@ -65,12 +65,12 @@
         <h2>Choose Scoring Style</h2>
 
         <button class="classic-mode" onclick="setScoringMode('classic')">
-          🧱 Classic (Box Points)<br />
+          Classic (Box Points)<br />
           <small>Each captured box is worth <strong>1 point</strong>.</small>
         </button>
 
         <button class="area-mode" onclick="setScoringMode('area')">
-          🗺️ Territory Takedown (Area Mode)<br />
+          Territory Takedown (Area Mode)<br />
           <small
             >Score the <strong>number of squares</strong> inside a captured
             zone. Overlaps can <strong>steal</strong> territory!</small
@@ -79,7 +79,7 @@
 
         <!-- Quick Fire goes to its own screen -->
         <button class="quickfire-mode" onclick="setScoringMode('quickfire')">
-          ⚡ Quick Fire<br />
+          Quick Fire<br />
           <small>Classic scoring with a win target.</small>
         </button>
       </div>
@@ -123,16 +123,16 @@
         <h2>Choose Difficulty</h2>
         <p>Select the AI difficulty level:</p>
         <button class="beginner" onclick="setDifficulty('beginner')">
-          🟢 Beginner<br /><small>Fast & Friendly</small>
+          Beginner<br /><small>Fast & Friendly</small>
         </button>
         <button class="medium" onclick="setDifficulty('medium')">
-          🟡 Medium<br /><small>Balanced Challenge</small>
+          Medium<br /><small>Balanced Challenge</small>
         </button>
         <button class="advanced" onclick="setDifficulty('advanced')">
-          🔴 Advanced<br /><small>Tough Opponent</small>
+          Advanced<br /><small>Tough Opponent</small>
         </button>
         <button class="impossible" onclick="setDifficulty('impossible')">
-          🟣 Impossible<br /><small>Perfect Play</small>
+          Impossible<br /><small>Perfect Play</small>
         </button>
       </div>
     </div>
@@ -152,8 +152,8 @@
       <div class="modal">
         <h2 id="endGameTitle">Game Over</h2>
         <p id="endGameSubtitle">Winner: <strong>—</strong></p>
-        <button id="tryAgainBtn">🔄 Try Again</button>
-        <button id="changeModeBtn">🛠️ Change Mode</button>
+        <button id="tryAgainBtn">Try Again</button>
+        <button id="changeModeBtn">Change Mode</button>
       </div>
     </div>
 
@@ -199,11 +199,11 @@
     <div id="inGameMenuOverlay" class="modal-overlay hidden" aria-hidden="true">
       <div class="modal in-game-menu">
         <h2>Menu</h2>
-        <button onclick="resetGameAndCloseMenu()">🔄 Reset Game</button>
-        <button onclick="openModeSelect()">🛠️ Change Game Mode</button>
-        <button onclick="openSettings()">⚙️ Settings</button>
-        <button onclick="goToMainMenu()">🏠 Main Menu</button>
-        <button onclick="closeInGameMenu()">✖ Close</button>
+        <button onclick="resetGameAndCloseMenu()">Reset Game</button>
+        <button onclick="openModeSelect()">Change Game Mode</button>
+        <button onclick="openSettings()">Settings</button>
+        <button onclick="goToMainMenu()">Main Menu</button>
+        <button onclick="closeInGameMenu()">Close</button>
       </div>
     </div>
     </div>

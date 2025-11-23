@@ -32,6 +32,7 @@ import {
   resetBoardUI,
   updateColumnHighlight,
   hideColumnHighlight,
+  enablePressedFeedback,
 } from "./ui.js";
 
 import { chooseComputerMove } from "./ai.js";
@@ -634,7 +635,7 @@ function ensureControlsUI() {
 
   const mainBtn = controls.querySelector("button");
   if (mainBtn) {
-    mainBtn.textContent = "🔄 Reset";
+    mainBtn.textContent = "Reset";
     mainBtn.onclick = () => initGame();
     mainBtn.setAttribute("title", "Reset the board (keeps mode & difficulty)");
   }
@@ -643,7 +644,7 @@ function ensureControlsUI() {
   if (!changeBtn) {
     changeBtn = document.createElement("button");
     changeBtn.id = "changeModeInlineBtn";
-    changeBtn.textContent = "🛠️ Change Mode";
+    changeBtn.textContent = "Change Mode";
     changeBtn.style.marginLeft = "10px";
     controls.appendChild(changeBtn);
   }
@@ -963,6 +964,7 @@ window.resetGameAndCloseMenu = resetGameAndCloseMenu;
 // initialize buttons on first load
 ensureControlsUI();
 applyResponsiveScale();
+enablePressedFeedback();
 
 // --- NEW: Board side controls wiring ---
 function wireBoardControlsUI() {

@@ -64,6 +64,27 @@ export function hideColumnHighlight() {
   }
 }
 
+export function enablePressedFeedback() {
+  if (enablePressedFeedback._bound) return;
+  const add = (el) => { if (el) el.classList.add("is-pressed"); };
+  const remove = (el) => { if (el) el.classList.remove("is-pressed"); };
+  document.addEventListener(
+    "touchstart",
+    (e) => {
+      const btn = e.target && (e.target.closest && e.target.closest("button"));
+      if (btn) add(btn);
+    },
+    { passive: true }
+  );
+  const endHandler = (e) => {
+    const pressed = document.querySelectorAll("button.is-pressed");
+    pressed.forEach((b) => remove(b));
+  };
+  document.addEventListener("touchend", endHandler, { passive: true });
+  document.addEventListener("touchcancel", endHandler, { passive: true });
+  enablePressedFeedback._bound = true;
+}
+
 export function applyResponsiveScale() {
   const cols = 30,
     rows = 20;
