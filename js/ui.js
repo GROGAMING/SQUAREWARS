@@ -16,6 +16,46 @@ export function getScale() {
   return SCALE;
 }
 
+/** Create/update the yellow column highlight overlay at the given column index */
+export function updateColumnHighlight(selectedCol) {
+  const layer = document.getElementById(UI_IDS.outlineLayer);
+  const canvas = document.getElementById("boardCanvas") || ensureCanvas();
+  if (!layer || !canvas || selectedCol == null) return;
+  lastSelectedCol = selectedCol;
+
+  const rows = (cachedGrid && cachedGrid.length) || 20;
+  const cols = (cachedGrid && cachedGrid[0] && cachedGrid[0].length) || 30;
+  const { cell, gap, step, height } = computeCanvasMetrics(rows, cols);
+
+  // Compute offset between canvas and overlay layer
+  const layerRect = layer.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
+  const offsetX = canvasRect.left - layerRect.left;
+  const offsetY = canvasRect.top - layerRect.top;
+
+  const x = offsetX + selectedCol * step;
+  const y = offsetY;
+  const w = cell; // highlight only the cell width, not the gap
+  const h = Math.round(height);
+
+  let hi = document.getElementById(UI_IDS.highlightCol);
+  if (!hi) {
+    hi = document.createElement("div");
+    hi.id = UI_IDS.highlightCol;
+    hi.style.position = "absolute";
+    hi.style.pointerEvents = "none";
+    hi.style.zIndex = "3";
+    hi.style.background = "rgba(255, 209, 102, 0.28)"; // yellow semi-transparent
+    hi.style.boxShadow = "inset 0 0 0 2px rgba(255, 209, 102, 0.5)";
+    layer.appendChild(hi);
+  }
+  hi.style.left = `${Math.round(x)}px`;
+  hi.style.top = `${Math.round(y)}px`;
+  hi.style.width = `${Math.max(0, Math.round(w))}px`;
+  hi.style.height = `${Math.max(0, h)}px`;
+  hi.style.borderRadius = "4px";
+}
+
 export function applyResponsiveScale() {
   const cols = 30,
     rows = 20;
@@ -80,6 +120,7 @@ let boardCtx = null;
 let cachedGrid = null;
 let cachedBlocked = null;
 let cachedLastMove = null;
+let lastSelectedCol = null;
 
 function ensureCanvas() {
   if (!boardCanvas) {
@@ -232,6 +273,7 @@ function ensureGridResizeObserver() {
       // Keep CSS scale reactive and redraw the canvas to the new measured size
       applyResponsiveScale();
       redrawFromCache();
+      if (lastSelectedCol != null) updateColumnHighlight(lastSelectedCol);
     });
     gridRO.observe(target);
   } catch (e) {
@@ -246,6 +288,7 @@ export function resetBoardUI() {
   cachedBlocked = null;
   cachedLastMove = null;
   uiLastMoveToken = 0;
+  lastSelectedCol = null;
 
   // Remove canvas so buildGrid can recreate a fresh one
   const host = document.getElementById(UI_IDS.gameGrid);

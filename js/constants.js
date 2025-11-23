@@ -53,6 +53,15 @@ export const UI_IDS = Object.freeze({
   gridOuter: "gridOuter",
   outlineLayer: "outlineLayer",
 
+  // Touch-friendly controls
+  highlightCol: "highlightCol",
+  controlsLeft: "boardControlsLeft",
+  controlsRight: "boardControlsRight",
+  btnToggleControlMode: "btnToggleControlMode",
+  btnArrowLeft: "btnArrowLeft",
+  btnDrop: "btnDrop",
+  btnArrowRight: "btnArrowRight",
+
   tryAgainBtn: "tryAgainBtn",
   changeModeBtn: "changeModeBtn",
 });

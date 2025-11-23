@@ -30,6 +30,7 @@ import {
   applyResponsiveScale,
   getScale,
   resetBoardUI,
+  updateColumnHighlight,
 } from "./ui.js";
 
 import { chooseComputerMove } from "./ai.js";
@@ -58,6 +59,10 @@ let touchTrack = { active: false, id: null, startX: 0, startY: 0, moved: false }
 
 let inputHandlersBound = false;
 let inputHandlePick = (clientX) => {};
+// --- NEW: control mode & selected column state ---
+let controlMode = "tap"; // "tap" | "buttons"
+let selectedColumnIndex = 0;
+
 // Menu navigation stack for full-screen menu screens
 let menuStack = [];
 
@@ -229,19 +234,29 @@ function initGame() {
   lastMovePosition = null;
   ownership = Object.create(null);
   moveToken = 0;
+  // Initialize control state
+  controlMode = controlMode || "tap";
+  selectedColumnIndex = Math.max(0, Math.min(COLS - 1, selectedColumnIndex || 0));
 
   const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
   if (outlineLayer) outlineLayer.innerHTML = "";
 
   buildGrid(ROWS, COLS, () => {});
+  // Ensure highlight starts at current selected column
+  updateColumnHighlight(selectedColumnIndex);
 
   // Scale-aware click/touch handlers
   const gameGrid = document.getElementById(UI_IDS.gameGrid);
   inputHandlePick = (clientX) => {
     const col = colFromClient(clientX);
+    // Always move highlight to tapped column
+    selectedColumnIndex = col;
+    updateColumnHighlight(selectedColumnIndex);
     if (!gameActive) return;
     if (gameMode === GAME_MODES.SINGLE && currentPlayer !== PLAYER.RED) return;
-    dropPiece(col);
+    if (controlMode === "tap") {
+      dropPiece(col);
+    }
   };
   if (gameGrid && !inputHandlersBound) {
     // remove previous direct handlers (if any)
@@ -341,6 +356,7 @@ function initGame() {
   }
 
   ensureControlsUI();
+  wireBoardControlsUI();
   updateDisplay(
     currentPlayer,
     gameMode,
@@ -679,6 +695,8 @@ window.addEventListener("resize", () => {
     const input = document.getElementById("qfTarget");
     onQuickfireInput(input);
   }
+  // Keep column highlight aligned after resize
+  updateColumnHighlight(selectedColumnIndex);
 });
 
 {
@@ -932,3 +950,57 @@ window.resetGameAndCloseMenu = resetGameAndCloseMenu;
 // initialize buttons on first load
 ensureControlsUI();
 applyResponsiveScale();
+
+// --- NEW: Board side controls wiring ---
+function wireBoardControlsUI() {
+  const btnToggle = document.getElementById(UI_IDS.btnToggleControlMode);
+  const btnLeft = document.getElementById(UI_IDS.btnArrowLeft);
+  const btnRight = document.getElementById(UI_IDS.btnArrowRight);
+  const btnDrop = document.getElementById(UI_IDS.btnDrop);
+
+  if (btnToggle && !btnToggle._bound) {
+    btnToggle.addEventListener("click", () => {
+      controlMode = controlMode === "tap" ? "buttons" : "tap";
+      refreshControlButtonsUI();
+    });
+    btnToggle._bound = true;
+  }
+  if (btnLeft && !btnLeft._bound) {
+    btnLeft.addEventListener("click", () => {
+      if (controlMode !== "buttons") return;
+      selectedColumnIndex = Math.max(0, selectedColumnIndex - 1);
+      updateColumnHighlight(selectedColumnIndex);
+    });
+    btnLeft._bound = true;
+  }
+  if (btnRight && !btnRight._bound) {
+    btnRight.addEventListener("click", () => {
+      if (controlMode !== "buttons") return;
+      selectedColumnIndex = Math.min(COLS - 1, selectedColumnIndex + 1);
+      updateColumnHighlight(selectedColumnIndex);
+    });
+    btnRight._bound = true;
+  }
+  if (btnDrop && !btnDrop._bound) {
+    btnDrop.addEventListener("click", () => {
+      if (controlMode !== "buttons") return;
+      if (!gameActive) return;
+      if (gameMode === GAME_MODES.SINGLE && currentPlayer !== PLAYER.RED) return;
+      dropPiece(selectedColumnIndex);
+    });
+    btnDrop._bound = true;
+  }
+  refreshControlButtonsUI();
+}
+
+function refreshControlButtonsUI() {
+  const btnToggle = document.getElementById(UI_IDS.btnToggleControlMode);
+  const btnLeft = document.getElementById(UI_IDS.btnArrowLeft);
+  const btnRight = document.getElementById(UI_IDS.btnArrowRight);
+  const btnDrop = document.getElementById(UI_IDS.btnDrop);
+  if (btnToggle) btnToggle.textContent = controlMode === "tap" ? "Tap to Drop" : "Button Drop";
+  const disabled = controlMode !== "buttons";
+  if (btnLeft) btnLeft.disabled = disabled;
+  if (btnRight) btnRight.disabled = disabled;
+  if (btnDrop) btnDrop.disabled = disabled;
+}

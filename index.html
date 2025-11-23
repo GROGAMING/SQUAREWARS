@@ -168,8 +168,17 @@
     </div>
 
     <div class="grid-outer" id="gridOuter">
+      <!-- Touch-friendly side controls -->
+      <div id="boardControlsLeft" class="board-controls side left" aria-label="Left board controls">
+        <button id="btnToggleControlMode" class="ctrl-btn ctrl-toggle" type="button">Tap to Drop</button>
+        <button id="btnArrowLeft" class="ctrl-btn ctrl-arrow" type="button" aria-label="Move left">◀</button>
+      </div>
       <div class="grid" id="gameGrid"></div>
       <div id="outlineLayer"></div>
+      <div id="boardControlsRight" class="board-controls side right" aria-label="Right board controls">
+        <button id="btnDrop" class="ctrl-btn ctrl-drop" type="button">Drop</button>
+        <button id="btnArrowRight" class="ctrl-btn ctrl-arrow" type="button" aria-label="Move right">▶</button>
+      </div>
     </div>
 
     <!-- In-game Options Overlay -->
