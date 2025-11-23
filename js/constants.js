@@ -50,6 +50,7 @@ export const UI_IDS = Object.freeze({
   currentPlayerBanner: "currentPlayerBanner",
 
   gameGrid: "gameGrid",
+  gridOuter: "gridOuter",
   outlineLayer: "outlineLayer",
 
   tryAgainBtn: "tryAgainBtn",

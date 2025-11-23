@@ -94,6 +94,32 @@ function ensureCanvas() {
 }
 
 function computeCanvasMetrics(rows, cols) {
+  // Prefer measuring the actual inner content size of the grid container
+  const gridEl = document.getElementById(UI_IDS.gameGrid);
+  if (gridEl) {
+    const cs = getComputedStyle(gridEl);
+    const padL = parseFloat(cs.paddingLeft) || 0;
+    const padR = parseFloat(cs.paddingRight) || 0;
+    const padT = parseFloat(cs.paddingTop) || 0;
+    const padB = parseFloat(cs.paddingBottom) || 0;
+    const contentW = Math.max(0, gridEl.clientWidth - padL - padR);
+    const contentH = Math.max(0, gridEl.clientHeight - padT - padB);
+    if (contentW > 0 && contentH > 0) {
+      const baseW = cols * CELL + (cols - 1) * GAP;
+      const baseH = rows * CELL + (rows - 1) * GAP;
+      // Calculate scale from the measured content box; width & height should match
+      const s = contentW / baseW; // height should be equivalent since both use the same CSS var scale
+      const cell = CELL * s;
+      const gap = GAP * s;
+      const step = cell + gap;
+      // Use measured content size to ensure perfect edge fit
+      const width = Math.round(contentW);
+      const height = Math.round(contentH);
+      return { cell, gap, step, width, height };
+    }
+  }
+
+  // Fallback: derive from global SCALE
   const s = getScale();
   const cell = CELL * s;
   const gap = GAP * s;
@@ -192,6 +218,24 @@ function drawBoardFromState(grid, blockedCells, lastMove) {
 function redrawFromCache() {
   if (boardCanvas && cachedGrid) {
     drawBoardFromState(cachedGrid, cachedBlocked || new Set(), cachedLastMove || null);
+  }
+}
+
+// Observe grid container size and keep canvas perfectly fitted
+let gridRO = null;
+function ensureGridResizeObserver() {
+  if (gridRO) return;
+  const target = document.getElementById(UI_IDS.gridOuter) || document.getElementById(UI_IDS.gameGrid);
+  if (!target) return;
+  try {
+    gridRO = new ResizeObserver(() => {
+      // Keep CSS scale reactive and redraw the canvas to the new measured size
+      applyResponsiveScale();
+      redrawFromCache();
+    });
+    gridRO.observe(target);
+  } catch (e) {
+    // ResizeObserver not available; rely on window resize listener
   }
 }
 
@@ -298,8 +342,17 @@ export function buildGrid(rows, cols, onColumnClick) {
   c.style.width = width + "px";
   c.style.height = height + "px";
   const empty = Array.from({ length: rows }, () => Array(cols).fill(0));
-  drawBoardFromState(empty, new Set(), null);
+  // Cache an empty board so any subsequent redraws (e.g., ResizeObserver) can render immediately
+  cachedGrid = empty;
+  cachedBlocked = new Set();
+  cachedLastMove = null;
+  drawBoardFromState(empty, cachedBlocked, cachedLastMove);
   ensureBoxesSvg();
+  // Start observing size changes so the canvas always fills the border perfectly
+  ensureGridResizeObserver();
+  // Ensure CSS scale is correct and repaint once after initial mount
+  applyResponsiveScale();
+  redrawFromCache();
 }
 
 /**
