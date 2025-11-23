@@ -29,6 +29,7 @@ import {
   updateLabelsForModeUI,
   applyResponsiveScale,
   getScale,
+  resetBoardUI,
 } from "./ui.js";
 
 import { chooseComputerMove } from "./ai.js";
@@ -619,6 +620,8 @@ function ensureControlsUI() {
     controls.appendChild(changeBtn);
   }
   changeBtn.onclick = () => {
+    // Ensure visuals are cleared when changing mode inline
+    resetBoardUI();
     const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
     if (outlineLayer) outlineLayer.innerHTML = "";
     redGames = 0;
@@ -713,6 +716,8 @@ document.getElementById(UI_IDS.tryAgainBtn).addEventListener("click", () => {
   hideEndGameModal();
   redGames = 0;
   blueGames = 0;
+  // Clear any previous rendering before starting a new game
+  resetBoardUI();
   initGame();
   updateDisplay(
     currentPlayer,
@@ -726,6 +731,8 @@ document.getElementById(UI_IDS.tryAgainBtn).addEventListener("click", () => {
 
 document.getElementById(UI_IDS.changeModeBtn).addEventListener("click", () => {
   hideEndGameModal();
+  // Clear board visuals when switching modes
+  resetBoardUI();
   const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
   if (outlineLayer) outlineLayer.innerHTML = "";
   redGames = 0;
@@ -793,6 +800,8 @@ function openModeSelect() {
   closeInGameMenu();
   hideMainMenu();
   hideGameScreen();
+  // Ensure old canvas/overlays are cleared before changing modes
+  resetBoardUI();
   const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
   if (outlineLayer) outlineLayer.innerHTML = "";
   redGames = 0;
@@ -821,6 +830,8 @@ function quickStart() {
 function goToMainMenu() {
   // Close any in-game overlays, then show main menu screen.
   closeInGameMenu();
+  // Clear rendering so the next game starts visually fresh
+  resetBoardUI();
   const modals = [
     UI_IDS.instructionsModal,
     UI_IDS.difficultySelectModal,
@@ -849,6 +860,8 @@ function startGameFromMenu() {
   // Reset stack to root
   menuStack = ['mainMenuScreen'];
   hideMainMenu();
+  // Force a fresh board render before showing the game screen
+  resetBoardUI();
   showGameScreen();
   initGame();
 }
@@ -902,6 +915,7 @@ window.openTutorial = openTutorial;
 window.closeTutorial = closeTutorial;
 function resetGameAndCloseMenu() {
   // Use existing reset, then close the in-game overlay.
+  resetBoardUI();
   initGame();
   updateDisplay(
     currentPlayer,

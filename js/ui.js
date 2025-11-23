@@ -195,6 +195,25 @@ function redrawFromCache() {
   }
 }
 
+/** Clear all board rendering state (canvas, overlay, and caches). UI-only. */
+export function resetBoardUI() {
+  // Clear caches used by redrawFromCache to prevent old state from reappearing
+  cachedGrid = null;
+  cachedBlocked = null;
+  cachedLastMove = null;
+  uiLastMoveToken = 0;
+
+  // Remove canvas so buildGrid can recreate a fresh one
+  const host = document.getElementById(UI_IDS.gameGrid);
+  if (host) host.innerHTML = "";
+  boardCanvas = null;
+  boardCtx = null;
+
+  // Clear overlay layer (outlines, win strikes, etc.)
+  const layer = document.getElementById(UI_IDS.outlineLayer);
+  if (layer) layer.innerHTML = "";
+}
+
 /** Track which move is the real "last move" to avoid race conditions */
 let uiLastMoveToken = 0;
 
