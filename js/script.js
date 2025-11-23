@@ -31,6 +31,7 @@ import {
   getScale,
   resetBoardUI,
   updateColumnHighlight,
+  hideColumnHighlight,
 } from "./ui.js";
 
 import { chooseComputerMove } from "./ai.js";
@@ -236,14 +237,22 @@ function initGame() {
   moveToken = 0;
   // Initialize control state
   controlMode = controlMode || "tap";
-  selectedColumnIndex = Math.max(0, Math.min(COLS - 1, selectedColumnIndex || 0));
+  if (controlMode === "buttons") {
+    selectedColumnIndex = Math.floor(COLS / 2);
+  } else {
+    selectedColumnIndex = Math.max(0, Math.min(COLS - 1, selectedColumnIndex || 0));
+  }
 
   const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
   if (outlineLayer) outlineLayer.innerHTML = "";
 
   buildGrid(ROWS, COLS, () => {});
-  // Ensure highlight starts at current selected column
-  updateColumnHighlight(selectedColumnIndex);
+  // Ensure highlight visibility matches mode
+  if (controlMode === "buttons") {
+    updateColumnHighlight(selectedColumnIndex);
+  } else {
+    hideColumnHighlight();
+  }
 
   // Scale-aware click/touch handlers
   const gameGrid = document.getElementById(UI_IDS.gameGrid);
@@ -251,7 +260,8 @@ function initGame() {
     const col = colFromClient(clientX);
     // Always move highlight to tapped column
     selectedColumnIndex = col;
-    updateColumnHighlight(selectedColumnIndex);
+    if (controlMode === "buttons") updateColumnHighlight(selectedColumnIndex);
+    else hideColumnHighlight();
     if (!gameActive) return;
     if (gameMode === GAME_MODES.SINGLE && currentPlayer !== PLAYER.RED) return;
     if (controlMode === "tap") {
@@ -695,8 +705,9 @@ window.addEventListener("resize", () => {
     const input = document.getElementById("qfTarget");
     onQuickfireInput(input);
   }
-  // Keep column highlight aligned after resize
-  updateColumnHighlight(selectedColumnIndex);
+  // Keep column highlight aligned after resize (only in Button mode)
+  if (controlMode === "buttons") updateColumnHighlight(selectedColumnIndex);
+  else hideColumnHighlight();
 });
 
 {
@@ -960,27 +971,109 @@ function wireBoardControlsUI() {
 
   if (btnToggle && !btnToggle._bound) {
     btnToggle.addEventListener("click", () => {
-      controlMode = controlMode === "tap" ? "buttons" : "tap";
+      const next = controlMode === "tap" ? "buttons" : "tap";
+      controlMode = next;
+      if (controlMode === "buttons") {
+        selectedColumnIndex = Math.floor(COLS / 2);
+        updateColumnHighlight(selectedColumnIndex);
+      } else {
+        hideColumnHighlight();
+      }
       refreshControlButtonsUI();
     });
+    // Prevent double-tap zoom on mobile and trigger click manually on touchend
+    btnToggle.addEventListener("touchstart", (e) => e.preventDefault(), { passive: false });
+    btnToggle.addEventListener(
+      "touchend",
+      (e) => {
+        e.preventDefault();
+        btnToggle.click();
+      },
+      { passive: false }
+    );
     btnToggle._bound = true;
   }
-  if (btnLeft && !btnLeft._bound) {
-    btnLeft.addEventListener("click", () => {
-      if (controlMode !== "buttons") return;
-      selectedColumnIndex = Math.max(0, selectedColumnIndex - 1);
-      updateColumnHighlight(selectedColumnIndex);
-    });
-    btnLeft._bound = true;
+  // Helper to move and update highlight if in Button mode
+  function moveLeftOnce() {
+    if (controlMode !== "buttons") return;
+    const prev = selectedColumnIndex;
+    selectedColumnIndex = Math.max(0, selectedColumnIndex - 1);
+    if (selectedColumnIndex !== prev) updateColumnHighlight(selectedColumnIndex);
   }
-  if (btnRight && !btnRight._bound) {
-    btnRight.addEventListener("click", () => {
-      if (controlMode !== "buttons") return;
-      selectedColumnIndex = Math.min(COLS - 1, selectedColumnIndex + 1);
-      updateColumnHighlight(selectedColumnIndex);
-    });
-    btnRight._bound = true;
+  function moveRightOnce() {
+    if (controlMode !== "buttons") return;
+    const prev = selectedColumnIndex;
+    selectedColumnIndex = Math.min(COLS - 1, selectedColumnIndex + 1);
+    if (selectedColumnIndex !== prev) updateColumnHighlight(selectedColumnIndex);
   }
+
+  function attachHoldHandlers(btn, moveOnce, direction) {
+    if (!btn || btn._holdBound) return;
+    let tId = null;
+    let iId = null;
+    let suppressClick = false;
+
+    const clearTimers = () => {
+      if (tId) {
+        clearTimeout(tId);
+        tId = null;
+      }
+      if (iId) {
+        clearInterval(iId);
+        iId = null;
+      }
+    };
+
+    const startHold = (e) => {
+      if (controlMode !== "buttons") return;
+      // prevent click zoom on touch and avoid text selection
+      if (e) e.preventDefault();
+      suppressClick = true;
+      moveOnce(); // immediate first step
+      clearTimers();
+      tId = setTimeout(() => {
+        iId = setInterval(() => {
+          const before = selectedColumnIndex;
+          moveOnce();
+          if (selectedColumnIndex === before) {
+            // hit edge, stop auto repeat
+            clearTimers();
+          }
+        }, 100);
+      }, 250);
+    };
+
+    const endHold = (e) => {
+      if (e) e.preventDefault();
+      clearTimers();
+      // suppress the synthetic click after a hold
+      setTimeout(() => (suppressClick = false), 0);
+    };
+
+    // Mouse
+    btn.addEventListener("mousedown", startHold);
+    btn.addEventListener("mouseup", endHold);
+    btn.addEventListener("mouseleave", endHold);
+    // Touch
+    btn.addEventListener("touchstart", startHold, { passive: false });
+    btn.addEventListener("touchend", endHold, { passive: false });
+    btn.addEventListener("touchcancel", endHold, { passive: false });
+
+    // Click fallback (single taps/clicks) while not suppressing
+    btn.addEventListener("click", (e) => {
+      if (suppressClick) {
+        e.preventDefault();
+        return;
+      }
+      moveOnce();
+    });
+
+    btn._holdBound = true;
+  }
+
+  attachHoldHandlers(btnLeft, moveLeftOnce, -1);
+  attachHoldHandlers(btnRight, moveRightOnce, +1);
+
   if (btnDrop && !btnDrop._bound) {
     btnDrop.addEventListener("click", () => {
       if (controlMode !== "buttons") return;
@@ -988,6 +1081,16 @@ function wireBoardControlsUI() {
       if (gameMode === GAME_MODES.SINGLE && currentPlayer !== PLAYER.RED) return;
       dropPiece(selectedColumnIndex);
     });
+    // Prevent double-tap zoom on mobile; trigger click on touchend
+    btnDrop.addEventListener("touchstart", (e) => e.preventDefault(), { passive: false });
+    btnDrop.addEventListener(
+      "touchend",
+      (e) => {
+        e.preventDefault();
+        btnDrop.click();
+      },
+      { passive: false }
+    );
     btnDrop._bound = true;
   }
   refreshControlButtonsUI();

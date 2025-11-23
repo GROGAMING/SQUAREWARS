@@ -56,6 +56,14 @@ export function updateColumnHighlight(selectedCol) {
   hi.style.borderRadius = "4px";
 }
 
+/** Remove the yellow column highlight overlay, if present */
+export function hideColumnHighlight() {
+  const hi = document.getElementById(UI_IDS.highlightCol);
+  if (hi && hi.parentElement) {
+    hi.parentElement.removeChild(hi);
+  }
+}
+
 export function applyResponsiveScale() {
   const cols = 30,
     rows = 20;
@@ -273,7 +281,9 @@ function ensureGridResizeObserver() {
       // Keep CSS scale reactive and redraw the canvas to the new measured size
       applyResponsiveScale();
       redrawFromCache();
-      if (lastSelectedCol != null) updateColumnHighlight(lastSelectedCol);
+      // Only reposition highlight if it already exists (avoid recreating in Tap mode)
+      const hi = document.getElementById(UI_IDS.highlightCol);
+      if (hi && lastSelectedCol != null) updateColumnHighlight(lastSelectedCol);
     });
     gridRO.observe(target);
   } catch (e) {

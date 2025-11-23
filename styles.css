@@ -54,6 +54,10 @@
   font-size: clamp(12px, 1vw + 9px, 14px);
   min-width: 54px;
   text-align: center;
+  /* Prevent double-tap zoom and accidental selection on rapid presses */
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .ctrl-btn.ctrl-arrow { padding: 8px 12px; min-width: 44px; font-size: clamp(14px, 1vw + 10px, 16px); }
 .ctrl-btn.ctrl-drop { background: linear-gradient(145deg, #ffe259, #ffc107); color: #1a1a1a; }
