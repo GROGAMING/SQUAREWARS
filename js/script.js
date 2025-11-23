@@ -61,8 +61,9 @@ let touchTrack = { active: false, id: null, startX: 0, startY: 0, moved: false }
 let inputHandlersBound = false;
 let inputHandlePick = (clientX) => {};
 // --- NEW: control mode & selected column state ---
-let controlMode = "tap"; // "tap" | "buttons"
+let controlMode = "touch"; // "touch" | "buttons"
 let selectedColumnIndex = 0;
+let settingsReturnToGame = false;
 
 // Menu navigation stack for full-screen menu screens
 let menuStack = [];
@@ -236,7 +237,7 @@ function initGame() {
   ownership = Object.create(null);
   moveToken = 0;
   // Initialize control state
-  controlMode = controlMode || "tap";
+  controlMode = controlMode || "touch";
   if (controlMode === "buttons") {
     selectedColumnIndex = Math.floor(COLS / 2);
   } else {
@@ -253,6 +254,7 @@ function initGame() {
   } else {
     hideColumnHighlight();
   }
+  updateBoardControlsVisibility();
 
   // Scale-aware click/touch handlers
   const gameGrid = document.getElementById(UI_IDS.gameGrid);
@@ -264,7 +266,7 @@ function initGame() {
     else hideColumnHighlight();
     if (!gameActive) return;
     if (gameMode === GAME_MODES.SINGLE && currentPlayer !== PLAYER.RED) return;
-    if (controlMode === "tap") {
+    if (controlMode === "touch") {
       dropPiece(col);
     }
   };
@@ -964,35 +966,10 @@ applyResponsiveScale();
 
 // --- NEW: Board side controls wiring ---
 function wireBoardControlsUI() {
-  const btnToggle = document.getElementById(UI_IDS.btnToggleControlMode);
   const btnLeft = document.getElementById(UI_IDS.btnArrowLeft);
   const btnRight = document.getElementById(UI_IDS.btnArrowRight);
   const btnDrop = document.getElementById(UI_IDS.btnDrop);
-
-  if (btnToggle && !btnToggle._bound) {
-    btnToggle.addEventListener("click", () => {
-      const next = controlMode === "tap" ? "buttons" : "tap";
-      controlMode = next;
-      if (controlMode === "buttons") {
-        selectedColumnIndex = Math.floor(COLS / 2);
-        updateColumnHighlight(selectedColumnIndex);
-      } else {
-        hideColumnHighlight();
-      }
-      refreshControlButtonsUI();
-    });
-    // Prevent double-tap zoom on mobile and trigger click manually on touchend
-    btnToggle.addEventListener("touchstart", (e) => e.preventDefault(), { passive: false });
-    btnToggle.addEventListener(
-      "touchend",
-      (e) => {
-        e.preventDefault();
-        btnToggle.click();
-      },
-      { passive: false }
-    );
-    btnToggle._bound = true;
-  }
+  // No in-game toggle anymore; controlled via Settings screen
   // Helper to move and update highlight if in Button mode
   function moveLeftOnce() {
     if (controlMode !== "buttons") return;
@@ -1094,16 +1071,79 @@ function wireBoardControlsUI() {
     btnDrop._bound = true;
   }
   refreshControlButtonsUI();
+  updateBoardControlsVisibility();
 }
 
 function refreshControlButtonsUI() {
-  const btnToggle = document.getElementById(UI_IDS.btnToggleControlMode);
   const btnLeft = document.getElementById(UI_IDS.btnArrowLeft);
   const btnRight = document.getElementById(UI_IDS.btnArrowRight);
   const btnDrop = document.getElementById(UI_IDS.btnDrop);
-  if (btnToggle) btnToggle.textContent = controlMode === "tap" ? "Tap to Drop" : "Button Drop";
   const disabled = controlMode !== "buttons";
   if (btnLeft) btnLeft.disabled = disabled;
   if (btnRight) btnRight.disabled = disabled;
   if (btnDrop) btnDrop.disabled = disabled;
 }
+
+function updateBoardControlsVisibility() {
+  const left = document.getElementById(UI_IDS.controlsLeft);
+  const right = document.getElementById(UI_IDS.controlsRight);
+  const show = controlMode === "buttons";
+  if (left) left.style.display = show ? "flex" : "none";
+  if (right) right.style.display = show ? "flex" : "none";
+}
+
+// --- Settings navigation & control mode binding ---
+function openSettings() {
+  const g = document.getElementById('gameScreen');
+  const isGameVisible = g && !g.classList.contains(CSS.HIDDEN);
+  settingsReturnToGame = !!isGameVisible;
+  if (settingsReturnToGame) hideGameScreen();
+  // If opened from in-game menu overlay, close it
+  const overlay = document.getElementById('inGameMenuOverlay');
+  if (overlay) {
+    overlay.classList.add(CSS.HIDDEN);
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+  setScreenVisibility(UI_IDS.settingsScreen, true);
+  // Reflect current control mode
+  const rTouch = document.getElementById('cmTouch');
+  const rButtons = document.getElementById('cmButtons');
+  if (rTouch && rButtons) {
+    rTouch.checked = controlMode === 'touch';
+    rButtons.checked = controlMode === 'buttons';
+    if (!openSettings._bound) {
+      const onChange = (e) => {
+        const val = rButtons.checked ? 'buttons' : 'touch';
+        if (val !== controlMode) {
+          const switchingToButtons = val === 'buttons' && controlMode !== 'buttons';
+          controlMode = val;
+          if (controlMode === 'buttons') {
+            if (switchingToButtons) selectedColumnIndex = Math.floor(COLS / 2);
+            updateColumnHighlight(selectedColumnIndex);
+          } else {
+            hideColumnHighlight();
+          }
+          refreshControlButtonsUI();
+          updateBoardControlsVisibility();
+        }
+      };
+      rTouch.addEventListener('change', onChange);
+      rButtons.addEventListener('change', onChange);
+      openSettings._bound = true;
+    }
+  }
+}
+
+function closeSettings() {
+  setScreenVisibility(UI_IDS.settingsScreen, false);
+  if (settingsReturnToGame) {
+    showGameScreen();
+    settingsReturnToGame = false;
+  }
+  // Ensure UI reflects the latest chosen control mode
+  refreshControlButtonsUI();
+  updateBoardControlsVisibility();
+}
+
+window.openSettings = openSettings;
+window.closeSettings = closeSettings;

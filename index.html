@@ -17,9 +17,9 @@
       <div class="menu-wrap">
         <h1 class="menu-title">SQUARE WARS</h1>
         <div class="menu-actions">
-          <button class="menu-primary" onclick="quickStart()">▶ Play</button>
-          <button class="menu-secondary" onclick="openModeSelect()">Game Mode</button>
+          <button class="menu-primary" onclick="openModeSelect()">Choose Game Mode</button>
           <button class="menu-secondary" onclick="openTutorial()">Tutorial</button>
+          <button class="menu-secondary" onclick="openSettings()">Settings</button>
         </div>
         <div class="menu-tutorial">
           <button class="menu-back" onclick="closeTutorial()">← Back</button>
@@ -40,6 +40,21 @@
         <button onclick="setGameMode('multi')">
           🔵 Multiplayer<br /><small>2 Players</small>
         </button>
+      </div>
+    </div>
+
+    <!-- Settings Screen (full-screen) -->
+    <div id="settingsScreen" class="menu-screen hidden" aria-hidden="true">
+      <div class="menu-wrap">
+        <button class="menu-back" onclick="closeSettings()">← Back</button>
+        <h2>Settings</h2>
+        <div class="settings-group">
+          <label><strong>Control Mode</strong></label>
+          <div class="settings-row">
+            <label><input type="radio" name="controlMode" id="cmTouch" value="touch" /> Touch Controls</label>
+            <label><input type="radio" name="controlMode" id="cmButtons" value="buttons" /> Button Controls</label>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -170,7 +185,6 @@
     <div class="grid-outer" id="gridOuter">
       <!-- Touch-friendly side controls -->
       <div id="boardControlsLeft" class="board-controls side left" aria-label="Left board controls">
-        <button id="btnToggleControlMode" class="ctrl-btn ctrl-toggle" type="button">Tap to Drop</button>
         <button id="btnArrowLeft" class="ctrl-btn ctrl-arrow" type="button" aria-label="Move left">◀</button>
       </div>
       <div class="grid" id="gameGrid"></div>
@@ -187,6 +201,7 @@
         <h2>Menu</h2>
         <button onclick="resetGameAndCloseMenu()">🔄 Reset Game</button>
         <button onclick="openModeSelect()">🛠️ Change Game Mode</button>
+        <button onclick="openSettings()">⚙️ Settings</button>
         <button onclick="goToMainMenu()">🏠 Main Menu</button>
         <button onclick="closeInGameMenu()">✖ Close</button>
       </div>

@@ -29,6 +29,7 @@ export const UI_IDS = Object.freeze({
   scoringSelectModal: "scoringSelectModal",
   quickfireSelectModal: "quickfireSelectModal", // NEW modal
   instructionsModal: "instructionsModal",
+  settingsScreen: "settingsScreen",
   difficultySelectModal: "difficultySelectModal",
   endGameModal: "endGameModal",
   endGameTitle: "endGameTitle",
