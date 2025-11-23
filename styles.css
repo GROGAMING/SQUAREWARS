@@ -5,6 +5,11 @@
   --grid-pad: calc(8px * var(--scale));
   --border: calc(6px * var(--scale));
 }
+.menu-screen:not(.hidden) .menu-wrap { animation: menuIn 180ms ease both; }
+@keyframes menuIn {
+  0% { transform: translateY(14px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
 
 /* In-game menu mild reductions for small viewport heights */
 @media (max-height: 600px) {
@@ -18,7 +23,27 @@
 }
 
 /* Grid outer wrapper to size exact scaled board */
-.grid-outer { width:100%; max-width:100vw; margin:0 auto; position:relative; }
+.grid-outer {
+  width:100%; max-width:100vw; margin:0 auto; position:relative;
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(124,92,255,0.12), rgba(0,0,0,0) 60%),
+    linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  box-shadow:
+    0 18px 48px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    inset 0 -1px 0 rgba(0,0,0,0.2);
+}
+.grid-outer::before {
+  content: "";
+  position: absolute;
+  inset: -6% -10% auto -10%;
+  height: 60%;
+  background: radial-gradient(60% 90% at 50% 30%, rgba(100, 120, 255, 0.26), rgba(0,0,0,0));
+  filter: blur(30px);
+  z-index: 0;
+  pointer-events: none;
+}
 #gridContainer { position:relative; transform:none !important; }
 
 /* NEW: overlay that matches the grid size and never blocks input */
@@ -58,14 +83,47 @@
   touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
 }
+.ctrl-btn:hover { filter: brightness(1.06); }
+.ctrl-btn:active { transform: scale(0.98); box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
 .ctrl-btn.ctrl-arrow { padding: 8px 12px; min-width: 44px; font-size: clamp(14px, 1vw + 10px, 16px); }
 .ctrl-btn.ctrl-drop { background: linear-gradient(145deg, #ffe259, #ffc107); color: #1a1a1a; }
 .ctrl-btn.ctrl-toggle { background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05)); }
 .ctrl-btn[disabled] { opacity: 0.45; pointer-events: none; }
 
 /* Yellow column highlight element lives inside outlineLayer */
-#highlightCol { border-radius: 4px; }
+#highlightCol {
+  border-radius: 4px;
+  transition: left 160ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Transient pop element for cell placement (canvas overlay) */
+.pop-cell {
+  position: absolute;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 6;
+  transform-origin: center;
+  animation: popCellScale 150ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35), 0 4px 12px rgba(0,0,0,0.25);
+}
+.pop-cell.red {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.14) 8%, rgba(255,255,255,0) 24%),
+    linear-gradient(135deg, var(--red-dark) 0%, var(--red-base) 55%, var(--red-hi) 85%);
+  border: 1px solid #b80000;
+}
+.pop-cell.blue {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.14) 8%, rgba(255,255,255,0) 24%),
+    linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-base) 55%, var(--blue-hi) 85%);
+  border: 1px solid #0000b8;
+}
+@keyframes popCellScale {
+  0% { transform: scale(0.82); opacity: .9; }
+  100% { transform: scale(1); opacity: 1; }
+}
 
 /* Responsive: tighten spacing on narrow screens */
 @media (max-width: 600px) {
@@ -159,7 +217,10 @@
   padding: 12px 18px;
   min-height: 42px;
   border-radius: 12px;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
 }
+.menu-screen .menu-wrap > button:hover { filter: brightness(1.06); }
+.menu-screen .menu-wrap > button:active { transform: scale(0.98); box-shadow: 0 6px 18px rgba(0,0,0,0.28); }
 .menu-screen .menu-wrap > button small { display: block; line-height: 1.2; opacity: 0.95; }
 .menu-primary {
   padding: 12px 22px;
@@ -214,8 +275,10 @@
   color: #fff;
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
 }
 .menu-btn:hover { filter: brightness(1.06); }
+.menu-btn:active { transform: scale(0.98); box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
 
 /* Thin, minimal leaderboard bar attached to grid */
 .thin-score-bar {
@@ -229,9 +292,14 @@
   gap: 8px;
   padding: 8px 12px;
   border-radius: 12px;
-  background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.04);
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.25), rgba(255,255,255,0.03)),
+    linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow:
+    0 10px 28px rgba(0,0,0,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    inset 0 -1px 0 rgba(0,0,0,0.2);
 }
 .thin-score-bar .scorebox,
 .thin-score-bar .modebox {
@@ -243,9 +311,12 @@
   gap: 8px;
   padding: 6px 10px;
   border-radius: 10px;
-  background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+  background: linear-gradient(145deg, rgba(255,255,255,0.11), rgba(255,255,255,0.05));
   border: 1px solid rgba(255,255,255,0.16);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(255,255,255,0.05);
+  box-shadow:
+    0 10px 20px rgba(0,0,0,0.26),
+    inset 0 0 8px rgba(255,255,255,0.06),
+    inset 0 0 0 1px rgba(255,255,255,0.05);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -273,6 +344,14 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+.thin-score-bar .value.bump {
+  animation: scorePulse 180ms ease;
+}
+@keyframes scorePulse {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.1); filter: brightness(1.08); }
+  100% { transform: scale(1); filter: brightness(1); }
 }
 .thin-score-bar .dot {
   width: 8px;
@@ -953,6 +1032,7 @@ button:active {
   margin: 8px;
   min-width: 160px;
   box-shadow: 0 8px 24px rgba(124, 92, 255, 0.35);
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
 }
 .modal button:hover {
   background: linear-gradient(145deg, var(--accent-secondary), #18b089);

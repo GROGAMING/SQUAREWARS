@@ -270,6 +270,42 @@ function redrawFromCache() {
   }
 }
 
+/** Create a transient pop overlay at a given cell position (row/col) */
+function showPopAtCell(row, col, color) {
+  try {
+    const layer = document.getElementById(UI_IDS.outlineLayer);
+    const canvas = document.getElementById("boardCanvas") || ensureCanvas();
+    if (!layer || !canvas) return;
+
+    const rows = (cachedGrid && cachedGrid.length) || 20;
+    const cols = (cachedGrid && cachedGrid[0] && cachedGrid[0].length) || 30;
+    const { cell, gap, step } = computeCanvasMetrics(rows, cols);
+
+    const layerRect = layer.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+    const offsetX = canvasRect.left - layerRect.left;
+    const offsetY = canvasRect.top - layerRect.top;
+
+    const x = offsetX + col * step;
+    const y = offsetY + row * step;
+
+    const el = document.createElement("div");
+    el.className = `pop-cell ${color === "red" ? "red" : "blue"}`;
+    el.style.left = `${Math.round(x)}px`;
+    el.style.top = `${Math.round(y)}px`;
+    el.style.width = `${Math.round(cell)}px`;
+    el.style.height = `${Math.round(cell)}px`;
+    layer.appendChild(el);
+
+    const remove = () => {
+      if (el && el.parentElement) el.parentElement.removeChild(el);
+    };
+    el.addEventListener("animationend", remove, { once: true });
+    // Fallback removal
+    setTimeout(remove, 260);
+  } catch {}
+}
+
 // Observe grid container size and keep canvas perfectly fitted
 let gridRO = null;
 function ensureGridResizeObserver() {
@@ -323,8 +359,29 @@ export function updateDisplay(
   redScore,
   blueScore
 ) {
-  document.getElementById(UI_IDS.redGames).textContent = redScore;
-  document.getElementById(UI_IDS.blueGames).textContent = blueScore;
+  const redEl = document.getElementById(UI_IDS.redGames);
+  const blueEl = document.getElementById(UI_IDS.blueGames);
+  if (redEl) {
+    const prev = redEl.textContent;
+    if (prev !== String(redScore)) {
+      redEl.textContent = redScore;
+      redEl.classList.remove("bump");
+      // restart animation
+      void redEl.offsetWidth;
+      redEl.classList.add("bump");
+      setTimeout(() => redEl && redEl.classList.remove("bump"), 220);
+    }
+  }
+  if (blueEl) {
+    const prev = blueEl.textContent;
+    if (prev !== String(blueScore)) {
+      blueEl.textContent = blueScore;
+      blueEl.classList.remove("bump");
+      void blueEl.offsetWidth;
+      blueEl.classList.add("bump");
+      setTimeout(() => blueEl && blueEl.classList.remove("bump"), 220);
+    }
+  }
 
   const redScoreEl = document.getElementById(UI_IDS.redScore);
   const blueScoreEl = document.getElementById(UI_IDS.blueScore);
@@ -424,6 +481,11 @@ export function updateCellDisplay(
   cachedBlocked = blockedCells;
   cachedLastMove = _prevLastMove;
   drawBoardFromState(grid, blockedCells, _prevLastMove);
+  // Transient pop for the cell that just changed
+  try {
+    const val = grid?.[row]?.[col] || 0;
+    if (val === 1 || val === 2) showPopAtCell(row, col, val === 1 ? "red" : "blue");
+  } catch {}
 }
 
 /** Update every cell */
