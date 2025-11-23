@@ -62,6 +62,28 @@
   55%  { transform: translateX(120%);  opacity: 0; }
   100% { transform: translateX(120%);  opacity: 0; }
 }
+
+/* Base root pseudo-elements for theme backgrounds (full viewport, behind UI) */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Slow drift used by themed backgrounds */
+@keyframes bgDrift {
+  0% { transform: translate3d(-2%, -1%, 0) scale(1.02); }
+  100% { transform: translate3d(2%, 1%, 0) scale(1.02); }
+}
+
+/* Stars drift for space theme overlay */
+@keyframes starsDrift {
+  0% { background-position: 0 0; opacity: 0.10; }
+  100% { background-position: 300px 0; opacity: 0.12; }
+}
 .grid-outer::before {
   content: "";
   position: absolute;
@@ -589,12 +611,8 @@ body {
   font-family: "Poppins", sans-serif;
   margin: 0;
   padding: 20px;
-  background:
-    radial-gradient(120% 120% at 0% 0%, rgba(255, 59, 59, 0.09), rgba(0,0,0,0) 60%),
-    radial-gradient(120% 120% at 100% 100%, rgba(47, 140, 255, 0.09), rgba(0,0,0,0) 60%),
-    linear-gradient(135deg, var(--bg-main), #0c1030 60%, #0a0f2b);
-  background-size: 200% 200%, 200% 200%, 100% 100%;
-  animation: bgShift 26s ease-in-out infinite;
+  /* Theme backgrounds provided by body.theme-* via ::before/::after. Do not set a global background here. */
+  background: transparent !important;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -1584,6 +1602,7 @@ button:active {
 /* Classroom (Easy) */
 body.theme-classroom::before { background: radial-gradient(120% 100% at 20% 10%, #f7e6c3, #d8ecff 70%, rgba(255,255,255,0)); animation: bgDrift 40s ease-in-out infinite alternate; }
 body.theme-classroom::after { opacity: 0.10; filter: none; mix-blend-mode: normal; }
+body.theme-classroom { background-color: #f7f3e9; }
 body.theme-classroom #gridOuter { background: linear-gradient(180deg, #254c3f, #183a31); box-shadow: 0 28px 60px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.22), inset 0 -4px 10px rgba(0,0,0,0.35); }
 body.theme-classroom #gameGrid { border-color: rgba(255,255,255,0.35); background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(0,0,0,0.08)); }
 body.theme-classroom #gridOuter::before { background: radial-gradient(60% 90% at 50% 30%, rgba(255,255,255,0.18), rgba(0,0,0,0)); filter: blur(20px); }
@@ -1592,6 +1611,7 @@ body.theme-classroom #gridOuter::before { background: radial-gradient(60% 90% at
 body.theme-warroom::before { background: radial-gradient(120% 100% at 50% 45%, rgba(44,61,110,0.4), rgba(5,7,26,0.0)), linear-gradient(160deg, #060a1c, #0b1430); animation: bgDrift 42s ease-in-out infinite alternate; }
 body.theme-warroom #gridOuter { background: linear-gradient(180deg, #0f1a33, #0c1226); box-shadow: 0 28px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(47,140,255,0.25), inset 0 -6px 16px rgba(0,0,0,0.5); }
 body.theme-warroom #gameGrid { border-color: rgba(47,140,255,0.35); }
+body.theme-warroom { background-color: #060a1c; }
 /* Tactical map overlay */
 body.theme-warroom #gridOuter::after { background: radial-gradient(120% 100% at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.22) 100%), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='340' height='200' viewBox='0 0 340 200' opacity='0.12'><g stroke='white' stroke-width='0.5' fill='none'><circle cx='60' cy='60' r='30'/><circle cx='280' cy='120' r='40'/><path d='M10 180L330 20'/></g></svg>") center/cover no-repeat; opacity: 1; }
 
@@ -1602,9 +1622,11 @@ body.theme-hitech #gameGrid { border-color: rgba(124,70,255,0.35); }
 /* Scanning line */
 body.theme-hitech #gridOuter > .scan-line { display: block; }
 body.theme-hitech #gridOuter::after { animation: frameShimmer 20s ease-in-out infinite; }
+body.theme-hitech { background-color: #05071a; }
 
 /* Space Arena (Impossible) */
 body.theme-space::before { background: radial-gradient(120% 100% at 50% 30%, rgba(20,25,60,0.35), rgba(0,0,0,0) 70%), radial-gradient(80% 100% at 70% 10%, rgba(10,16,42,0.35), rgba(0,0,0,0) 70%), linear-gradient(180deg, #040617, #030414); animation: bgDrift 50s ease-in-out infinite alternate; }
-body.theme-space::after { opacity: 0.12; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'><g fill='white' opacity='0.5'><circle cx='10' cy='20' r='1'/><circle cx='50' cy='10' r='1.2'/><circle cx='70' cy='50' r='0.8'/><circle cx='90' cy='80' r='1.4'/><circle cx='30' cy='90' r='1.1'/></g></svg>"); background-size: 256px 256px; mix-blend-mode: screen; }
+body.theme-space::after { opacity: 0.12; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'><g fill='white' opacity='0.5'><circle cx='10' cy='20' r='1'/><circle cx='50' cy='10' r='1.2'/><circle cx='70' cy='50' r='0.8'/><circle cx='90' cy='80' r='1.4'/><circle cx='30' cy='90' r='1.1'/></g></svg>"); background-size: 256px 256px; mix-blend-mode: screen; animation: starsDrift 90s linear infinite; }
 body.theme-space #gridOuter { background: linear-gradient(180deg, #0b0f2b, #05071a); box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(120,160,255,0.35), inset 0 0 24px rgba(120,160,255,0.35), inset 0 -10px 26px rgba(0,0,0,0.6); }
 body.theme-space #gameGrid { border-color: rgba(120,160,255,0.45); }
+body.theme-space { background-color: #030414; }
