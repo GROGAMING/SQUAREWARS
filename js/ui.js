@@ -359,9 +359,12 @@ function showPopAtCell(row, col, color) {
     el.style.top = `${Math.round(y)}px`;
     el.style.width = `${Math.round(cell)}px`;
     el.style.height = `${Math.round(cell)}px`;
-    // Start drop just above the grid border with a bounce distance scaled to cell
-    const dropY = Math.max(16, Math.round(cell * 0.9));
+    // Full-column drop: distance from above canvas top to landing cell
+    const startAbove = Math.max(20, Math.round(cell * 0.8));
+    const dropY = Math.max(0, Math.round(row * step + startAbove));
+    const bounceY = Math.max(4, Math.min(8, Math.round(cell * 0.18)));
     el.style.setProperty('--drop-y', `${dropY}px`);
+    el.style.setProperty('--bounce-y', `${bounceY}px`);
     layer.appendChild(el);
 
     const remove = () => {
