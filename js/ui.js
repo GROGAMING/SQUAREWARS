@@ -248,16 +248,19 @@ export function updateDisplay(
     meterB.style.width = pctB + "%";
   }
 
-  // Update thin bar Blue label with AI difficulty in single-player
+  // Update thin bar left/right labels (no color names)
+  const thinRed = document.getElementById(UI_IDS.thinRedLabel);
+  if (thinRed) thinRed.textContent = "Player 1";
+
   const thinBlue = document.getElementById(UI_IDS.thinBlueLabel);
   if (thinBlue) {
     if (gameMode === "single") {
       const name = aiDifficulty
         ? aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)
         : null;
-      thinBlue.textContent = name ? `Blue — ${name} AI` : "Blue — AI";
+      thinBlue.textContent = name ? `${name} AI` : "AI";
     } else {
-      thinBlue.textContent = "Blue";
+      thinBlue.textContent = "Player 2";
     }
   }
 
@@ -574,18 +577,19 @@ export function updateLabelsForModeUI(
   const thinModeEl = document.getElementById(UI_IDS.thinMode);
   if (thinModeEl) thinModeEl.textContent = centerMode;
 
-  // Update Blue label in thin bar for single-player AI
-  const thinBlue = document.getElementById(UI_IDS.thinBlueLabel);
-  if (thinBlue) {
+  // Update left/right labels for thin bar consistently on mode/difficulty changes
+  const thinRed2 = document.getElementById(UI_IDS.thinRedLabel);
+  if (thinRed2) thinRed2.textContent = "Player 1";
+
+  const thinBlue2 = document.getElementById(UI_IDS.thinBlueLabel);
+  if (thinBlue2) {
     if (gameMode === "single") {
       const difficultyName = aiDifficulty
         ? aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)
         : null;
-      thinBlue.textContent = difficultyName
-        ? `Blue — ${difficultyName} AI`
-        : "Blue — AI";
+      thinBlue2.textContent = difficultyName ? `${difficultyName} AI` : "AI";
     } else {
-      thinBlue.textContent = "Blue";
+      thinBlue2.textContent = "Player 2";
     }
   }
 
