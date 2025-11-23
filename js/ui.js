@@ -150,6 +150,8 @@ let cachedGrid = null;
 let cachedBlocked = null;
 let cachedLastMove = null;
 let lastSelectedCol = null;
+// Track cells currently animating a drop so we suppress static drawing
+let animatingCells = new Set();
 
 function ensureCanvas() {
   if (!boardCanvas) {
@@ -252,14 +254,17 @@ function drawBoardFromState(grid, blockedCells, lastMove) {
     const y = r * step;
     for (let col = 0; col < cols; col++) {
       const x = col * step;
+      const cellKey = r + "-" + col;
       const val = grid ? grid[r][col] : 0;
+      // If this cell is animating, visually treat it as empty for now
+      const displayVal = animatingCells.has(cellKey) && (val === 1 || val === 2) ? 0 : val;
 
       let g;
-      if (val === 1) {
+      if (displayVal === 1) {
         g = ctx.createLinearGradient(x, y, x + cell, y + cell);
         g.addColorStop(0, redA);
         g.addColorStop(1, redB);
-      } else if (val === 2) {
+      } else if (displayVal === 2) {
         g = ctx.createLinearGradient(x, y, x + cell, y + cell);
         g.addColorStop(0, blueA);
         g.addColorStop(1, blueB);
@@ -271,12 +276,12 @@ function drawBoardFromState(grid, blockedCells, lastMove) {
 
       // Base fill with slight translucency to keep grid visible
       ctx.save();
-      ctx.globalAlpha = val ? 0.92 : 1.0;
+      ctx.globalAlpha = displayVal ? 0.92 : 1.0;
       // Soft outer glow per piece color
-      if (val === 1) {
+      if (displayVal === 1) {
         ctx.shadowColor = "rgba(255, 80, 80, 0.45)";
         ctx.shadowBlur = Math.max(6, cell * 0.25);
-      } else if (val === 2) {
+      } else if (displayVal === 2) {
         ctx.shadowColor = "rgba(77, 171, 247, 0.45)";
         ctx.shadowBlur = Math.max(6, cell * 0.25);
       } else {
@@ -287,7 +292,7 @@ function drawBoardFromState(grid, blockedCells, lastMove) {
       ctx.restore();
 
       // Inner shadow for depth
-      if (val === 1 || val === 2) {
+      if (displayVal === 1 || displayVal === 2) {
         ctx.save();
         ctx.strokeStyle = "rgba(0,0,0,0.18)";
         ctx.lineWidth = Math.max(1, Math.round(cell * 0.04));
@@ -369,10 +374,13 @@ function showPopAtCell(row, col, color) {
 
     const remove = () => {
       if (el && el.parentElement) el.parentElement.removeChild(el);
+      // Reveal the static piece now that animation is done
+      animatingCells.delete(`${row}-${col}`);
+      redrawFromCache();
     };
     el.addEventListener("animationend", remove, { once: true });
     // Fallback removal (longer than animation duration)
-    setTimeout(remove, 650);
+    setTimeout(remove, 900);
   } catch {}
 }
 
@@ -550,8 +558,16 @@ export function updateCellDisplay(
   cachedGrid = grid;
   cachedBlocked = blockedCells;
   cachedLastMove = _prevLastMove;
+  // If this is a newly placed piece, mark it animating so we hide the static draw
+  try {
+    const val = grid?.[row]?.[col] || 0;
+    if (val === 1 || val === 2) {
+      animatingCells.add(`${row}-${col}`);
+    }
+  } catch {}
+  // Draw with animating cell suppressed
   drawBoardFromState(grid, blockedCells, _prevLastMove);
-  // Transient pop for the cell that just changed
+  // Transient dropping overlay for the cell that just changed
   try {
     const val = grid?.[row]?.[col] || 0;
     if (val === 1 || val === 2) showPopAtCell(row, col, val === 1 ? "red" : "blue");
