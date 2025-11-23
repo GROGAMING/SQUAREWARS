@@ -309,6 +309,36 @@ function drawBoardFromState(grid, blockedCells, lastMove) {
         ctx.globalCompositeOperation = "lighter";
         ctx.fillRect(x, y, cell, cell);
         ctx.restore();
+
+        // Specular highlight dot for a premium glossy feel
+        ctx.save();
+        const dot = ctx.createRadialGradient(
+          x + cell * 0.22,
+          y + cell * 0.18,
+          0,
+          x + cell * 0.22,
+          y + cell * 0.18,
+          cell * 0.12
+        );
+        dot.addColorStop(0, "rgba(255,255,255,0.9)");
+        dot.addColorStop(0.5, "rgba(255,255,255,0.35)");
+        dot.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = dot;
+        ctx.globalCompositeOperation = "lighter";
+        ctx.fillRect(x, y, cell, cell);
+        ctx.restore();
+
+        // Subtle brushed light streak to mimic material texture
+        ctx.save();
+        const streak = ctx.createLinearGradient(x, y + cell * 0.2, x + cell, y + cell * 0.3);
+        streak.addColorStop(0, "rgba(255,255,255,0.06)");
+        streak.addColorStop(0.5, "rgba(255,255,255,0.08)");
+        streak.addColorStop(1, "rgba(255,255,255,0.02)");
+        ctx.fillStyle = streak;
+        ctx.globalCompositeOperation = "overlay";
+        ctx.globalAlpha = 0.35;
+        ctx.fillRect(x, y + cell * 0.12, cell, cell * 0.22);
+        ctx.restore();
       }
 
       // Subtle border to separate cells
