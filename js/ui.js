@@ -563,12 +563,12 @@ export function updateLabelsForModeUI(
   const redLabel = document.getElementById(UI_IDS.redLabel);
   const blueLabel = document.getElementById(UI_IDS.blueLabel);
 
-  // Compose center mode text for thin bar
-  let centerMode = "Classic (Box Points)";
-  if (scoringMode === SCORING_MODES.AREA) centerMode = "Territory Takedown (Area Mode)";
+  // Compose center mode text for thin bar (short forms)
+  let centerMode = "1 point per box";
+  if (scoringMode === SCORING_MODES.AREA) centerMode = "Area Mode";
   if (scoringMode === SCORING_MODES.QUICKFIRE) {
     const n = quickFireTarget ?? 5;
-    centerMode = `Quick Fire — First to ${n}`;
+    centerMode = `Best to ${n}`;
   }
 
   const thinModeEl = document.getElementById(UI_IDS.thinMode);
