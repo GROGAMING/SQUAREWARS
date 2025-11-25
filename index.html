@@ -186,19 +186,31 @@
       </div>
     </div>
 
-    <div class="grid-outer" id="gridOuter">
-      <!-- Touch-friendly side controls -->
-      <div id="boardControlsLeft" class="board-controls side left" aria-label="Left board controls">
-        <button id="btnArrowLeft" class="ctrl-btn ctrl-arrow" type="button" aria-label="Move left">◀</button>
+    <div class="desk-surface">
+      <div class="grid-wrapper">
+        <div class="grid-outer" id="gridOuter">
+          <!-- Touch-friendly side controls -->
+          <div id="boardControlsLeft" class="board-controls side left" aria-label="Left board controls">
+            <button id="btnArrowLeft" class="ctrl-btn ctrl-arrow" type="button" aria-label="Move left">◀</button>
+          </div>
+          <div class="grid" id="gameGrid"></div>
+          <div id="outlineLayer"></div>
+          <!-- Visual-only scanning line (shown in High-Tech theme) -->
+          <div class="scan-line" aria-hidden="true"></div>
+          <div id="boardControlsRight" class="board-controls side right" aria-label="Right board controls">
+            <button id="btnDrop" class="ctrl-btn ctrl-drop" type="button">Drop</button>
+            <button id="btnArrowRight" class="ctrl-btn ctrl-arrow" type="button" aria-label="Move right">▶</button>
+          </div>
+        </div>
       </div>
-      <div class="grid" id="gameGrid"></div>
-      <div id="outlineLayer"></div>
-      <!-- Visual-only scanning line (shown in High-Tech theme) -->
-      <div class="scan-line" aria-hidden="true"></div>
-      <div id="boardControlsRight" class="board-controls side right" aria-label="Right board controls">
-        <button id="btnDrop" class="ctrl-btn ctrl-drop" type="button">Drop</button>
-        <button id="btnArrowRight" class="ctrl-btn ctrl-arrow" type="button" aria-label="Move right">▶</button>
-      </div>
+    </div>
+
+    <!-- Classroom props positioned around the edges; visible only in Classroom theme -->
+    <div class="classroom-props" aria-hidden="true">
+      <img src="./assets/classroom/pencil.png" alt="" class="classroom-item pencil" />
+      <img src="./assets/classroom/book.png" alt="" class="classroom-item book" />
+      <img src="./assets/classroom/eraser.png" alt="" class="classroom-item eraser" />
+      <img src="./assets/classroom/sticky.png" alt="" class="classroom-item sticky" />
     </div>
 
     <!-- In-game Options Overlay -->

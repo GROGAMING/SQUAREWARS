@@ -1521,6 +1521,9 @@ button:active {
   display: none !important;
 }
 
+/* Default: classroom props hidden unless Classroom theme active */
+.classroom-props { display: none; }
+
 /* Themed Environment Skins */
 .environment-skin {
   width: 100px;
@@ -1630,3 +1633,77 @@ body.theme-space::after { opacity: 0.12; background-image: url("data:image/svg+x
 body.theme-space #gridOuter { background: linear-gradient(180deg, #0b0f2b, #05071a); box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(120,160,255,0.35), inset 0 0 24px rgba(120,160,255,0.35), inset 0 -10px 26px rgba(0,0,0,0.6); }
 body.theme-space #gameGrid { border-color: rgba(120,160,255,0.45); }
 body.theme-space { background-color: #030414; }
+
+/* ===== Classroom theme enhancements (Beginner/Easy) ===== */
+/* Bright, soft classroom background — scoped */
+body.theme-classroom {
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(255, 228, 181, 0.15), transparent 55%),
+    linear-gradient(135deg, #f4f7ff 0%, #dfe9ff 40%, #fdf3df 100%) !important;
+}
+
+/* Establish positioning context for edge props */
+.theme-classroom #gameScreen { position: relative; }
+
+/* Desk surface around the grid (never under the grid) */
+.theme-classroom .desk-surface {
+  position: relative;
+  display: inline-block;
+  padding: 32px;
+  border-radius: 16px;
+  background-image: url('./assets/classroom/wood_texture.jpg');
+  background-size: cover;
+  background-position: center;
+  box-shadow:
+    0 26px 40px rgba(0, 0, 0, 0.45),
+    inset 0 0 18px rgba(0, 0, 0, 0.35);
+}
+.theme-classroom .grid-wrapper { position: relative; z-index: 2; }
+
+/* Props layer: sits behind grid wrapper, above background */
+.theme-classroom .classroom-props {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block; /* shown only in Classroom theme (HTML defaults to none) */
+}
+.theme-classroom .classroom-item {
+  position: absolute;
+  opacity: 0.9;
+  will-change: transform;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.18));
+}
+
+/* Example placements (kept to screen edges; avoid grid overlap) */
+.theme-classroom .classroom-item.pencil { top: 8%; left: 4%; transform: rotate(18deg); }
+.theme-classroom .classroom-item.book { bottom: 6%; right: 6%; width: 120px; }
+.theme-classroom .classroom-item.eraser { bottom: 20%; left: 3%; width: 64px; }
+.theme-classroom .classroom-item.sticky { top: 12%; right: 8%; width: 70px; }
+
+/* Subtle animations */
+.theme-classroom .classroom-item.pencil { animation: classroom-pencil-wobble 5s ease-in-out infinite; }
+@keyframes classroom-pencil-wobble {
+  0%   { transform: rotate(17deg); }
+  50%  { transform: rotate(21deg); }
+  100% { transform: rotate(17deg); }
+}
+.theme-classroom .classroom-item.book { animation: classroom-book-breathe 7s ease-in-out infinite; }
+@keyframes classroom-book-breathe {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+.theme-classroom .classroom-item.sticky { animation: classroom-sticky-flutter 4s ease-in-out infinite; }
+@keyframes classroom-sticky-flutter {
+  0%   { transform: rotate(-1deg); }
+  50%  { transform: rotate(1deg); }
+  100% { transform: rotate(-1deg); }
+}
+
+/* Compact adjustments on small heights so props stay at margins */
+@media (max-height: 600px) {
+  .theme-classroom .classroom-item.book { width: 100px; }
+  .theme-classroom .classroom-item.sticky { width: 60px; }
+}
