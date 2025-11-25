@@ -1689,9 +1689,10 @@ body.theme-classroom {
 .theme-classroom .desk-surface {
   position: relative;
   display: inline-block;
-  padding: 32px;
-  border-radius: 16px;
+  padding: 48px 64px; /* larger desk area around grid */
+  border-radius: 24px;
   z-index: 2;
+  overflow: visible; /* keep props visible at edges */
   background:
     repeating-linear-gradient(25deg, #caa16c 0px, #caa16c 12px, #c89a5d 12px, #c89a5d 24px),
     radial-gradient(200% 140% at 50% 0%, rgba(0,0,0,0.08), rgba(0,0,0,0) 40%);
@@ -1705,37 +1706,37 @@ body.theme-classroom {
 .theme-classroom .classroom-props {
   pointer-events: none;
   position: absolute;
-  inset: 0;
-  z-index: 1;
+  inset: 0; /* anchored to the desk surface */
+  z-index: 2; /* on top of desk, below grid */
   display: block; /* shown only in Classroom theme (HTML defaults to none) */
 }
 .theme-classroom .classroom-item {
   position: absolute;
-  opacity: 0.9;
+  opacity: 0.95;
   will-change: transform;
-  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.18));
+  filter: drop-shadow(0 10px 12px rgba(0,0,0,0.35)); /* deeper but soft shadow */
 }
 
 /* Example placements (kept to screen edges; avoid grid overlap) */
-.theme-classroom .classroom-item.pencil { top: 12%; left: 4%; transform: rotate(18deg); }
-.theme-classroom .classroom-item.book { bottom: 8%; right: 6%; width: 120px; }
-.theme-classroom .classroom-item.eraser { bottom: 22%; left: 3%; width: 60px; }
-.theme-classroom .classroom-item.sticky { top: 16%; right: 10%; width: 70px; }
+.theme-classroom .classroom-item.pencil { top: 6%; left: 8%; width: 90px; transform: rotate(9deg); }
+.theme-classroom .classroom-item.book { bottom: 6%; right: 10%; width: 130px; }
+.theme-classroom .classroom-item.eraser { bottom: 10%; left: 16%; width: 90px; }
+.theme-classroom .classroom-item.sticky { top: 12%; right: 12%; width: 72px; }
 
 /* Subtle animations */
-.theme-classroom .classroom-item.pencil { animation: classroom-pencil-wobble 5s ease-in-out infinite; }
+.theme-classroom .classroom-item.pencil { animation: classroom-pencil-wobble 7s ease-in-out infinite; }
 @keyframes classroom-pencil-wobble {
-  0%   { transform: rotate(17deg); }
-  50%  { transform: rotate(21deg); }
-  100% { transform: rotate(17deg); }
+  0%   { transform: rotate(8deg); }
+  50%  { transform: rotate(10deg); }
+  100% { transform: rotate(8deg); }
 }
-.theme-classroom .classroom-item.book { animation: classroom-book-breathe 7s ease-in-out infinite; }
+.theme-classroom .classroom-item.book { animation: classroom-book-breathe 9s ease-in-out infinite; }
 @keyframes classroom-book-breathe {
   0%   { transform: scale(1); }
-  50%  { transform: scale(1.03); }
+  50%  { transform: scale(1.02); }
   100% { transform: scale(1); }
 }
-.theme-classroom .classroom-item.sticky { animation: classroom-sticky-flutter 4s ease-in-out infinite; }
+.theme-classroom .classroom-item.sticky { animation: classroom-sticky-flutter 8s ease-in-out infinite; }
 @keyframes classroom-sticky-flutter {
   0%   { transform: rotate(-1deg); }
   50%  { transform: rotate(1deg); }
