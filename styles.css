@@ -1683,7 +1683,7 @@ body.theme-classroom {
 }
 
 /* Establish positioning context for edge props */
-.theme-classroom #gameScreen { position: relative; }
+.theme-classroom #gameScreen { position: relative; overflow: visible; }
 
 /* Desk surface around the grid (never under the grid) */
 .theme-classroom .desk-surface {
@@ -1691,14 +1691,15 @@ body.theme-classroom {
   display: inline-block;
   padding: 32px;
   border-radius: 16px;
-  background-image: url('./assets/classroom/wood_texture.jpg');
-  background-size: cover;
-  background-position: center;
+  z-index: 2;
+  background:
+    repeating-linear-gradient(25deg, #caa16c 0px, #caa16c 12px, #c89a5d 12px, #c89a5d 24px),
+    radial-gradient(200% 140% at 50% 0%, rgba(0,0,0,0.08), rgba(0,0,0,0) 40%);
   box-shadow:
     0 26px 40px rgba(0, 0, 0, 0.45),
     inset 0 0 18px rgba(0, 0, 0, 0.35);
 }
-.theme-classroom .grid-wrapper { position: relative; z-index: 2; }
+.theme-classroom .grid-wrapper { position: relative; z-index: 3; }
 
 /* Props layer: sits behind grid wrapper, above background */
 .theme-classroom .classroom-props {
@@ -1716,10 +1717,10 @@ body.theme-classroom {
 }
 
 /* Example placements (kept to screen edges; avoid grid overlap) */
-.theme-classroom .classroom-item.pencil { top: 8%; left: 4%; transform: rotate(18deg); }
-.theme-classroom .classroom-item.book { bottom: 6%; right: 6%; width: 120px; }
-.theme-classroom .classroom-item.eraser { bottom: 20%; left: 3%; width: 64px; }
-.theme-classroom .classroom-item.sticky { top: 12%; right: 8%; width: 70px; }
+.theme-classroom .classroom-item.pencil { top: 12%; left: 4%; transform: rotate(18deg); }
+.theme-classroom .classroom-item.book { bottom: 8%; right: 6%; width: 120px; }
+.theme-classroom .classroom-item.eraser { bottom: 22%; left: 3%; width: 60px; }
+.theme-classroom .classroom-item.sticky { top: 16%; right: 10%; width: 70px; }
 
 /* Subtle animations */
 .theme-classroom .classroom-item.pencil { animation: classroom-pencil-wobble 5s ease-in-out infinite; }
