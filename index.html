@@ -189,10 +189,100 @@
     <div class="desk-surface">
       <!-- Classroom props positioned on the desk surface; visible only in Classroom theme -->
       <div class="classroom-props-on-desk" aria-hidden="true">
-        <div class="classroom-item pencil"><img src="./assets/classroom/pencil.svg" alt="" /></div>
-        <div class="classroom-item book"><img src="./assets/classroom/book.svg" alt="" /></div>
+        <!-- Premium inline SVG pencil -->
+        <div class="classroom-item pencil" aria-hidden="true">
+          <svg viewBox="0 0 240 48" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="decorative pencil">
+            <defs>
+              <linearGradient id="pencilBody" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#f6d25b"/>
+                <stop offset="100%" stop-color="#d8a640"/>
+              </linearGradient>
+              <linearGradient id="metalBand" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#cfd5dd"/>
+                <stop offset="60%" stop-color="#aab2bd"/>
+                <stop offset="100%" stop-color="#8f97a3"/>
+              </linearGradient>
+              <linearGradient id="eraserFill" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ff9bb6"/>
+                <stop offset="100%" stop-color="#ff6f9c"/>
+              </linearGradient>
+              <linearGradient id="woodTip" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#e9c49a"/>
+                <stop offset="100%" stop-color="#c29b6f"/>
+              </linearGradient>
+              <filter id="tipShadow" x="-20%" y="-200%" width="140%" height="400%">
+                <feGaussianBlur stdDeviation="2.5"/>
+              </filter>
+              <linearGradient id="bodyHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.25)"/>
+                <stop offset="35%" stop-color="rgba(255,255,255,0)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+              </linearGradient>
+            </defs>
+            <!-- soft shadow under tip -->
+            <ellipse cx="216" cy="36" rx="16" ry="5" fill="rgba(0,0,0,0.35)" filter="url(#tipShadow)"/>
+            <!-- body -->
+            <rect x="40" y="10" width="150" height="28" rx="6" ry="6" fill="url(#pencilBody)" stroke="#2b1e0f" stroke-width="2.2"/>
+            <!-- highlight strip -->
+            <rect x="48" y="12" width="110" height="10" rx="5" ry="5" fill="url(#bodyHighlight)"/>
+            <!-- metal band -->
+            <rect x="24" y="10" width="16" height="28" rx="3" ry="3" fill="url(#metalBand)" stroke="#2b1e0f" stroke-width="2.2"/>
+            <circle cx="28" cy="16" r="1.6" fill="#88919c"/>
+            <circle cx="28" cy="32" r="1.6" fill="#88919c"/>
+            <circle cx="36" cy="16" r="1.6" fill="#88919c"/>
+            <circle cx="36" cy="32" r="1.6" fill="#88919c"/>
+            <!-- eraser -->
+            <rect x="4" y="10" width="20" height="28" rx="6" ry="6" fill="url(#eraserFill)" stroke="#2b1e0f" stroke-width="2.2"/>
+            <!-- wood tip + graphite -->
+            <polygon points="190,10 190,38 216,24" fill="url(#woodTip)" stroke="#2b1e0f" stroke-width="2.2"/>
+            <polygon points="216,24 226,20 226,28" fill="#1f1b18" stroke="#2b1e0f" stroke-width="2.2"/>
+          </svg>
+        </div>
+
+        <!-- Premium inline SVG notebook -->
+        <div class="classroom-item book" aria-hidden="true">
+          <svg viewBox="0 0 120 90" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="decorative notebook">
+            <defs>
+              <linearGradient id="cover" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#5aa0e6"/>
+                <stop offset="100%" stop-color="#2f79c8"/>
+              </linearGradient>
+              <linearGradient id="coverShine" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.25)"/>
+                <stop offset="30%" stop-color="rgba(255,255,255,0)"/>
+              </linearGradient>
+            </defs>
+            <rect x="8" y="8" width="100" height="74" rx="8" ry="8" fill="url(#cover)" stroke="#1c2a3f" stroke-width="2"/>
+            <rect x="14" y="12" width="40" height="6" rx="3" fill="#ffffff22"/>
+            <rect x="14" y="20" width="36" height="6" rx="3" fill="#ffffff22"/>
+            <rect x="8" y="8" width="60" height="74" rx="8" ry="8" fill="url(#coverShine)"/>
+            <!-- spiral rings -->
+            <g fill="#e6edf5" stroke="#1c2a3f" stroke-width="1">
+              <circle cx="12" cy="20" r="2"/>
+              <circle cx="12" cy="32" r="2"/>
+              <circle cx="12" cy="44" r="2"/>
+              <circle cx="12" cy="56" r="2"/>
+              <circle cx="12" cy="68" r="2"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Premium inline SVG sticky note -->
+        <div class="classroom-item sticky" aria-hidden="true">
+          <svg viewBox="0 0 84 84" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="decorative sticky note">
+            <defs>
+              <linearGradient id="stickyFill" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#fff7a8"/>
+                <stop offset="100%" stop-color="#ffe065"/>
+              </linearGradient>
+            </defs>
+            <path d="M8 8 H64 a4 4 0 0 1 4 4 V56 L56 76 H12 a4 4 0 0 1 -4 -4 V12 a4 4 0 0 1 4 -4 z" fill="url(#stickyFill)" stroke="#3a2c0e" stroke-width="2"/>
+            <!-- folded corner shadow -->
+            <path d="M68 56 L56 76 L68 76 Z" fill="#e1c14d"/>
+          </svg>
+        </div>
+
         <div class="classroom-item eraser"><img src="./assets/classroom/eraser.svg" alt="" /></div>
-        <div class="classroom-item sticky"><img src="./assets/classroom/sticky.svg" alt="" /></div>
       </div>
       <div class="grid-wrapper">
         <div class="grid-outer" id="gridOuter">
