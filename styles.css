@@ -1683,10 +1683,11 @@ body.theme-classroom {
     linear-gradient(135deg, #f4f7ff 0%, #dfe9ff 40%, #fdf3df 100%) !important;
 }
 
-/* Establish positioning context for edge props */
-.theme-classroom #gameScreen { position: relative; overflow: visible; }
-/* Scoreboard sits just above the grid, visually on the table */
-.theme-classroom .thin-score-bar { position: relative; z-index: 3; margin-bottom: 8px; }
+  /* Establish positioning context for edge props */
+  .theme-classroom #gameScreen { position: relative; overflow: visible; }
+  /* Scoreboard sits just above the grid, visually on the table */
+  .theme-classroom .scoreboard-row { position: relative; z-index: 3; }
+  .theme-classroom .thin-score-bar { position: relative; z-index: 3; margin-bottom: 8px; }
 
 /* Desk surface around the grid (never under the grid) */
 .theme-classroom .desk-surface {
@@ -1734,23 +1735,23 @@ body.theme-classroom {
   position: absolute;
   opacity: 0.95;
   will-change: transform;
-  max-width: 80px;
+  max-width: 70px;
   filter: drop-shadow(0 6px 6px rgba(0,0,0,0.35)); /* soft premium shadow */
 }
-.theme-classroom .classroom-item.book { max-width: 110px; }
+.theme-classroom .classroom-item.book { max-width: 70px; }
 .theme-classroom .classroom-item img { display: block; width: 100%; height: auto; }
 
 /* Example placements on desk edges; avoid grid overlap */
-.theme-classroom .classroom-item.pencil { top: 18px; left: 80px; transform: rotate(-18deg); }
-.theme-classroom .classroom-item.book { bottom: 22px; left: 60px; }
-.theme-classroom .classroom-item.eraser { bottom: 22px; right: 90px; }
-.theme-classroom .classroom-item.sticky { top: 16px; right: 100px; max-width: 68px; }
+.theme-classroom .classroom-item.pencil { top: 18px; left: 70px; transform: rotate(-18deg); }
+.theme-classroom .classroom-item.book { bottom: 18px; left: 60px; }
+.theme-classroom .classroom-item.eraser { bottom: 18px; right: 90px; }
+.theme-classroom .classroom-item.sticky { top: 10px; right: 60px; max-width: 68px; }
 
 /* Subtle premium animations */
-.theme-classroom .classroom-item.pencil { animation: pencil-wobble 7s ease-in-out infinite; }
+.theme-classroom .classroom-item.pencil { animation: pencil-wobble 8s ease-in-out infinite; }
 @keyframes pencil-wobble {
   0%   { transform: rotate(-18deg); }
-  50%  { transform: rotate(-14deg); }
+  50%  { transform: rotate(-15deg); }
   100% { transform: rotate(-18deg); }
 }
 .theme-classroom .classroom-item.book { animation: book-breathe 10s ease-in-out infinite; }
@@ -1768,12 +1769,12 @@ body.theme-classroom {
   background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 40%, transparent 80%);
   mix-blend-mode: screen;
   transform: translateX(-120%);
-  animation: eraser-shine 6s ease-in-out infinite;
+  animation: eraser-shine 14s ease-in-out infinite;
 }
 @keyframes eraser-shine {
   0%   { transform: translateX(-120%); opacity: 0; }
-  20%  { opacity: 1; }
-  40%  { transform: translateX(120%); opacity: 0; }
+  12%  { opacity: 0.6; }
+  28%  { transform: translateX(120%); opacity: 0; }
   100% { transform: translateX(120%); opacity: 0; }
 }
 
