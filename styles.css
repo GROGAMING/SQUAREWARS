@@ -1693,7 +1693,7 @@ body.theme-classroom {
 .desk-surface {
   position: relative;
   display: inline-block;
-  padding: 48px 56px; /* larger desk area around grid */
+  padding: clamp(40px, 6vw, 96px) clamp(48px, 8vw, 120px); /* larger desk area around grid */
   border-radius: 28px;
   z-index: 1; /* desk below grid */
   overflow: visible; /* keep props visible at edges */
@@ -1735,19 +1735,19 @@ body.theme-classroom {
 .desk-surface .classroom-props-on-desk { display: block; }
 .decor-pencil {
   position: absolute;
-  top: 10px;
-  left: 20px;
-  width: 80px;
+  top: clamp(8px, 1.2vw, 18px);
+  left: clamp(12px, 2vw, 28px);
+  width: clamp(90px, 12vw, 110px);
 }
 .decor-holder {
   position: absolute;
-  top: 10px;
-  right: 20px;
-  width: 90px;
+  top: clamp(8px, 1.2vw, 18px);
+  right: clamp(12px, 2vw, 28px);
+  width: clamp(110px, 15vw, 160px);
 }
 .decor-books {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  width: 90px;
+  bottom: clamp(12px, 2vw, 28px);
+  left: clamp(12px, 2vw, 28px);
+  width: clamp(110px, 15vw, 160px);
 }
