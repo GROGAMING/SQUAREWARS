@@ -1697,7 +1697,7 @@ body.theme-classroom {
   border-radius: 28px;
   z-index: 1; /* desk below grid */
   overflow: visible; /* keep props visible at edges */
-  background-image: url('/images/wood.png');
+  background-image: url('images/wood.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1717,7 +1717,7 @@ body.theme-classroom {
     inset 0 0 8px rgba(0,0,0,0.45);
 }
 .desk-surface #gridOuter {
-  background-image: url('/images/wood.png') !important;
+  background-image: url('images/wood.png') !important;
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
