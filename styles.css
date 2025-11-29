@@ -1697,7 +1697,7 @@ body.theme-classroom {
   border-radius: 28px;
   z-index: 1; /* desk below grid */
   overflow: visible; /* keep props visible at edges */
-  background-image: url('images/wood.png');
+  background-image: none; /* wood only in Classroom theme */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1705,6 +1705,10 @@ body.theme-classroom {
     0 32px 48px rgba(0, 0, 0, 0.55),
     inset 0 0 20px rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255,255,255,0.4);
+}
+/* Classroom-only wood background */
+.theme-classroom .desk-surface {
+  background-image: url('images/wood.png');
 }
 .theme-classroom .grid-wrapper {
   position: relative;
@@ -1729,7 +1733,7 @@ body.theme-classroom {
   inset: 0;
   z-index: 1;
 }
-.desk-surface .classroom-props-on-desk { display: block; }
+.theme-classroom .classroom-props-on-desk { display: block; }
 .decor-pencil {
   position: absolute;
   top: 0;
@@ -1757,3 +1761,19 @@ body.theme-classroom {
   .decor-holder,
   .decor-books { opacity: 0; }
 }
+
+/* Blank backgrounds for non-Classroom themes */
+body.theme-warroom::before,
+body.theme-warroom::after,
+body.theme-hitech::before,
+body.theme-hitech::after,
+body.theme-space::before,
+body.theme-space::after { background: none !important; animation: none !important; opacity: 0 !important; }
+body.theme-warroom,
+body.theme-hitech,
+body.theme-space { background: transparent !important; }
+body.theme-warroom #gridOuter,
+body.theme-hitech #gridOuter,
+body.theme-space #gridOuter { background: transparent !important; box-shadow: none !important; }
+/* Disable non-classroom scanning line */
+body.theme-hitech #gridOuter > .scan-line { display: none !important; }
