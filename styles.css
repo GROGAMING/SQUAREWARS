@@ -1701,7 +1701,7 @@ body.theme-classroom {
   background:
     radial-gradient(circle at 10% 0%, rgba(255,255,255,0.16), transparent 60%),
     radial-gradient(circle at 90% 100%, rgba(0,0,0,0.22), transparent 70%),
-    url('./assets/classroom/wood_premium.jpg'),
+    url('./public/images/wood.png'),
     linear-gradient(140deg, #c79a63 0%, #a9773d 40%, #8d5f2c 60%, #b98346 100%);
   background-size: cover;
   background-position: center;
@@ -1733,57 +1733,21 @@ body.theme-classroom {
   position: absolute;
   opacity: 0.98;
   will-change: transform;
-  max-width: 80px;
+  max-width: 90px;
   filter: drop-shadow(0 6px 6px rgba(0,0,0,0.35)); /* soft premium shadow */
 }
-.theme-classroom .classroom-item.book { max-width: 80px; }
+.theme-classroom .classroom-item.books { max-width: 100px; }
 .theme-classroom .classroom-item img { display: block; width: 100%; height: auto; }
 
 /* Example placements on desk edges; avoid grid overlap */
-.theme-classroom .classroom-item.pencil   { top: 20px; left: 80px; width: 80px; max-width: 80px; transform: rotate(-24deg); }
-.theme-classroom .classroom-item.book     { bottom: 24px; left: 90px; }
-.theme-classroom .classroom-item.eraser   { bottom: 22px; right: 90px; }
-.theme-classroom .classroom-item.sticky   { top: 18px; right: 80px; max-width: 80px; }
+.theme-classroom .classroom-item.pencil { top: 18px; left: 56px; width: clamp(56px, 10vw, 86px); transform: rotate(-18deg); }
+.theme-classroom .classroom-item.books  { bottom: 24px; left: 64px; width: clamp(68px, 12vw, 110px); }
+.theme-classroom .classroom-item.holder { top: 18px; right: 64px; width: clamp(52px, 9vw, 90px); }
 
 /* Subtle premium animations */
-.theme-classroom .classroom-item.pencil { animation: pencil-idle 12s cubic-bezier(0.33, 0.0, 0.33, 1) infinite; }
-@keyframes pencil-idle {
-  0%   { transform: rotate(-24deg); }
-  50%  { transform: rotate(-22deg); }
-  100% { transform: rotate(-24deg); }
-}
-.theme-classroom .classroom-item.sticky { animation: sticky-idle 10s ease-in-out infinite; will-change: transform, filter; }
-@keyframes sticky-idle {
-  0%   { transform: translateY(0);    filter: brightness(1); }
-  50%  { transform: translateY(-2px); filter: brightness(1.05); }
-  100% { transform: translateY(0);    filter: brightness(1); }
-}
-.theme-classroom .classroom-item.book { animation: book-breathe 10s ease-in-out infinite; }
-@keyframes book-breathe {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.02); }
-  100% { transform: scale(1); }
-}
-/* Optional shine on eraser */
-.theme-classroom .classroom-item.eraser { position: relative; overflow: visible; }
-.theme-classroom .classroom-item.eraser::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 40%, transparent 80%);
-  mix-blend-mode: screen;
-  transform: translateX(-120%);
-  animation: eraser-shine 14s ease-in-out infinite;
-}
-@keyframes eraser-shine {
-  0%   { transform: translateX(-120%); opacity: 0; }
-  12%  { opacity: 0.6; }
-  28%  { transform: translateX(120%); opacity: 0; }
-  100% { transform: translateX(120%); opacity: 0; }
-}
+.theme-classroom .classroom-item { animation: none !important; }
 
 /* Compact adjustments on small heights so props stay at margins */
 @media (max-height: 600px) {
-  .theme-classroom .classroom-item.book { width: 100px; }
-  .theme-classroom .classroom-item.sticky { width: 60px; }
+  .theme-classroom .classroom-item.books { width: 90px; }
 }
