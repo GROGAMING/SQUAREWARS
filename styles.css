@@ -1697,12 +1697,7 @@ body.theme-classroom {
   border-radius: 28px;
   z-index: 1; /* desk below grid */
   overflow: visible; /* keep props visible at edges */
-  /* Premium wood: texture with gradient fallback and gentle highlights */
-  background:
-    radial-gradient(circle at 10% 0%, rgba(255,255,255,0.16), transparent 60%),
-    radial-gradient(circle at 90% 100%, rgba(0,0,0,0.22), transparent 70%),
-    url('./public/images/wood.png'),
-    linear-gradient(140deg, #c79a63 0%, #a9773d 40%, #8d5f2c 60%, #b98346 100%);
+  background-image: url('/images/wood.png');
   background-size: cover;
   background-position: center;
   box-shadow:
@@ -1720,34 +1715,36 @@ body.theme-classroom {
     0 10px 18px rgba(0,0,0,0.4),
     inset 0 0 8px rgba(0,0,0,0.45);
 }
+/* Ensure the wood is visible behind the grid by clearing overlays within desk area */
+.desk-surface #gridOuter { background: transparent !important; }
+.desk-surface #gridOuter::before,
+.desk-surface #gridOuter::after { background: none !important; }
 
 /* Props layer: sits above grid frame but should be positioned around, not over cells */
-.theme-classroom .classroom-props-on-desk {
+.classroom-props-on-desk {
   pointer-events: none;
   position: absolute;
-  inset: 0; /* anchored to the desk surface */
-  z-index: 4; /* on top of grid frame */
-  display: block; /* shown only in Classroom theme (HTML defaults to none) */
+  inset: 0;
+  z-index: 4;
 }
-.theme-classroom .classroom-item {
+/* Always show props when desk-surface is present */
+.desk-surface .classroom-props-on-desk { display: block; }
+/* Decor image positioning */
+.decor-pencil {
   position: absolute;
-  opacity: 0.98;
-  will-change: transform;
-  max-width: 90px;
-  filter: drop-shadow(0 6px 6px rgba(0,0,0,0.35)); /* soft premium shadow */
+  top: 10px;
+  left: 20px;
+  width: 80px;
 }
-.theme-classroom .classroom-item.books { max-width: 100px; }
-.theme-classroom .classroom-item img { display: block; width: 100%; height: auto; }
-
-/* Example placements on desk edges; avoid grid overlap */
-.theme-classroom .classroom-item.pencil { top: 18px; left: 56px; width: clamp(56px, 10vw, 86px); transform: rotate(-18deg); }
-.theme-classroom .classroom-item.books  { bottom: 24px; left: 64px; width: clamp(68px, 12vw, 110px); }
-.theme-classroom .classroom-item.holder { top: 18px; right: 64px; width: clamp(52px, 9vw, 90px); }
-
-/* Subtle premium animations */
-.theme-classroom .classroom-item { animation: none !important; }
-
-/* Compact adjustments on small heights so props stay at margins */
-@media (max-height: 600px) {
-  .theme-classroom .classroom-item.books { width: 90px; }
+.decor-holder {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  width: 90px;
+}
+.decor-books {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  width: 90px;
 }
