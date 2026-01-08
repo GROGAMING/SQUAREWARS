@@ -923,6 +923,13 @@ function closeTutorial() {
   if (wrap) wrap.classList.remove('show-tutorial');
 }
 
+function openLeaderboard() {
+  closeInGameMenu();
+  hideMainMenu();
+  hideGameScreen();
+  navigateTo('leaderboardScreen');
+}
+
 // Ensure game screen visibility toggles with menu
 function showGameScreen() {
   const g = document.getElementById('gameScreen');
@@ -949,6 +956,7 @@ window.menuBack = menuBack;
 window.startGameFromMenu = startGameFromMenu;
 window.openTutorial = openTutorial;
 window.closeTutorial = closeTutorial;
+window.openLeaderboard = openLeaderboard;
 // Expose theme applier for UI-only skin switching
 window.applyThemeForDifficulty = applyThemeForDifficulty;
 

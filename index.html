@@ -10,6 +10,10 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <script>
+      tailwind = { config: { corePlugins: { preflight: false } } }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
       body.theme-classroom::before,
       body.theme-classroom::after { animation: none !important; }
@@ -19,13 +23,49 @@
   <body>
     <!-- Full-screen Main Menu Screen -->
     <div id="mainMenuScreen" class="menu-screen" aria-hidden="false">
-      <div class="menu-wrap">
-        <h1 class="menu-title">SQUARE WARS</h1>
-        <div class="menu-actions">
-          <button class="menu-primary" onclick="openModeSelect()">Choose Game Mode</button>
-          <button class="menu-secondary" onclick="openTutorial()">Tutorial</button>
-          <button class="menu-secondary" onclick="openSettings()">Settings</button>
+      <div class="menu-wrap max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 flex items-center justify-center p-6">
+        <div class="w-full flex items-center justify-between gap-12">
+          <div class="flex-shrink-0 flex items-center justify-center">
+            <div class="text-white font-bold tracking-wider text-4xl" style="filter: drop-shadow(0 0 20px rgba(255, 165, 0, 0.5));">
+              SQUARE WARS
+            </div>
+          </div>
+
+          <div class="menu-actions flex-1 max-w-[400px] flex flex-col gap-3">
+            <button
+              onclick="openModeSelect()"
+              class="w-full h-16 bg-gradient-to-r from-[#00bfff] to-[#0099ff] hover:from-[#00d4ff] hover:to-[#00aaff] text-white font-semibold text-lg rounded-full shadow-lg border border-cyan-300/30"
+              type="button"
+            >
+              START GAME
+            </button>
+
+            <button
+              onclick="openLeaderboard()"
+              class="w-full h-14 bg-slate-700/80 hover:bg-slate-600/80 text-white font-semibold text-base rounded-full shadow-lg border border-gray-600/50"
+              type="button"
+            >
+              LEADERBOARD
+            </button>
+
+            <button
+              onclick="openTutorial()"
+              class="w-full h-14 bg-slate-700/80 hover:bg-slate-600/80 text-white font-semibold text-base rounded-full shadow-lg border border-gray-600/50"
+              type="button"
+            >
+              TUTORIAL
+            </button>
+
+            <button
+              onclick="openSettings()"
+              class="w-full h-14 bg-slate-700/80 hover:bg-slate-600/80 text-white font-semibold text-base rounded-full shadow-lg border border-gray-600/50"
+              type="button"
+            >
+              SETTINGS
+            </button>
+          </div>
         </div>
+
         <div class="menu-tutorial">
           <button class="menu-back" onclick="closeTutorial()">← Back</button>
           <h3>Tutorial</h3>
@@ -35,27 +75,86 @@
     </div>
     <!-- Mode Select Screen (full-screen) -->
     <div id="modeSelectModal" class="menu-screen hidden" aria-hidden="true">
-      <div class="menu-wrap">
-        <button class="menu-back" onclick="menuBack()">← Back</button>
-        <h2>Choose Game Mode</h2>
-        <p>Select how you want to play SQUARE WARS:</p>
-        <button class="single-player" onclick="setGameMode('single')">
-          Single Player<br /><small>vs Computer</small>
-        </button>
-        <button onclick="setGameMode('multi')">
-          Multiplayer<br /><small>2 Players</small>
-        </button>
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 p-6">
+        <div class="h-full flex flex-col">
+          <div class="flex items-center mb-6">
+            <button
+              onclick="menuBack()"
+              class="w-12 h-12 rounded-2xl bg-slate-700/50 hover:bg-slate-600/70 text-white border border-gray-600/30"
+              type="button"
+            >
+              ←
+            </button>
+            <h1 class="flex-1 text-center text-2xl font-bold text-white tracking-wider mr-12">PLAY MODE</h1>
+          </div>
+
+          <div class="flex-1 flex items-center justify-center">
+            <div class="grid grid-cols-2 gap-6 w-full max-w-[650px]">
+              <button
+                onclick="setGameMode('single')"
+                class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#00bfff] to-[#0099ff] p-4 shadow-xl shadow-cyan-500/50 border border-white/20 hover:scale-105 transition-all duration-300 h-[240px] flex flex-col items-center justify-center"
+                type="button"
+              >
+                <div class="text-white text-center space-y-2">
+                  <h3 class="font-bold text-base tracking-wide">SINGLE PLAYER</h3>
+                  <p class="text-xs text-white/90 leading-relaxed px-2">vs Computer</p>
+                </div>
+              </button>
+              <button
+                onclick="setGameMode('multi')"
+                class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#ff1e5a] to-[#ff0844] p-4 shadow-xl shadow-pink-500/50 border border-white/20 hover:scale-105 transition-all duration-300 h-[240px] flex flex-col items-center justify-center"
+                type="button"
+              >
+                <div class="text-white text-center space-y-2">
+                  <h3 class="font-bold text-base tracking-wide">MULTIPLAYER</h3>
+                  <p class="text-xs text-white/90 leading-relaxed px-2">2 Players</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Settings Screen (full-screen) -->
     <div id="settingsScreen" class="menu-screen hidden" aria-hidden="true">
-      <div class="menu-wrap">
-        <button class="menu-back" onclick="closeSettings()">← Back</button>
-        <h2>Settings</h2>
-        <div class="settings-group">
-          <label><strong>Control Mode</strong></label>
-          <div class="settings-row">
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-[#1a1b3e] via-[#2a2b5e] to-[#3a3b7e] p-4 flex flex-col relative overflow-hidden">
+        <div class="flex items-center justify-between mb-4">
+          <button
+            onclick="closeSettings()"
+            class="w-12 h-12 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 text-white shadow-lg border border-gray-600/50"
+            type="button"
+          >
+            ←
+          </button>
+          <h1 class="text-white text-3xl font-bold tracking-wider">SETTINGS</h1>
+          <div class="rounded-2xl bg-[#2a2b4e]/80 px-4 py-2 border border-gray-600/50">
+            <p class="text-white text-xs font-semibold">Square Wars</p>
+            <p class="text-gray-400 text-[10px]">Version 1.0.0</p>
+          </div>
+        </div>
+
+        <div class="flex-1 flex flex-col items-center justify-center gap-4">
+          <h2 class="text-cyan-400 text-xl font-bold tracking-wider uppercase">Control Scheme</h2>
+
+          <div class="w-full max-w-xl h-16 rounded-full bg-[#2a2b4e]/80 border-2 border-gray-600/50 p-1.5 flex items-center gap-2 shadow-xl">
+            <button
+              onclick="document.getElementById('cmTouch').click()"
+              class="flex-1 h-full rounded-full flex items-center justify-center gap-2 font-semibold text-sm transition-all text-gray-400"
+              type="button"
+            >
+              TOUCH
+            </button>
+            <button
+              onclick="document.getElementById('cmButtons').click()"
+              class="flex-1 h-full rounded-full flex items-center justify-center gap-2 font-semibold text-sm transition-all text-gray-400"
+              type="button"
+            >
+              BUTTON
+            </button>
+          </div>
+
+          <div class="hidden">
             <label><input type="radio" name="controlMode" id="cmTouch" value="touch" /> Touch Controls</label>
             <label><input type="radio" name="controlMode" id="cmButtons" value="buttons" /> Button Controls</label>
           </div>
@@ -63,30 +162,127 @@
       </div>
     </div>
 
+    <!-- Leaderboard Screen (full-screen) -->
+    <div id="leaderboardScreen" class="menu-screen hidden" aria-hidden="true">
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-[#1a1b3e] via-[#2a2b5e] to-[#3a3b7e] flex flex-col p-6 overflow-hidden">
+        <div class="flex items-center justify-between mb-4">
+          <button
+            onclick="menuBack()"
+            class="w-12 h-12 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 border border-gray-600/50 flex items-center justify-center transition-colors text-white"
+            type="button"
+          >
+            ←
+          </button>
+          <h1 class="text-3xl font-bold text-white tracking-wider">LEADERBOARD</h1>
+          <div class="w-12"></div>
+        </div>
+
+        <div class="flex gap-3 mb-4 justify-center">
+          <button
+            type="button"
+            class="h-12 px-8 rounded-full font-semibold text-sm bg-gradient-to-r from-[#00bfff] to-[#0099ff] text-white shadow-lg border border-cyan-300/30"
+          >
+            SCORE
+          </button>
+          <button
+            type="button"
+            class="h-12 px-8 rounded-full font-semibold text-sm bg-[#2a2b4e]/80 text-gray-300 border border-gray-600/50 hover:bg-[#3a3b5e]/80"
+          >
+            WINS
+          </button>
+          <button
+            type="button"
+            class="h-12 px-8 rounded-full font-semibold text-sm bg-[#2a2b4e]/80 text-gray-300 border border-gray-600/50 hover:bg-[#3a3b5e]/80"
+          >
+            STREAK
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto pr-2 space-y-2">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-[#2a2b4e]/60 rounded-3xl p-4 border border-gray-600/40 flex items-center gap-4">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-400 flex items-center justify-center text-2xl font-bold text-black shadow-lg">1</div>
+              <div class="flex-1">
+                <h3 class="text-white font-semibold text-lg">You</h3>
+                <div class="flex gap-4 text-xs text-gray-400">
+                  <span>Wins: 0</span>
+                  <span>Streak: 0</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-2xl font-bold text-cyan-400">0</div>
+                <div class="text-xs text-gray-400">points</div>
+              </div>
+            </div>
+            <div class="bg-[#2a2b4e]/60 rounded-3xl p-4 border border-gray-600/40 flex items-center gap-4">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-2xl font-bold text-black shadow-lg">2</div>
+              <div class="flex-1">
+                <h3 class="text-white font-semibold text-lg">Player 2</h3>
+                <div class="flex gap-4 text-xs text-gray-400">
+                  <span>Wins: 0</span>
+                  <span>Streak: 0</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-2xl font-bold text-cyan-400">0</div>
+                <div class="text-xs text-gray-400">points</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Scoring Select Screen (full-screen) -->
     <div id="scoringSelectModal" class="menu-screen hidden" aria-hidden="true">
-      <div class="menu-wrap">
-        <button class="menu-back" onclick="menuBack()">← Back</button>
-        <h2>Choose Scoring Style</h2>
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 p-6">
+        <div class="h-full flex flex-col">
+          <div class="flex items-center mb-6">
+            <button
+              onclick="menuBack()"
+              class="w-12 h-12 rounded-2xl bg-slate-700/50 hover:bg-slate-600/70 text-white border border-gray-600/30"
+              type="button"
+            >
+              ←
+            </button>
+            <h1 class="flex-1 text-center text-2xl font-bold text-white tracking-wider mr-12">GAME MODES</h1>
+          </div>
 
-        <button class="classic-mode" onclick="setScoringMode('classic')">
-          Classic (Box Points)<br />
-          <small>Each captured box is worth <strong>1 point</strong>.</small>
-        </button>
-
-        <button class="area-mode" onclick="setScoringMode('area')">
-          Territory Takedown (Area Mode)<br />
-          <small
-            >Score the <strong>number of squares</strong> inside a captured
-            zone. Overlaps can <strong>steal</strong> territory!</small
-          >
-        </button>
-
-        <!-- Quick Fire goes to its own screen -->
-        <button class="quickfire-mode" onclick="setScoringMode('quickfire')">
-          Quick Fire<br />
-          <small>Classic scoring with a win target.</small>
-        </button>
+          <div class="flex-1 flex items-center justify-center">
+            <div class="grid grid-cols-3 gap-4 w-full max-w-[750px]">
+              <button
+                onclick="setScoringMode('classic')"
+                class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#00bfff] to-[#0099ff] p-4 shadow-xl shadow-cyan-500/50 border border-white/20 hover:scale-105 transition-all duration-300 h-[220px] flex flex-col items-center justify-center"
+                type="button"
+              >
+                <div class="text-white text-center space-y-2">
+                  <h3 class="font-bold text-base tracking-wide">CLASSIC</h3>
+                  <p class="text-xs text-white/90 leading-relaxed px-2">1 point per completed box.</p>
+                </div>
+              </button>
+              <button
+                onclick="setScoringMode('area')"
+                class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#ff1e5a] to-[#ff0844] p-4 shadow-xl shadow-pink-500/50 border border-white/20 hover:scale-105 transition-all duration-300 h-[220px] flex flex-col items-center justify-center"
+                type="button"
+              >
+                <div class="text-white text-center space-y-2">
+                  <h3 class="font-bold text-base tracking-wide">TERRITORY</h3>
+                  <p class="text-xs text-white/90 leading-relaxed px-2">Biggest connected territory wins.</p>
+                </div>
+              </button>
+              <button
+                onclick="setScoringMode('quickfire')"
+                class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#a855f7] to-[#8b5cf6] p-4 shadow-xl shadow-purple-500/50 border border-white/20 hover:scale-105 transition-all duration-300 h-[220px] flex flex-col items-center justify-center"
+                type="button"
+              >
+                <div class="text-white text-center space-y-2">
+                  <h3 class="font-bold text-base tracking-wide">QUICKFIRE</h3>
+                  <p class="text-xs text-white/90 leading-relaxed px-2">Best to X points.</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -123,26 +319,67 @@
 
     <!-- Difficulty Select Screen (full-screen) -->
     <div id="difficultySelectModal" class="menu-screen hidden" aria-hidden="true">
-      <div class="menu-wrap">
-        <button class="menu-back" onclick="menuBack()">← Back</button>
-        <h2>Choose Difficulty</h2>
-        <p>Select the AI difficulty level:</p>
-        <button class="beginner theme-opt" onclick="setDifficulty('beginner')">
-          <span class="thumb theme-classroom" aria-hidden="true"></span>
-          <span class="txt"><span class="title">Classroom</span><br /><small>Relaxed, learner-friendly mode</small></span>
-        </button>
-        <button class="medium theme-opt" onclick="setDifficulty('medium')">
-          <span class="thumb theme-warroom" aria-hidden="true"></span>
-          <span class="txt"><span class="title">War Room</span><br /><small>Tactical challenge</small></span>
-        </button>
-        <button class="advanced theme-opt" onclick="setDifficulty('advanced')">
-          <span class="thumb theme-hitech" aria-hidden="true"></span>
-          <span class="txt"><span class="title">High-Tech Command</span><br /><small>Serious strategic battle</small></span>
-        </button>
-        <button class="impossible theme-opt" onclick="setDifficulty('impossible')">
-          <span class="thumb theme-space" aria-hidden="true"></span>
-          <span class="txt"><span class="title">Space Arena</span><br /><small>Ultimate challenge</small></span>
-        </button>
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 p-6">
+        <div class="h-full flex flex-col">
+          <div class="flex items-center mb-6">
+            <button
+              onclick="menuBack()"
+              class="w-12 h-12 rounded-2xl bg-slate-700/50 hover:bg-slate-600/70 text-white border border-gray-600/30"
+              type="button"
+            >
+              ←
+            </button>
+            <div class="flex-1 text-center mr-12">
+              <h2 class="text-cyan-400 text-xs font-semibold tracking-wide">SINGLE PLAYER</h2>
+              <h1 class="text-2xl font-bold text-white tracking-wider">SELECT DIFFICULTY</h1>
+            </div>
+          </div>
+
+          <div class="flex-1 flex items-center justify-center">
+            <div class="grid grid-cols-4 gap-4 w-full max-w-[750px]">
+              <button
+                onclick="setDifficulty('beginner')"
+                class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00ff88] to-[#00cc66] p-3 shadow-xl shadow-green-500/50 border border-white/20 hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center h-[220px]"
+                type="button"
+              >
+                <div class="text-white text-center space-y-3">
+                  <h3 class="font-bold text-lg tracking-wide">CLASSROOM</h3>
+                  <p class="text-white/90 text-xs font-medium">Relaxed</p>
+                </div>
+              </button>
+              <button
+                onclick="setDifficulty('medium')"
+                class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00bfff] to-[#0099ff] p-3 shadow-xl shadow-cyan-500/50 border border-white/20 hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center h-[220px]"
+                type="button"
+              >
+                <div class="text-white text-center space-y-3">
+                  <h3 class="font-bold text-lg tracking-wide">WAR ROOM</h3>
+                  <p class="text-white/90 text-xs font-medium">Tactical</p>
+                </div>
+              </button>
+              <button
+                onclick="setDifficulty('advanced')"
+                class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ff9944] to-[#ff7711] p-3 shadow-xl shadow-orange-500/50 border border-white/20 hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center h-[220px]"
+                type="button"
+              >
+                <div class="text-white text-center space-y-3">
+                  <h3 class="font-bold text-lg tracking-wide">HIGH-TECH</h3>
+                  <p class="text-white/90 text-xs font-medium">Serious</p>
+                </div>
+              </button>
+              <button
+                onclick="setDifficulty('impossible')"
+                class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ff1e5a] to-[#ff0844] p-3 shadow-xl shadow-pink-500/50 border border-white/20 hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center h-[220px]"
+                type="button"
+              >
+                <div class="text-white text-center space-y-3">
+                  <h3 class="font-bold text-lg tracking-wide">SPACE ARENA</h3>
+                  <p class="text-white/90 text-xs font-medium">Ultimate</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -167,66 +404,119 @@
     </div>
 
     <div id="gameScreen" class="hidden">
-      
+      <div class="max-w-[844px] w-full mx-auto bg-gradient-to-br from-[#1a1b3e] via-[#2a2b5e] to-[#3a3b7e] p-4 flex flex-col relative">
 
-    <!-- In-game top bar with menu button -->
-    <div class="topbar">
-      <button id="menuBtn" class="menu-btn" onclick="openInGameMenu()" aria-label="Open Menu">☰</button>
-    </div>
+        <div class="flex items-center gap-3 mb-3">
+          <button
+            id="menuBtn"
+            onclick="openInGameMenu()"
+            class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white shadow-lg border border-purple-400/30"
+            type="button"
+            aria-label="Open Menu"
+          >
+            ☰
+          </button>
 
-    <!-- Thin, minimal scoreboard: three compact boxes in one row -->
-    <div id="thinScoreBar" class="thin-score-bar scoreboard-row" aria-label="Scores">
-      <div id="redScore" class="scorebox left" role="group" aria-label="Red score">
-        <span class="dot dot-red" aria-hidden="true"></span>
-        <span class="name" id="thinRedLabel">Player 1</span>
-        <span class="value" id="redGames">0</span>
-      </div>
-      <div id="modeBox" class="modebox center" aria-live="polite" aria-atomic="true">
-        <span id="thinMode"></span>
-      </div>
-      <div id="blueScore" class="scorebox right" role="group" aria-label="Blue score">
-        <span class="dot dot-blue" aria-hidden="true"></span>
-        <span class="name" id="thinBlueLabel">Player 2</span>
-        <span class="value" id="blueGames">0</span>
-      </div>
-    </div>
-
-    <div class="desk-surface">
-      <!-- Classroom props positioned on the desk surface; visible only in Classroom theme -->
-      <div class="classroom-props-on-desk" aria-hidden="true">
-        <img src="images/pencil.png" class="decor-pencil" alt="Pencil" />
-        <img src="images/books.png" class="decor-books" alt="Books" />
-        <img src="images/holder.png" class="decor-holder" alt="Holder" />
-      </div>
-      <div class="grid-wrapper">
-        <div class="grid-outer" id="gridOuter">
-          <!-- Touch-friendly side controls -->
-          <div id="boardControlsLeft" class="board-controls side left" aria-label="Left board controls">
-            <button id="btnArrowLeft" class="ctrl-btn ctrl-arrow" type="button" aria-label="Move left">◀</button>
+          <div id="redScore" class="flex-1 h-16 rounded-3xl bg-gradient-to-br from-[#ff1e5a] to-[#ff0844] shadow-xl border border-white/20 flex flex-col items-center justify-center px-4">
+            <p id="thinRedLabel" class="text-white/90 text-xs font-semibold tracking-wider uppercase">Player 1</p>
+            <p id="redGames" class="text-white text-3xl font-bold">0</p>
           </div>
-          <div class="grid" id="gameGrid"></div>
-          <div id="outlineLayer"></div>
-          <!-- Visual-only scanning line (shown in High-Tech theme) -->
-          <div class="scan-line" aria-hidden="true"></div>
-          <div id="boardControlsRight" class="board-controls side right" aria-label="Right board controls">
-            <button id="btnDrop" class="ctrl-btn ctrl-drop" type="button">Drop</button>
-            <button id="btnArrowRight" class="ctrl-btn ctrl-arrow" type="button" aria-label="Move right">▶</button>
+
+          <div class="flex-1 h-16 rounded-3xl bg-[#2a2b4e]/80 backdrop-blur-sm shadow-xl border border-gray-600/30 flex items-center justify-center px-4">
+            <p id="thinMode" class="text-cyan-400 text-base font-bold tracking-wider uppercase"></p>
+          </div>
+
+          <div id="blueScore" class="flex-1 h-16 rounded-3xl bg-gradient-to-br from-[#00bfff] to-[#0099ff] shadow-xl border border-white/20 flex flex-col items-center justify-center px-4">
+            <p id="thinBlueLabel" class="text-white/90 text-xs font-semibold tracking-wider uppercase">Player 2</p>
+            <p id="blueGames" class="text-white text-3xl font-bold">0</p>
+          </div>
+        </div>
+
+         <div class="flex-1 flex items-center justify-center gap-3">
+          <div id="boardControlsLeft" class="flex flex-col gap-2 flex-shrink-0 justify-center" aria-label="Left board controls">
+            <div class="w-16 h-20"></div>
+            <button
+              id="btnArrowLeft"
+              class="w-16 h-16 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 text-white shadow-lg border border-gray-600/50"
+              type="button"
+              aria-label="Move left"
+            >
+              ◀
+            </button>
+          </div>
+
+          <div class="rounded-3xl bg-gradient-to-br from-gray-200 to-gray-300 shadow-2xl shadow-black/20 border-4 border-white/50 flex items-center justify-center flex-shrink-0 p-2">
+            <div class="grid-outer" id="gridOuter">
+              <div class="grid" id="gameGrid"></div>
+              <div id="outlineLayer"></div>
+              <div class="scan-line" aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <div id="boardControlsRight" class="flex flex-col gap-2 flex-shrink-0 justify-center" aria-label="Right board controls">
+            <button
+              id="btnDrop"
+              class="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#00bfff] to-[#0099ff] hover:from-[#00d4ff] hover:to-[#00aaff] text-white shadow-lg border border-cyan-300/30 font-bold text-sm"
+              type="button"
+            >
+              DROP
+            </button>
+            <button
+              id="btnArrowRight"
+              class="w-16 h-16 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 text-white shadow-lg border border-gray-600/50"
+              type="button"
+              aria-label="Move right"
+            >
+              ▶
+            </button>
+          </div>
+        </div>
+
+        <div id="thinScoreBar" class="hidden" aria-label="Scores"></div>
+
+        <div id="inGameMenuOverlay" class="modal-overlay hidden" aria-hidden="true">
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center rounded-3xl">
+            <div class="flex flex-col items-center gap-3 w-full max-w-sm px-6">
+              <h2 class="text-white text-4xl font-bold tracking-wider mb-2">PAUSED</h2>
+              <button
+                onclick="closeInGameMenu()"
+                class="w-full h-12 bg-gradient-to-r from-[#00bfff] to-[#0099ff] hover:from-[#00d4ff] hover:to-[#00aaff] text-white font-semibold text-sm rounded-full shadow-lg border border-cyan-300/30"
+                type="button"
+              >
+                RESUME
+              </button>
+              <button
+                onclick="resetGameAndCloseMenu()"
+                class="w-full h-11 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-semibold text-sm rounded-full shadow-lg border border-purple-400/30"
+                type="button"
+              >
+                RESET GAME
+              </button>
+              <button
+                onclick="openModeSelect()"
+                class="w-full h-11 bg-[#2a2b4e]/90 hover:bg-[#3a3b5e]/90 text-white font-semibold text-sm rounded-full shadow-lg border border-gray-600/50"
+                type="button"
+              >
+                CHANGE MODE
+              </button>
+              <button
+                onclick="openSettings()"
+                class="w-full h-11 bg-[#2a2b4e]/90 hover:bg-[#3a3b5e]/90 text-white font-semibold text-sm rounded-full shadow-lg border border-gray-600/50"
+                type="button"
+              >
+                SETTINGS
+              </button>
+              <button
+                onclick="goToMainMenu()"
+                class="w-full h-11 bg-[#2a2b4e]/90 hover:bg-[#3a3b5e]/90 text-white font-semibold text-sm rounded-full shadow-lg border border-gray-600/50"
+                type="button"
+              >
+                MAIN MENU
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- In-game Options Overlay -->
-    <div id="inGameMenuOverlay" class="modal-overlay hidden" aria-hidden="true">
-      <div class="modal in-game-menu">
-        <h2>Menu</h2>
-        <button onclick="resetGameAndCloseMenu()">Reset Game</button>
-        <button onclick="openModeSelect()">Change Game Mode</button>
-        <button onclick="openSettings()">Settings</button>
-        <button onclick="goToMainMenu()">Main Menu</button>
-        <button onclick="closeInGameMenu()">Close</button>
-      </div>
-    </div>
     </div>
 
     <script type="module" src="./js/script.js"></script>
