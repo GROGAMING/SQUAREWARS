@@ -448,13 +448,14 @@ function onQuickfireInput(inputEl) {
   const val = Number(inputEl.value || 5);
   bubble.textContent = String(val);
 
-  // position bubble centered above the thumb
+  if (!bubble.classList || !bubble.classList.contains("qf-bubble")) return;
   const pct = (val - min) / (max - min);
-  const wrap = inputEl.parentElement; // .qf-range-wrap
+  const wrap = inputEl.parentElement;
+  if (!wrap || !wrap.getBoundingClientRect) return;
   const wrapRect = wrap.getBoundingClientRect();
   const inputRect = inputEl.getBoundingClientRect();
-  const usable = inputRect.width - 16; // approx thumb width
-  const x = inputRect.left - wrapRect.left + 8 + usable * pct; // +8 centers on thumb
+  const usable = inputRect.width - 16;
+  const x = inputRect.left - wrapRect.left + 8 + usable * pct;
   bubble.style.left = `${x}px`;
 }
 

@@ -32,7 +32,7 @@
     </div>
 
     <div id="createAccountScreen" class="menu-screen hidden" aria-hidden="true">
-      <div class="h-[390px] w-[844px] mx-auto flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 overflow-hidden">
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 overflow-hidden">
         <div class="h-full w-full overflow-y-auto px-8 py-6">
           <div class="max-w-2xl mx-auto space-y-5 h-full flex flex-col justify-between">
             <div class="flex justify-between items-center">
@@ -125,7 +125,7 @@
     </div>
 
     <div id="loginScreen" class="menu-screen hidden" aria-hidden="true">
-      <div class="h-[390px] w-[844px] mx-auto flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 relative">
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 relative">
         <div class="w-full max-w-lg space-y-4 px-8">
           <div class="absolute top-4 left-4">
             <button
@@ -183,7 +183,7 @@
     </div>
 
     <div id="dailyChallengeScreen" class="menu-screen hidden" aria-hidden="true">
-      <div class="w-[844px] h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 p-4 flex flex-col relative">
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 p-4 flex flex-col relative">
         <div id="dailyChallengeOverlay" class="absolute inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center" aria-hidden="false">
           <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 max-w-md border-2 border-cyan-400/50 shadow-2xl shadow-cyan-500/20">
             <div class="flex justify-between items-start mb-4">
@@ -248,7 +248,7 @@
     </div>
 
     <div id="tutorialScreen" class="menu-screen hidden" aria-hidden="true">
-      <div class="w-[844px] h-[390px] mx-auto bg-gradient-to-br from-[#1a1b3e] via-[#2a2b5e] to-[#3a3b7e] flex items-center justify-center p-6 relative">
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-[#1a1b3e] via-[#2a2b5e] to-[#3a3b7e] flex items-center justify-center p-6 relative">
         <button
           onclick="closeTutorialScreen()"
           class="absolute top-6 left-6 w-14 h-14 bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 rounded-2xl flex items-center justify-center text-white shadow-lg border border-gray-600/50 transition-colors"
@@ -557,16 +557,31 @@
 
     <!-- Quick Fire target Screen (full-screen) -->
     <div id="quickfireSelectModal" class="menu-screen hidden" aria-hidden="true">
-      <div class="menu-wrap">
-        <h2>Quick Fire — Set Win Target</h2>
-        <p>Choose how many boxes a player needs to win the match.</p>
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 p-6 flex flex-col">
+        <div class="flex items-center mb-6">
+          <button
+            onclick="backFromQuickfire()"
+            class="w-12 h-12 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 text-white shadow-lg border border-gray-600/50"
+            type="button"
+            aria-label="Back"
+          >
+            ←
+          </button>
+          <div class="flex-1 text-center mr-12">
+            <h2 class="text-cyan-400 text-xs font-semibold tracking-wide">QUICKFIRE</h2>
+            <h1 class="text-2xl font-bold text-white tracking-wider">SET TARGET</h1>
+          </div>
+        </div>
 
-        <div class="qf-chooser">
-          <label for="qfTarget">Target</label>
+        <div class="flex-1 flex items-center justify-center">
+          <div class="w-full max-w-[560px] bg-[#2a2b4e]/60 rounded-3xl border border-gray-600/40 shadow-xl p-6">
+            <div class="flex items-center justify-between mb-3">
+              <p class="text-white font-semibold text-sm tracking-wider">TARGET BOXES</p>
+              <div class="h-9 px-4 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                <span id="qfBubble">5</span>
+              </div>
+            </div>
 
-          <!-- Range + live bubble -->
-          <div class="qf-range-wrap">
-            <div id="qfBubble" class="qf-bubble">5</div>
             <input
               type="range"
               id="qfTarget"
@@ -575,13 +590,31 @@
               step="1"
               value="5"
               oninput="onQuickfireInput(this)"
+              class="w-full"
             />
-          </div>
-        </div>
 
-        <div class="qf-actions">
-          <button class="qf-start" onclick="confirmQuickfire()">Start</button>
-          <button class="qf-cancel" onclick="backFromQuickfire()">Back</button>
+            <div class="flex justify-between text-xs text-gray-300 mt-2">
+              <span>1</span>
+              <span>10</span>
+            </div>
+
+            <div class="mt-6 grid grid-cols-2 gap-3">
+              <button
+                onclick="confirmQuickfire()"
+                class="h-12 bg-gradient-to-r from-[#00bfff] to-[#0099ff] hover:from-[#00d4ff] hover:to-[#00aaff] text-white font-semibold text-sm rounded-2xl shadow-lg border border-cyan-300/30"
+                type="button"
+              >
+                CONTINUE
+              </button>
+              <button
+                onclick="backFromQuickfire()"
+                class="h-12 bg-[#2a2b4e]/90 hover:bg-[#3a3b5e]/90 text-white font-semibold text-sm rounded-2xl shadow-lg border border-gray-600/50"
+                type="button"
+              >
+                BACK
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
