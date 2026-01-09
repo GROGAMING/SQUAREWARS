@@ -70,6 +70,183 @@ let settingsReturnToGame = false;
 let menuStack = [];
 
 const AUTH_STORAGE_KEY = "squarewars_auth";
+const LEADERBOARD_STORAGE_KEY = "squarewars_leaderboard";
+let leaderboardTab = "score";
+
+function getAuthProfile() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function getUserDisplayName() {
+  const p = getAuthProfile();
+  const dn = p && typeof p.displayName === "string" ? p.displayName.trim() : "";
+  return dn || "You";
+}
+
+function loadLeaderboard() {
+  try {
+    const raw = localStorage.getItem(LEADERBOARD_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((x) => x && typeof x === "object" && typeof x.name === "string")
+      .map((x) => ({
+        name: String(x.name),
+        score: Number(x.score) || 0,
+        wins: Number(x.wins) || 0,
+        streak: Number(x.streak) || 0,
+      }));
+  } catch {
+    return [];
+  }
+}
+
+function saveLeaderboard(list) {
+  try {
+    localStorage.setItem(LEADERBOARD_STORAGE_KEY, JSON.stringify(list || []));
+  } catch {}
+}
+
+function upsertPlayer(list, name) {
+  const n = String(name || "").trim() || "Player";
+  let p = list.find((x) => x && x.name === n);
+  if (!p) {
+    p = { name: n, score: 0, wins: 0, streak: 0 };
+    list.push(p);
+  }
+  return p;
+}
+
+function applyMatchToLeaderboard({ p1Name, p1Score, p2Name, p2Score }) {
+  const list = loadLeaderboard();
+  const a = upsertPlayer(list, p1Name);
+  const b = upsertPlayer(list, p2Name);
+
+  const s1 = Number(p1Score) || 0;
+  const s2 = Number(p2Score) || 0;
+  a.score += s1;
+  b.score += s2;
+
+  if (s1 === s2) {
+    a.streak = 0;
+    b.streak = 0;
+  } else if (s1 > s2) {
+    a.wins += 1;
+    a.streak = (a.streak | 0) + 1;
+    b.streak = 0;
+  } else {
+    b.wins += 1;
+    b.streak = (b.streak | 0) + 1;
+    a.streak = 0;
+  }
+
+  saveLeaderboard(list);
+  const lb = document.getElementById("leaderboardScreen");
+  if (lb && !lb.classList.contains(CSS.HIDDEN)) {
+    renderLeaderboard();
+  }
+}
+
+function getSortedLeaderboard(list) {
+  const tab = leaderboardTab;
+  const sorted = [...(list || [])];
+  if (tab === "wins") {
+    sorted.sort((a, b) => (b.wins - a.wins) || (b.score - a.score) || a.name.localeCompare(b.name));
+  } else if (tab === "streak") {
+    sorted.sort((a, b) => (b.streak - a.streak) || (b.wins - a.wins) || a.name.localeCompare(b.name));
+  } else {
+    sorted.sort((a, b) => (b.score - a.score) || (b.wins - a.wins) || a.name.localeCompare(b.name));
+  }
+  return sorted;
+}
+
+function setLeaderboardTab(tab) {
+  leaderboardTab = tab === "wins" || tab === "streak" ? tab : "score";
+  renderLeaderboard();
+}
+
+function setLbTabButtonStyles(active) {
+  const scoreBtn = document.getElementById("leaderboardTabScore");
+  const winsBtn = document.getElementById("leaderboardTabWins");
+  const streakBtn = document.getElementById("leaderboardTabStreak");
+  const activeCls = "h-12 px-8 rounded-full font-semibold text-sm bg-gradient-to-r from-[#00bfff] to-[#0099ff] text-white shadow-lg border border-cyan-300/30";
+  const inactiveCls = "h-12 px-8 rounded-full font-semibold text-sm bg-[#2a2b4e]/80 text-gray-300 border border-gray-600/50 hover:bg-[#3a3b5e]/80";
+  if (scoreBtn) scoreBtn.className = active === "score" ? activeCls : inactiveCls;
+  if (winsBtn) winsBtn.className = active === "wins" ? activeCls : inactiveCls;
+  if (streakBtn) streakBtn.className = active === "streak" ? activeCls : inactiveCls;
+}
+
+function rankBadgeClass(rank) {
+  if (rank === 1) return "from-yellow-400 to-orange-400";
+  if (rank === 2) return "from-gray-300 to-gray-400";
+  if (rank === 3) return "from-amber-600 to-orange-700";
+  return "from-slate-600 to-slate-700";
+}
+
+function buildLeaderboardCard(rank, player) {
+  const wrap = document.createElement("div");
+  wrap.className = "bg-[#2a2b4e]/60 rounded-3xl p-4 border border-gray-600/40 flex items-center gap-4";
+  const badge = document.createElement("div");
+  badge.className = `w-14 h-14 rounded-2xl bg-gradient-to-br ${rankBadgeClass(rank)} flex items-center justify-center text-2xl font-bold text-black shadow-lg`;
+  badge.textContent = String(rank);
+  const mid = document.createElement("div");
+  mid.className = "flex-1";
+  const name = document.createElement("h3");
+  name.className = "text-white font-semibold text-lg";
+  name.textContent = player.name;
+  const meta = document.createElement("div");
+  meta.className = "flex gap-4 text-xs text-gray-400";
+  const wins = document.createElement("span");
+  wins.textContent = `Wins: ${player.wins}`;
+  const streak = document.createElement("span");
+  streak.textContent = `Streak: ${player.streak}`;
+  meta.appendChild(wins);
+  meta.appendChild(streak);
+  mid.appendChild(name);
+  mid.appendChild(meta);
+  const right = document.createElement("div");
+  right.className = "text-right";
+  const val = document.createElement("div");
+  val.className = "text-2xl font-bold text-cyan-400";
+  val.textContent = String(player.score);
+  const label = document.createElement("div");
+  label.className = "text-xs text-gray-400";
+  label.textContent = "points";
+  right.appendChild(val);
+  right.appendChild(label);
+  wrap.appendChild(badge);
+  wrap.appendChild(mid);
+  wrap.appendChild(right);
+  return wrap;
+}
+
+function renderLeaderboard() {
+  const listEl = document.getElementById("leaderboardList");
+  const emptyEl = document.getElementById("leaderboardEmpty");
+  if (!listEl) return;
+  const list = loadLeaderboard();
+  const sorted = getSortedLeaderboard(list);
+  listEl.innerHTML = "";
+  if (emptyEl) {
+    if (sorted.length === 0) emptyEl.classList.remove(CSS.HIDDEN);
+    else emptyEl.classList.add(CSS.HIDDEN);
+  }
+  sorted.forEach((p, idx) => {
+    listEl.appendChild(buildLeaderboardCard(idx + 1, p));
+  });
+  setLbTabButtonStyles(leaderboardTab);
+}
+
+window.setLeaderboardTab = setLeaderboardTab;
+
 function isAuthed() {
   try {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -111,6 +288,41 @@ function openLogin() {
   hideMainMenu();
   setScreenVisibility("createAccountScreen", false);
   setScreenVisibility("loginScreen", true);
+}
+
+function openDailyChallenge() {
+  closeInGameMenu();
+  hideMainMenu();
+  hideGameScreen();
+  setScreenVisibility("dailyChallengeScreen", true);
+  openDailyChallengeInstructions();
+}
+
+function closeDailyChallenge() {
+  setScreenVisibility("dailyChallengeScreen", false);
+  showMainMenu();
+}
+
+function openDailyChallengeInstructions() {
+  const ov = document.getElementById("dailyChallengeOverlay");
+  if (!ov) return;
+  ov.classList.remove(CSS.HIDDEN);
+  ov.setAttribute("aria-hidden", "false");
+}
+
+function closeDailyChallengeInstructions() {
+  const ov = document.getElementById("dailyChallengeOverlay");
+  if (!ov) return;
+  ov.classList.add(CSS.HIDDEN);
+  ov.setAttribute("aria-hidden", "true");
+}
+
+function startDailyChallenge() {
+  closeDailyChallengeInstructions();
+}
+
+function completeDailyChallenge() {
+  closeDailyChallenge();
 }
 
 function authedLanding() {
@@ -530,6 +742,14 @@ function getWinnerLabel() {
 function showEnd() {
   showEndGameModal(getWinnerLabel(), redGames, blueGames);
   gameActive = false;
+  try {
+    if (gameMode) {
+      const p1Name = gameMode === GAME_MODES.SINGLE ? getUserDisplayName() : "Player 1";
+      const aiName = aiDifficulty ? `${aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)} AI` : "AI";
+      const p2Name = gameMode === GAME_MODES.SINGLE ? aiName : "Player 2";
+      applyMatchToLeaderboard({ p1Name, p1Score: redGames, p2Name, p2Score: blueGames });
+    }
+  } catch {}
 }
 
 function checkEndOfGame() {
@@ -963,26 +1183,24 @@ function startGameFromMenu() {
   // Re-apply theme after game screen shows (in case of navigation)
   if (aiDifficulty) applyThemeForDifficulty(aiDifficulty);
 }
-
+// Tutorial is now a modal that reuses the existing instructions content.
 function openTutorial() {
   // Reuse existing instructions content without adding another screen in the flow.
-  showInstructionsUI(scoringMode, quickFireTarget);
-  const instrModal = document.getElementById(UI_IDS.instructionsModal);
-  const body = document.getElementById('instructionsBody');
-  const target = document.getElementById('tutorialContent');
-  if (body && target) target.innerHTML = body.innerHTML;
-  // Immediately hide the instructions modal if it was shown
-  if (instrModal) {
-    instrModal.classList.add(CSS.HIDDEN);
-    instrModal.setAttribute('aria-hidden', 'true');
-  }
-  const wrap = document.querySelector('#mainMenuScreen .menu-wrap');
-  if (wrap) wrap.classList.add('show-tutorial');
+  closeInGameMenu();
+  hideMainMenu();
+  hideGameScreen();
+  setScreenVisibility("tutorialScreen", true);
+  tutorialIndex = 0;
+  renderTutorial();
 }
 
 function closeTutorial() {
-  const wrap = document.querySelector('#mainMenuScreen .menu-wrap');
-  if (wrap) wrap.classList.remove('show-tutorial');
+  setScreenVisibility("tutorialScreen", false);
+  showMainMenu();
+}
+
+function closeTutorialScreen() {
+  closeTutorial();
 }
 
 function openLeaderboard() {
@@ -990,6 +1208,7 @@ function openLeaderboard() {
   hideMainMenu();
   hideGameScreen();
   navigateTo('leaderboardScreen');
+  renderLeaderboard();
 }
 
 // Ensure game screen visibility toggles with menu
@@ -1018,6 +1237,81 @@ window.menuBack = menuBack;
 window.startGameFromMenu = startGameFromMenu;
 window.openTutorial = openTutorial;
 window.closeTutorial = closeTutorial;
+window.closeTutorialScreen = closeTutorialScreen;
+window.openDailyChallenge = openDailyChallenge;
+window.closeDailyChallenge = closeDailyChallenge;
+window.openDailyChallengeInstructions = openDailyChallengeInstructions;
+window.closeDailyChallengeInstructions = closeDailyChallengeInstructions;
+window.startDailyChallenge = startDailyChallenge;
+window.completeDailyChallenge = completeDailyChallenge;
+
+let tutorialIndex = 0;
+const tutorialSlides = [
+  {
+    alt: "Drop pieces into the grid",
+    desc: "Tap a column to drop your piece. Connect 4 in a row to capture territory.",
+  },
+  {
+    alt: "Capturing blocks squares",
+    desc: "When you connect 4, the captured area becomes blocked off and counts toward score.",
+  },
+  {
+    alt: "Modes and scoring",
+    desc: "Choose Classic, Territory, or Quickfire. Quickfire ends when someone hits the target.",
+  },
+  {
+    alt: "Controls",
+    desc: "Use Touch mode or Buttons mode (left/right + DROP) from Settings.",
+  },
+];
+
+function renderTutorial() {
+  const imgAlt = document.getElementById("tutorialImageAlt");
+  const desc = document.getElementById("tutorialDescription");
+  const dots = document.getElementById("tutorialDots");
+  const prevBtn = document.getElementById("tutorialPrevBtn");
+  const nextBtn = document.getElementById("tutorialNextBtn");
+  const startBtn = document.getElementById("tutorialStartBtn");
+
+  const slide = tutorialSlides[tutorialIndex] || tutorialSlides[0];
+  if (imgAlt) imgAlt.textContent = slide.alt;
+  if (desc) desc.textContent = slide.desc;
+
+  if (dots) {
+    dots.innerHTML = "";
+    for (let i = 0; i < tutorialSlides.length; i++) {
+      const d = document.createElement("div");
+      d.className =
+        "w-2 h-2 rounded-full transition-all " +
+        (i === tutorialIndex ? "bg-cyan-400" : "bg-gray-600");
+      dots.appendChild(d);
+    }
+  }
+
+  if (prevBtn) prevBtn.disabled = tutorialIndex === 0;
+  const isLast = tutorialIndex === tutorialSlides.length - 1;
+  if (nextBtn) nextBtn.classList.toggle(CSS.HIDDEN, isLast);
+  if (startBtn) startBtn.classList.toggle(CSS.HIDDEN, !isLast);
+}
+
+function tutorialPrev() {
+  tutorialIndex = Math.max(0, tutorialIndex - 1);
+  renderTutorial();
+}
+
+function tutorialNext() {
+  tutorialIndex = Math.min(tutorialSlides.length - 1, tutorialIndex + 1);
+  renderTutorial();
+}
+
+function tutorialStartGame() {
+  closeTutorial();
+  openModeSelect();
+}
+
+window.tutorialPrev = tutorialPrev;
+window.tutorialNext = tutorialNext;
+window.tutorialStartGame = tutorialStartGame;
 window.openLeaderboard = openLeaderboard;
 // Expose theme applier for UI-only skin switching
 window.applyThemeForDifficulty = applyThemeForDifficulty;

@@ -182,6 +182,122 @@
       </div>
     </div>
 
+    <div id="dailyChallengeScreen" class="menu-screen hidden" aria-hidden="true">
+      <div class="w-[844px] h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 p-4 flex flex-col relative">
+        <div id="dailyChallengeOverlay" class="absolute inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center" aria-hidden="false">
+          <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 max-w-md border-2 border-cyan-400/50 shadow-2xl shadow-cyan-500/20">
+            <div class="flex justify-between items-start mb-4">
+              <h2 class="text-2xl font-bold text-cyan-400">Daily Challenge</h2>
+              <button
+                onclick="closeDailyChallengeInstructions()"
+                class="text-white hover:text-cyan-400 transition-colors"
+                type="button"
+              >
+                ✕
+              </button>
+            </div>
+            <p class="text-white text-sm leading-relaxed mb-6">Welcome to today's Daily Challenge! Complete the puzzle to earn bonus points. You must capture at least 15 squares to win this challenge. Good luck!</p>
+            <button
+              onclick="startDailyChallenge()"
+              class="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white font-bold py-3 rounded-xl shadow-lg shadow-cyan-500/50 border border-green-400/30"
+              type="button"
+            >
+              START CHALLENGE
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mb-3">
+          <button
+            onclick="closeDailyChallenge()"
+            class="w-12 h-12 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 text-white shadow-lg border border-gray-600/50"
+            type="button"
+            aria-label="Back"
+          >
+            ←
+          </button>
+          <div class="flex-1 h-12 rounded-2xl bg-[#2a2b4e]/80 backdrop-blur-sm shadow-xl border border-gray-600/30 flex items-center justify-center px-4">
+            <p class="text-cyan-400 text-xl font-bold tracking-wider uppercase">Daily Challenge</p>
+          </div>
+          <button
+            onclick="openDailyChallengeInstructions()"
+            class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white shadow-lg shadow-purple-500/50 border border-purple-400/30"
+            type="button"
+            aria-label="Info"
+          >
+            i
+          </button>
+        </div>
+
+        <div class="flex-1 flex items-center justify-center gap-3 relative">
+          <div class="rounded-3xl bg-gradient-to-br from-gray-200 to-gray-300 shadow-2xl shadow-black/20 border-4 border-white/50 flex items-center justify-center flex-shrink-0 p-2">
+            <div class="grid-outer" id="dailyGridOuter">
+              <div class="grid" id="dailyGameGrid"></div>
+            </div>
+          </div>
+
+          <button
+            onclick="completeDailyChallenge()"
+            class="absolute bottom-0 right-0 px-6 h-12 rounded-2xl bg-gradient-to-br from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold shadow-lg shadow-green-500/50 border border-green-400/30"
+            type="button"
+          >
+            COMPLETE
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tutorialScreen" class="menu-screen hidden" aria-hidden="true">
+      <div class="w-[844px] h-[390px] mx-auto bg-gradient-to-br from-[#1a1b3e] via-[#2a2b5e] to-[#3a3b7e] flex items-center justify-center p-6 relative">
+        <button
+          onclick="closeTutorialScreen()"
+          class="absolute top-6 left-6 w-14 h-14 bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 rounded-2xl flex items-center justify-center text-white shadow-lg border border-gray-600/50 transition-colors"
+          type="button"
+        >
+          ←
+        </button>
+
+        <div class="flex items-center gap-4 justify-center">
+          <button
+            onclick="tutorialPrev()"
+            id="tutorialPrevBtn"
+            class="w-12 h-12 bg-[#2a2b4e]/60 hover:bg-[#3a3b5e]/80 rounded-xl flex items-center justify-center text-gray-400 hover:text-white transition-all"
+            type="button"
+          >
+            ←
+          </button>
+
+          <div class="flex flex-col items-center gap-3">
+            <div class="w-[450px] h-[300px] bg-[#1e2047]/60 rounded-3xl border-2 border-gray-600/30 shadow-xl p-6 flex flex-col items-center justify-center gap-4">
+              <div class="w-[300px] h-[200px] bg-[#2a2d5e] rounded-xl border border-gray-500/30 flex items-center justify-center">
+                <span id="tutorialImageAlt" class="text-gray-400 text-sm font-medium text-center px-4"></span>
+              </div>
+              <p id="tutorialDescription" class="text-white text-sm font-medium text-center px-4"></p>
+            </div>
+            <div id="tutorialDots" class="flex gap-2"></div>
+          </div>
+
+          <button
+            onclick="tutorialNext()"
+            id="tutorialNextBtn"
+            class="w-12 h-12 bg-gradient-to-br from-[#7799ff] to-[#5577ff] hover:from-[#8899ff] hover:to-[#6688ff] rounded-xl flex items-center justify-center text-white shadow-lg transition-all"
+            type="button"
+          >
+            →
+          </button>
+
+          <button
+            onclick="tutorialStartGame()"
+            id="tutorialStartBtn"
+            class="hidden h-12 px-6 bg-gradient-to-r from-[#00bfff] to-[#0099ff] hover:from-[#00d4ff] hover:to-[#00aaff] text-white font-semibold text-sm rounded-xl shadow-lg shadow-cyan-500/50 border border-cyan-300/30"
+            type="button"
+          >
+            START GAME
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Full-screen Main Menu Screen -->
     <div id="mainMenuScreen" class="menu-screen hidden" aria-hidden="true">
       <div class="menu-wrap max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 flex items-center justify-center p-6">
@@ -205,6 +321,14 @@
               type="button"
             >
               LEADERBOARD
+            </button>
+
+            <button
+              onclick="openDailyChallenge()"
+              class="w-full h-14 bg-slate-700/80 hover:bg-slate-600/80 text-white font-semibold text-base rounded-full shadow-lg border border-gray-600/50"
+              type="button"
+            >
+              DAILY CHALLENGE
             </button>
 
             <button
@@ -343,59 +467,37 @@
           <h1 class="text-3xl font-bold text-white tracking-wider">LEADERBOARD</h1>
           <div class="w-12"></div>
         </div>
-
+@@
         <div class="flex gap-3 mb-4 justify-center">
           <button
+            id="leaderboardTabScore"
             type="button"
+            onclick="setLeaderboardTab('score')"
             class="h-12 px-8 rounded-full font-semibold text-sm bg-gradient-to-r from-[#00bfff] to-[#0099ff] text-white shadow-lg border border-cyan-300/30"
           >
             SCORE
           </button>
           <button
+            id="leaderboardTabWins"
             type="button"
+            onclick="setLeaderboardTab('wins')"
             class="h-12 px-8 rounded-full font-semibold text-sm bg-[#2a2b4e]/80 text-gray-300 border border-gray-600/50 hover:bg-[#3a3b5e]/80"
           >
             WINS
           </button>
           <button
+            id="leaderboardTabStreak"
             type="button"
+            onclick="setLeaderboardTab('streak')"
             class="h-12 px-8 rounded-full font-semibold text-sm bg-[#2a2b4e]/80 text-gray-300 border border-gray-600/50 hover:bg-[#3a3b5e]/80"
           >
             STREAK
           </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto pr-2 space-y-2">
-          <div class="grid grid-cols-2 gap-3">
-            <div class="bg-[#2a2b4e]/60 rounded-3xl p-4 border border-gray-600/40 flex items-center gap-4">
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-400 flex items-center justify-center text-2xl font-bold text-black shadow-lg">1</div>
-              <div class="flex-1">
-                <h3 class="text-white font-semibold text-lg">You</h3>
-                <div class="flex gap-4 text-xs text-gray-400">
-                  <span>Wins: 0</span>
-                  <span>Streak: 0</span>
-                </div>
-              </div>
-              <div class="text-right">
-                <div class="text-2xl font-bold text-cyan-400">0</div>
-                <div class="text-xs text-gray-400">points</div>
-              </div>
-            </div>
-            <div class="bg-[#2a2b4e]/60 rounded-3xl p-4 border border-gray-600/40 flex items-center gap-4">
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-2xl font-bold text-black shadow-lg">2</div>
-              <div class="flex-1">
-                <h3 class="text-white font-semibold text-lg">Player 2</h3>
-                <div class="flex gap-4 text-xs text-gray-400">
-                  <span>Wins: 0</span>
-                  <span>Streak: 0</span>
-                </div>
-              </div>
-              <div class="text-right">
-                <div class="text-2xl font-bold text-cyan-400">0</div>
-                <div class="text-xs text-gray-400">points</div>
-              </div>
-            </div>
-          </div>
+        <div class="flex-1 overflow-y-auto pr-2">
+          <div id="leaderboardEmpty" class="text-center text-gray-300 text-sm hidden">No stats yet — play a match to appear here.</div>
+          <div id="leaderboardList" class="grid grid-cols-2 gap-3"></div>
         </div>
       </div>
     </div>
