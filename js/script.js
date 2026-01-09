@@ -334,7 +334,8 @@ function authedLanding() {
       el.setAttribute('aria-hidden', 'true');
     }
   });
-  showMainMenu();
+  setScreenVisibility("dailyChallengeScreen", true);
+  openDailyChallengeInstructions();
 }
 
 function showAuthEntry() {
@@ -1146,9 +1147,9 @@ function openModeSelect() {
   redGames = 0;
   blueGames = 0;
   gameActive = false;
-  gameMode = null;
+  gameMode = GAME_MODES.SINGLE;
   aiDifficulty = null;
-  navigateTo(UI_IDS.modeSelectModal);
+  navigateTo(UI_IDS.scoringSelectModal);
   updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
   updateDisplay(
     currentPlayer,
