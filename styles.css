@@ -549,17 +549,20 @@ body::after {
 
 /* In-game options modal tweaks */
 #inGameMenuOverlay {
-  /* Compact dropdown anchored near top-left */
-  position: fixed; /* override .modal-overlay */
-  top: calc(max(8px, env(safe-area-inset-top)) + 44px); /* below fixed menu button */
-  left: max(8px, env(safe-area-inset-left));
-  width: auto; /* size to panel */
-  height: auto;
-  padding: 0; /* no overlay padding */
-  background: transparent; /* no dim backdrop */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
   backdrop-filter: none;
-  display: block; /* disable flex centering from .modal-overlay */
-  z-index: 1300;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
 }
 #inGameMenuOverlay .in-game-menu {
   /* Floating panel look, consistent with app theme */

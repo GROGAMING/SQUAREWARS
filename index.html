@@ -557,65 +557,88 @@
 
     <!-- Quick Fire target Screen (full-screen) -->
     <div id="quickfireSelectModal" class="menu-screen hidden" aria-hidden="true">
-      <div class="max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 p-6 flex flex-col">
-        <div class="flex items-center mb-6">
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 flex flex-col justify-between p-4">
+        <div>
           <button
             onclick="backFromQuickfire()"
-            class="w-12 h-12 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 text-white shadow-lg border border-gray-600/50"
+            class="w-10 h-10 rounded-2xl bg-slate-700/50 hover:bg-slate-600/70 text-white border border-gray-600/30"
             type="button"
             aria-label="Back"
           >
             ←
           </button>
-          <div class="flex-1 text-center mr-12">
-            <h2 class="text-cyan-400 text-xs font-semibold tracking-wide">QUICKFIRE</h2>
-            <h1 class="text-2xl font-bold text-white tracking-wider">SET TARGET</h1>
-          </div>
         </div>
 
-        <div class="flex-1 flex items-center justify-center">
-          <div class="w-full max-w-[560px] bg-[#2a2b4e]/60 rounded-3xl border border-gray-600/40 shadow-xl p-6">
-            <div class="flex items-center justify-between mb-3">
-              <p class="text-white font-semibold text-sm tracking-wider">TARGET BOXES</p>
-              <div class="h-9 px-4 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                <span id="qfBubble">5</span>
+        <div class="flex items-center justify-center -mt-4">
+          <div class="w-full max-w-[700px] space-y-4">
+            <div class="text-center space-y-0.5">
+              <h1 class="text-2xl font-bold text-white tracking-wide">Quickfire Mode</h1>
+              <p class="text-gray-300 text-sm">Select boxes needed to win</p>
+            </div>
+
+            <div class="w-64 mx-auto rounded-3xl bg-gradient-to-br from-[#a3b7ff] to-[#8ba3ff] p-4 shadow-2xl shadow-blue-500/30 border border-white/20">
+              <div class="text-center space-y-0.5">
+                <p class="text-[#2a2b5e] font-semibold text-xs tracking-wider uppercase">Target Boxes</p>
+                <p id="qfBubble" class="text-white text-5xl font-bold">5</p>
               </div>
             </div>
 
-            <input
-              type="range"
-              id="qfTarget"
-              min="1"
-              max="10"
-              step="1"
-              value="5"
-              oninput="onQuickfireInput(this)"
-              class="w-full"
-            />
+            <div class="w-full max-w-[600px] mx-auto relative px-4">
+              <div class="relative">
+                <div class="h-10 rounded-full bg-slate-700/50 border border-gray-600/30 relative overflow-hidden">
+                  <div
+                    id="qfFill"
+                    class="absolute left-0 top-0 h-full bg-gradient-to-r from-[#a3b7ff] to-[#8ba3ff] transition-all duration-200"
+                    style="width: 44%;"
+                  ></div>
+                  <div id="qfTicks" class="absolute inset-0 flex items-center justify-between px-6">
+                    <div data-tick="1" class="w-0.5 h-3 bg-white/30"></div>
+                    <div data-tick="2" class="w-0.5 h-3 bg-white/30"></div>
+                    <div data-tick="3" class="w-0.5 h-3 bg-white/30"></div>
+                    <div data-tick="4" class="w-0.5 h-3 bg-white/30"></div>
+                    <div data-tick="5" class="w-0.5 h-3 bg-white/30"></div>
+                    <div data-tick="6" class="w-0.5 h-3 bg-gray-500/30"></div>
+                    <div data-tick="7" class="w-0.5 h-3 bg-gray-500/30"></div>
+                    <div data-tick="8" class="w-0.5 h-3 bg-gray-500/30"></div>
+                    <div data-tick="9" class="w-0.5 h-3 bg-gray-500/30"></div>
+                    <div data-tick="10" class="w-0.5 h-3 bg-gray-500/30"></div>
+                  </div>
+                </div>
 
-            <div class="flex justify-between text-xs text-gray-300 mt-2">
-              <span>1</span>
-              <span>10</span>
+                <input
+                  type="range"
+                  id="qfTarget"
+                  min="1"
+                  max="10"
+                  step="1"
+                  value="5"
+                  oninput="onQuickfireInput(this)"
+                  class="absolute inset-0 w-full h-10 opacity-0 cursor-pointer z-10"
+                />
+
+                <div
+                  id="qfThumb"
+                  class="absolute top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-gradient-to-br from-[#b3c7ff] to-[#9bb3ff] shadow-xl shadow-blue-500/50 border-4 border-white flex items-center justify-center font-bold text-[#2a2b5e] text-base pointer-events-none transition-all duration-200"
+                  style="left: calc(44% - 24px);"
+                >
+                  5
+                </div>
+              </div>
             </div>
 
-            <div class="mt-6 grid grid-cols-2 gap-3">
+            <div class="flex justify-center pt-2">
               <button
                 onclick="confirmQuickfire()"
-                class="h-12 bg-gradient-to-r from-[#00bfff] to-[#0099ff] hover:from-[#00d4ff] hover:to-[#00aaff] text-white font-semibold text-sm rounded-2xl shadow-lg border border-cyan-300/30"
+                class="w-56 h-12 rounded-full bg-gradient-to-r from-[#a3b7ff] to-[#8ba3ff] hover:from-[#b3c7ff] hover:to-[#9bb3ff] text-white text-base font-semibold tracking-wider shadow-2xl shadow-blue-500/30 border border-white/20 transition-all duration-300 hover:scale-105"
                 type="button"
               >
                 CONTINUE
               </button>
-              <button
-                onclick="backFromQuickfire()"
-                class="h-12 bg-[#2a2b4e]/90 hover:bg-[#3a3b5e]/90 text-white font-semibold text-sm rounded-2xl shadow-lg border border-gray-600/50"
-                type="button"
-              >
-                BACK
-              </button>
             </div>
           </div>
         </div>
+
+        <div class="h-10"></div>
       </div>
     </div>
 
@@ -706,7 +729,7 @@
     </div>
 
     <div id="gameScreen" class="hidden">
-      <div class="max-w-[844px] w-full mx-auto bg-gradient-to-br from-[#1a1b3e] via-[#2a2b5e] to-[#3a3b7e] p-4 flex flex-col relative">
+      <div class="max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-[#1a1b3e] via-[#2a2b5e] to-[#3a3b7e] p-4 flex flex-col relative">
 
         <div class="flex items-center gap-3 mb-3">
           <button

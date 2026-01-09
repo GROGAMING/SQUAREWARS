@@ -448,8 +448,28 @@ function onQuickfireInput(inputEl) {
   const val = Number(inputEl.value || 5);
   bubble.textContent = String(val);
 
-  if (!bubble.classList || !bubble.classList.contains("qf-bubble")) return;
   const pct = (val - min) / (max - min);
+
+  const fill = document.getElementById("qfFill");
+  if (fill) fill.style.width = `${pct * 100}%`;
+
+  const thumb = document.getElementById("qfThumb");
+  if (thumb) {
+    thumb.style.left = `calc(${pct * 100}% - 24px)`;
+    thumb.textContent = String(val);
+  }
+
+  const ticksWrap = document.getElementById("qfTicks");
+  if (ticksWrap) {
+    const ticks = ticksWrap.querySelectorAll("[data-tick]");
+    ticks.forEach((el) => {
+      const n = Number(el.getAttribute("data-tick"));
+      el.classList.remove("bg-white/30", "bg-gray-500/30");
+      el.classList.add(n <= val ? "bg-white/30" : "bg-gray-500/30");
+    });
+  }
+
+  if (!bubble.classList || !bubble.classList.contains("qf-bubble")) return;
   const wrap = inputEl.parentElement;
   if (!wrap || !wrap.getBoundingClientRect) return;
   const wrapRect = wrap.getBoundingClientRect();
@@ -477,6 +497,7 @@ function backFromQuickfire() {
 function confirmQuickfire() {
   const input = document.getElementById("qfTarget");
   const val = Number(input.value || 5);
+  // UI → gameplay: persist Quickfire win target used by scoring logic.
   quickFireTarget = Math.max(1, Math.min(10, val));
   ownership = Object.create(null);
 
@@ -525,6 +546,7 @@ function initGame() {
   const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
   if (outlineLayer) outlineLayer.innerHTML = "";
 
+  // UI → gameplay: mount the game renderer into the v0-style placeholder container (#gameGrid).
   buildGrid(ROWS, COLS, () => {});
   // Ensure highlight visibility matches mode
   if (controlMode === "buttons") {
