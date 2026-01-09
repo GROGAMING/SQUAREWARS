@@ -21,14 +21,173 @@
     </style>
   </head>
   <body>
+    <!-- Loading / Entry Screen (full-screen) -->
+    <div id="loadingScreen" class="menu-screen" aria-hidden="false">
+      <div class="menu-wrap max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 flex items-center justify-center p-6">
+        <div class="flex flex-col items-center justify-center gap-4">
+          <div class="sw-logo-anim text-white font-bold tracking-wider text-5xl">SQUARE WARS</div>
+          <div class="text-cyan-300/80 text-sm font-semibold tracking-wider">LOADING...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="createAccountScreen" class="menu-screen hidden" aria-hidden="true">
+      <div class="h-[390px] w-[844px] mx-auto flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 overflow-hidden">
+        <div class="h-full w-full overflow-y-auto px-8 py-6">
+          <div class="max-w-2xl mx-auto space-y-5 h-full flex flex-col justify-between">
+            <div class="flex justify-between items-center">
+              <h1 class="text-3xl font-bold text-white tracking-wider">CREATE ACCOUNT</h1>
+              <button
+                onclick="openLogin()"
+                class="text-cyan-400 hover:text-cyan-300 text-sm font-semibold px-4 py-2 h-auto rounded-xl bg-slate-700/50"
+                type="button"
+              >
+                LOG IN
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+              <div class="space-y-1.5">
+                <label class="text-white text-sm font-medium">Display Name</label>
+                <input
+                  id="caDisplayName"
+                  type="text"
+                  placeholder="Your name"
+                  class="w-full bg-slate-700/50 border-2 border-slate-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
+                />
+                <p id="caDisplayNameError" class="text-red-400 text-xs hidden"></p>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="text-white text-sm font-medium">Email Address</label>
+                <input
+                  id="caEmail"
+                  type="email"
+                  placeholder="your@email.com"
+                  class="w-full bg-slate-700/50 border-2 border-slate-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
+                />
+                <p id="caEmailError" class="text-red-400 text-xs hidden"></p>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="text-white text-sm font-medium">Password</label>
+                <input
+                  id="caPassword"
+                  type="password"
+                  placeholder="At least 8 characters"
+                  class="w-full bg-slate-700/50 border-2 border-slate-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
+                />
+                <p id="caPasswordError" class="text-red-400 text-xs hidden"></p>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="text-white text-sm font-medium">Confirm Password</label>
+                <input
+                  id="caConfirmPassword"
+                  type="password"
+                  placeholder="Re-enter password"
+                  class="w-full bg-slate-700/50 border-2 border-slate-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
+                />
+                <p id="caConfirmPasswordError" class="text-red-400 text-xs hidden"></p>
+              </div>
+
+              <div class="col-span-2 flex items-start gap-2.5 pt-2">
+                <input
+                  id="caTerms"
+                  type="checkbox"
+                  class="w-4 h-4 mt-0.5 rounded border-2 border-slate-600 bg-slate-700/50 checked:bg-cyan-500 checked:border-cyan-500 cursor-pointer"
+                />
+                <label for="caTerms" class="text-white text-xs cursor-pointer">I agree to the Terms of Service and Privacy Policy</label>
+              </div>
+              <p id="caTermsError" class="col-span-2 text-red-400 text-xs -mt-1 hidden"></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <button
+                onclick="createAccountComplete()"
+                class="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-cyan-500/50 transition-all text-sm"
+                type="button"
+              >
+                CREATE ACCOUNT
+              </button>
+
+              <button
+                onclick="createAccountSkip()"
+                class="bg-purple-600/50 hover:bg-purple-600/70 text-white font-semibold py-3.5 rounded-xl transition-all text-sm border border-purple-400/30"
+                type="button"
+              >
+                SKIP (Testing Only)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="loginScreen" class="menu-screen hidden" aria-hidden="true">
+      <div class="h-[390px] w-[844px] mx-auto flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 relative">
+        <div class="w-full max-w-lg space-y-4 px-8">
+          <div class="absolute top-4 left-4">
+            <button
+              onclick="openCreateAccount()"
+              class="w-12 h-12 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 text-white shadow-lg border border-gray-600/50"
+              type="button"
+            >
+              ←
+            </button>
+          </div>
+
+          <h1 class="text-4xl font-bold text-white tracking-wider text-center">LOG IN</h1>
+
+          <div class="space-y-3">
+            <div class="space-y-1">
+              <label class="text-white text-xs font-medium">Email Address</label>
+              <input
+                id="liEmail"
+                type="email"
+                placeholder="your@email.com"
+                class="w-full bg-slate-700/50 border-2 border-slate-600 rounded-2xl px-4 py-2.5 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
+              />
+              <p id="liEmailError" class="text-red-400 text-xs hidden"></p>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-white text-xs font-medium">Password</label>
+              <input
+                id="liPassword"
+                type="password"
+                placeholder="Enter your password"
+                class="w-full bg-slate-700/50 border-2 border-slate-600 rounded-2xl px-4 py-2.5 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
+              />
+              <p id="liPasswordError" class="text-red-400 text-xs hidden"></p>
+            </div>
+          </div>
+
+          <button
+            onclick="loginComplete()"
+            class="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white font-bold py-3 rounded-2xl shadow-lg shadow-cyan-500/50 transition-all text-base"
+            type="button"
+          >
+            LOGIN
+          </button>
+
+          <button
+            onclick="loginSkip()"
+            class="w-full bg-purple-600/50 hover:bg-purple-600/70 text-white/70 font-semibold py-2 rounded-2xl transition-all text-xs border border-purple-400/30"
+            type="button"
+          >
+            SKIP (Testing Only)
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Full-screen Main Menu Screen -->
-    <div id="mainMenuScreen" class="menu-screen" aria-hidden="false">
+    <div id="mainMenuScreen" class="menu-screen hidden" aria-hidden="true">
       <div class="menu-wrap max-w-[844px] w-full min-h-[390px] mx-auto bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800 flex items-center justify-center p-6">
         <div class="w-full flex items-center justify-between gap-12">
           <div class="flex-shrink-0 flex items-center justify-center">
-            <div class="text-white font-bold tracking-wider text-4xl" style="filter: drop-shadow(0 0 20px rgba(255, 165, 0, 0.5));">
-              SQUARE WARS
-            </div>
+            <div class="sw-logo-anim text-white font-bold tracking-wider text-4xl" style="filter: drop-shadow(0 0 20px rgba(255, 165, 0, 0.5));">SQUARE WARS</div>
           </div>
 
           <div class="menu-actions flex-1 max-w-[400px] flex flex-col gap-3">
@@ -158,6 +317,14 @@
             <label><input type="radio" name="controlMode" id="cmTouch" value="touch" /> Touch Controls</label>
             <label><input type="radio" name="controlMode" id="cmButtons" value="buttons" /> Button Controls</label>
           </div>
+
+          <button
+            id="logoutBtn"
+            class="w-full max-w-xl h-12 bg-red-600/80 hover:bg-red-600 text-white font-semibold text-sm rounded-full shadow-lg border border-red-500/50"
+            type="button"
+          >
+            LOG OUT
+          </button>
         </div>
       </div>
     </div>

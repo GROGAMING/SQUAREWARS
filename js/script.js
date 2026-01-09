@@ -69,6 +69,68 @@ let settingsReturnToGame = false;
 // Menu navigation stack for full-screen menu screens
 let menuStack = [];
 
+const AUTH_STORAGE_KEY = "squarewars_auth";
+function isAuthed() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    return !!(parsed && parsed.loggedIn);
+  } catch {
+    return false;
+  }
+}
+function setAuthed(displayName = "") {
+  try {
+    localStorage.setItem(
+      AUTH_STORAGE_KEY,
+      JSON.stringify({ loggedIn: true, displayName: String(displayName || "") })
+    );
+  } catch {}
+}
+function clearAuthed() {
+  try {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch {}
+}
+
+function hideAuthScreens() {
+  setScreenVisibility("createAccountScreen", false);
+  setScreenVisibility("loginScreen", false);
+}
+
+function openCreateAccount() {
+  hideGameScreen();
+  hideMainMenu();
+  setScreenVisibility("loginScreen", false);
+  setScreenVisibility("createAccountScreen", true);
+}
+
+function openLogin() {
+  hideGameScreen();
+  hideMainMenu();
+  setScreenVisibility("createAccountScreen", false);
+  setScreenVisibility("loginScreen", true);
+}
+
+function authedLanding() {
+  hideAuthScreens();
+  const screens = document.querySelectorAll('.menu-screen');
+  screens.forEach((el) => {
+    if (el && el.id && el.id !== 'mainMenuScreen' && el.id !== 'loadingScreen') {
+      el.classList.add(CSS.HIDDEN);
+      el.setAttribute('aria-hidden', 'true');
+    }
+  });
+  showMainMenu();
+}
+
+function showAuthEntry() {
+  hideGameScreen();
+  hideMainMenu();
+  openCreateAccount();
+}
+
 function setScreenVisibility(id, visible) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -999,6 +1061,35 @@ ensureControlsUI();
 applyResponsiveScale();
 enablePressedFeedback();
 
+function bootToMainMenu() {
+  try {
+    const loading = document.getElementById("loadingScreen");
+    const main = document.getElementById("mainMenuScreen");
+    if (loading) {
+      loading.classList.remove(CSS.HIDDEN);
+      loading.setAttribute("aria-hidden", "false");
+    }
+    if (main) {
+      main.classList.add(CSS.HIDDEN);
+      main.setAttribute("aria-hidden", "true");
+    }
+    setTimeout(() => {
+      if (loading) {
+        loading.classList.add(CSS.HIDDEN);
+        loading.setAttribute("aria-hidden", "true");
+      }
+      menuStack = ["mainMenuScreen"];
+      if (isAuthed()) {
+        authedLanding();
+      } else {
+        showAuthEntry();
+      }
+    }, 650);
+  } catch {}
+}
+
+bootToMainMenu();
+
 // --- NEW: Board side controls wiring ---
 function wireBoardControlsUI() {
   const btnLeft = document.getElementById(UI_IDS.btnArrowLeft);
@@ -1182,3 +1273,128 @@ function closeSettings() {
 
 window.openSettings = openSettings;
 window.closeSettings = closeSettings;
+
+function setErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (msg) {
+    el.textContent = String(msg);
+    el.classList.remove(CSS.HIDDEN);
+  } else {
+    el.textContent = "";
+    el.classList.add(CSS.HIDDEN);
+  }
+}
+function validateEmailSimple(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
+}
+
+function createAccountComplete() {
+  const displayName = (document.getElementById('caDisplayName')?.value || '').trim();
+  const email = (document.getElementById('caEmail')?.value || '').trim();
+  const password = document.getElementById('caPassword')?.value || '';
+  const confirmPassword = document.getElementById('caConfirmPassword')?.value || '';
+  const agreed = !!document.getElementById('caTerms')?.checked;
+
+  let ok = true;
+  if (!displayName) {
+    setErr('caDisplayNameError', 'Display name is required');
+    ok = false;
+  } else setErr('caDisplayNameError', '');
+
+  if (!email) {
+    setErr('caEmailError', 'Email is required');
+    ok = false;
+  } else if (!validateEmailSimple(email)) {
+    setErr('caEmailError', 'Please enter a valid email address');
+    ok = false;
+  } else setErr('caEmailError', '');
+
+  if (!password) {
+    setErr('caPasswordError', 'Password is required');
+    ok = false;
+  } else if (String(password).length < 8) {
+    setErr('caPasswordError', 'Password must be at least 8 characters');
+    ok = false;
+  } else setErr('caPasswordError', '');
+
+  if (!confirmPassword) {
+    setErr('caConfirmPasswordError', 'Please confirm your password');
+    ok = false;
+  } else if (password !== confirmPassword) {
+    setErr('caConfirmPasswordError', 'Passwords do not match');
+    ok = false;
+  } else setErr('caConfirmPasswordError', '');
+
+  if (!agreed) {
+    setErr('caTermsError', 'You must agree to the Terms of Service and Privacy Policy');
+    ok = false;
+  } else setErr('caTermsError', '');
+
+  if (!ok) return;
+  setAuthed(displayName);
+  authedLanding();
+}
+
+function createAccountSkip() {
+  setAuthed('');
+  authedLanding();
+}
+
+function loginComplete() {
+  const email = (document.getElementById('liEmail')?.value || '').trim();
+  const password = document.getElementById('liPassword')?.value || '';
+  let ok = true;
+
+  if (!email) {
+    setErr('liEmailError', 'Email is required');
+    ok = false;
+  } else if (!validateEmailSimple(email)) {
+    setErr('liEmailError', 'Please enter a valid email address');
+    ok = false;
+  } else setErr('liEmailError', '');
+
+  if (!password) {
+    setErr('liPasswordError', 'Password is required');
+    ok = false;
+  } else setErr('liPasswordError', '');
+
+  if (!ok) return;
+  setAuthed('');
+  authedLanding();
+}
+
+function loginSkip() {
+  setAuthed('');
+  authedLanding();
+}
+
+function logout() {
+  clearAuthed();
+  setScreenVisibility(UI_IDS.settingsScreen, false);
+  closeInGameMenu();
+  const screens = document.querySelectorAll('.menu-screen');
+  screens.forEach((el) => {
+    if (!el || !el.id) return;
+    if (el.id === 'loadingScreen') return;
+    el.classList.add(CSS.HIDDEN);
+    el.setAttribute('aria-hidden', 'true');
+  });
+  showAuthEntry();
+}
+
+function wireLogoutButton() {
+  const btn = document.getElementById('logoutBtn');
+  if (!btn || btn._bound) return;
+  btn.addEventListener('click', () => logout());
+  btn._bound = true;
+}
+
+wireLogoutButton();
+
+window.openCreateAccount = openCreateAccount;
+window.openLogin = openLogin;
+window.createAccountComplete = createAccountComplete;
+window.createAccountSkip = createAccountSkip;
+window.loginComplete = loginComplete;
+window.loginSkip = loginSkip;
