@@ -1010,7 +1010,12 @@
     <!-- Instructions Screen (full-screen) -->
     <div id="instructionsModal" class="menu-screen hidden" aria-hidden="true">
       <div class="menu-wrap">
-        <button class="menu-back" onclick="menuBack()">← Back</button>
+        <button class="menu-back" onclick="menuBack()">
+          <svg class="w-4 h-4 mr-2 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m15 18-6-6 6-6"></path>
+          </svg>
+          Back
+        </button>
         <h2 id="instructionsTitle">How to Play SQUARE WARS</h2>
         <p id="instructionsBody"></p>
         <button onclick="closeInstructions()">Got it, let's play!</button>

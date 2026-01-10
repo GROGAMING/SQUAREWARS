@@ -62,7 +62,7 @@ let touchTrack = { active: false, id: null, startX: 0, startY: 0, moved: false }
 let inputHandlersBound = false;
 let inputHandlePick = (clientX) => {};
 // --- NEW: control mode & selected column state ---
-let controlMode = "touch"; // "touch" | "buttons"
+let controlMode = "buttons"; // "touch" | "buttons"
 let selectedColumnIndex = 0;
 let settingsReturnToGame = false;
 
@@ -356,6 +356,7 @@ function authedLanding() {
       el.setAttribute('aria-hidden', 'true');
     }
   });
+  hideMainMenu();
   setScreenVisibility("dailyChallengeScreen", true);
   openDailyChallengeInstructions();
 }
@@ -1589,6 +1590,7 @@ function openSettings() {
   const isGameVisible = g && !g.classList.contains(CSS.HIDDEN);
   settingsReturnToGame = !!isGameVisible;
   if (settingsReturnToGame) hideGameScreen();
+  else hideMainMenu();
   // If opened from in-game menu overlay, close it
   const overlay = document.getElementById('inGameMenuOverlay');
   if (overlay) {
@@ -1613,16 +1615,11 @@ function openSettings() {
 
     if (resumeBtn) resumeBtn.classList.toggle(CSS.HIDDEN, !settingsReturnToGame);
 
-    const activeCls = 'bg-gradient-to-r from-[#00bfff] to-[#0099ff] text-white shadow-lg shadow-cyan-500/50';
-    const inactiveCls = 'text-gray-400';
-    if (uiTouchBtn) {
-      uiTouchBtn.classList.remove(activeCls, inactiveCls);
-      uiTouchBtn.classList.add(controlMode === 'touch' ? activeCls : inactiveCls);
-    }
-    if (uiButtonsBtn) {
-      uiButtonsBtn.classList.remove(activeCls, inactiveCls);
-      uiButtonsBtn.classList.add(controlMode === 'buttons' ? activeCls : inactiveCls);
-    }
+    const base = 'flex-1 h-full rounded-full flex items-center justify-center gap-2 font-semibold text-sm transition-all ';
+    const active = 'bg-gradient-to-r from-[#00bfff] to-[#0099ff] text-white shadow-lg shadow-cyan-500/50';
+    const inactive = 'text-gray-400';
+    if (uiTouchBtn) uiTouchBtn.className = base + (controlMode === 'touch' ? active : inactive);
+    if (uiButtonsBtn) uiButtonsBtn.className = base + (controlMode === 'buttons' ? active : inactive);
 
     if (!openSettings._bound) {
       const onChange = (e) => {
@@ -1637,14 +1634,8 @@ function openSettings() {
             hideColumnHighlight();
           }
 
-          if (uiTouchBtn) {
-            uiTouchBtn.classList.remove(activeCls, inactiveCls);
-            uiTouchBtn.classList.add(controlMode === 'touch' ? activeCls : inactiveCls);
-          }
-          if (uiButtonsBtn) {
-            uiButtonsBtn.classList.remove(activeCls, inactiveCls);
-            uiButtonsBtn.classList.add(controlMode === 'buttons' ? activeCls : inactiveCls);
-          }
+          if (uiTouchBtn) uiTouchBtn.className = base + (controlMode === 'touch' ? active : inactive);
+          if (uiButtonsBtn) uiButtonsBtn.className = base + (controlMode === 'buttons' ? active : inactive);
 
           refreshControlButtonsUI();
           updateBoardControlsVisibility();
@@ -1663,6 +1654,8 @@ function closeSettings() {
   if (settingsReturnToGame) {
     showGameScreen();
     settingsReturnToGame = false;
+  } else {
+    showMainMenu();
   }
   // Ensure UI reflects the latest chosen control mode
   refreshControlButtonsUI();
