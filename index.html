@@ -282,7 +282,10 @@
                 class="text-white hover:text-cyan-400 transition-colors"
                 type="button"
               >
-                ✕
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M18 6 6 18"></path>
+                  <path d="M6 6l12 12"></path>
+                </svg>
               </button>
             </div>
             <p class="text-white text-sm leading-relaxed mb-6">Welcome to today's Daily Challenge! Complete the puzzle to earn bonus points. You must capture at least 15 squares to win this challenge. Good luck!</p>
@@ -297,14 +300,6 @@
         </div>
 
         <div class="flex items-center gap-3 mb-3">
-          <button
-            onclick="closeDailyChallenge()"
-            class="w-12 h-12 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 text-white shadow-lg border border-gray-600/50"
-            type="button"
-            aria-label="Back"
-          >
-            ←
-          </button>
           <div class="flex-1 h-12 rounded-2xl bg-[#2a2b4e]/80 backdrop-blur-sm shadow-xl border border-gray-600/30 flex items-center justify-center px-4">
             <p class="text-cyan-400 text-xl font-bold tracking-wider uppercase">Daily Challenge</p>
           </div>
@@ -314,15 +309,48 @@
             type="button"
             aria-label="Info"
           >
-            i
+            <svg class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 16v-4"></path>
+              <path d="M12 8h.01"></path>
+            </svg>
           </button>
         </div>
 
         <div class="flex-1 flex items-center justify-center gap-3 relative">
-          <div class="rounded-3xl bg-gradient-to-br from-gray-200 to-gray-300 shadow-2xl shadow-black/20 border-4 border-white/50 flex items-center justify-center flex-shrink-0 p-2">
-            <div class="grid-outer" id="dailyGridOuter">
-              <div class="grid" id="dailyGameGrid"></div>
-            </div>
+          <div id="dailyControlsLeft" class="hidden flex flex-col gap-2 flex-shrink-0 justify-center" aria-label="Left board controls">
+            <div class="w-16 h-20"></div>
+            <button
+              type="button"
+              class="w-16 h-16 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 text-white shadow-lg border border-gray-600/50"
+              aria-label="Move left"
+            >
+              <svg class="w-8 h-8 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m15 18-6-6 6-6"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="w-[450px] h-[260px] rounded-3xl bg-gradient-to-br from-gray-200 to-gray-300 shadow-2xl shadow-black/20 border-4 border-white/50 flex items-center justify-center flex-shrink-0">
+            <p class="text-gray-400 text-lg font-semibold">Daily Challenge Game Grid</p>
+          </div>
+
+          <div id="dailyControlsRight" class="hidden flex flex-col gap-2 flex-shrink-0 justify-center" aria-label="Right board controls">
+            <button
+              type="button"
+              class="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#00bfff] to-[#0099ff] hover:from-[#00d4ff] hover:to-[#00aaff] text-white shadow-lg shadow-cyan-500/50 border border-cyan-300/30 font-bold text-sm"
+            >
+              DROP
+            </button>
+            <button
+              type="button"
+              class="w-16 h-16 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 text-white shadow-lg border border-gray-600/50"
+              aria-label="Move right"
+            >
+              <svg class="w-8 h-8 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
+            </button>
           </div>
 
           <button
@@ -343,17 +371,21 @@
           class="absolute top-6 left-6 w-14 h-14 bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 rounded-2xl flex items-center justify-center text-white shadow-lg border border-gray-600/50 transition-colors"
           type="button"
         >
-          ←
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m15 18-6-6 6-6"></path>
+          </svg>
         </button>
 
         <div class="flex items-center gap-4 justify-center">
           <button
             onclick="tutorialPrev()"
             id="tutorialPrevBtn"
-            class="w-12 h-12 bg-[#2a2b4e]/60 hover:bg-[#3a3b5e]/80 rounded-xl flex items-center justify-center text-gray-400 hover:text-white transition-all"
+            class="w-12 h-12 bg-[#2a2b4e]/60 hover:bg-[#3a3b5e]/80 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl flex items-center justify-center text-gray-400 hover:text-white transition-all"
             type="button"
           >
-            ←
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m15 18-6-6 6-6"></path>
+            </svg>
           </button>
 
           <div class="flex flex-col items-center gap-3">
@@ -372,7 +404,9 @@
             class="w-12 h-12 bg-gradient-to-br from-[#7799ff] to-[#5577ff] hover:from-[#8899ff] hover:to-[#6688ff] rounded-xl flex items-center justify-center text-white shadow-lg transition-all"
             type="button"
           >
-            →
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
           </button>
 
           <button
@@ -530,19 +564,45 @@
           <div class="w-full max-w-xl h-16 rounded-full bg-[#2a2b4e]/80 border-2 border-gray-600/50 p-1.5 flex items-center gap-2 shadow-xl">
             <button
               onclick="document.getElementById('cmTouch').click()"
+              id="settingsTouchBtn"
               class="flex-1 h-full rounded-full flex items-center justify-center gap-2 font-semibold text-sm transition-all text-gray-400"
               type="button"
             >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v5"></path>
+                <path d="M14 10V5a2 2 0 0 0-2-2 2 2 0 0 0-2 2v5"></path>
+                <path d="M10 10V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6v-1a2 2 0 0 0-2-2h-2"></path>
+              </svg>
               TOUCH
             </button>
             <button
               onclick="document.getElementById('cmButtons').click()"
+              id="settingsButtonBtn"
               class="flex-1 h-full rounded-full flex items-center justify-center gap-2 font-semibold text-sm transition-all text-gray-400"
               type="button"
             >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="6" y1="12" x2="10" y2="12"></line>
+                <line x1="8" y1="10" x2="8" y2="14"></line>
+                <line x1="15" y1="13" x2="15.01" y2="13"></line>
+                <line x1="18" y1="11" x2="18.01" y2="11"></line>
+                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+              </svg>
               BUTTON
             </button>
           </div>
+
+          <button
+            id="settingsResumeBtn"
+            onclick="closeSettings()"
+            class="hidden w-full max-w-xl h-12 bg-gradient-to-r from-[#00bfff] to-[#0099ff] hover:from-[#00d4ff] hover:to-[#00aaff] text-white font-semibold text-sm rounded-full shadow-lg shadow-cyan-500/50 border border-cyan-300/30"
+            type="button"
+          >
+            <svg class="w-4 h-4 mr-2 inline-block" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            RESUME GAME
+          </button>
 
           <div class="hidden">
             <label><input type="radio" name="controlMode" id="cmTouch" value="touch" /> Touch Controls</label>
@@ -554,8 +614,36 @@
             class="w-full max-w-xl h-12 bg-red-600/80 hover:bg-red-600 text-white font-semibold text-sm rounded-full shadow-lg border border-red-500/50"
             type="button"
           >
+            <svg class="w-4 h-4 mr-2 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <path d="M16 17l5-5-5-5"></path>
+              <path d="M21 12H9"></path>
+            </svg>
             LOG OUT
           </button>
+        </div>
+
+        <div id="logoutConfirmOverlay" class="absolute inset-0 bg-black/70 hidden flex items-center justify-center backdrop-blur-sm">
+          <div class="bg-[#2a2b4e] border-2 border-gray-600/50 rounded-3xl p-6 max-w-sm shadow-2xl">
+            <h2 class="text-white text-xl font-bold text-center mb-3">Log Out</h2>
+            <p class="text-gray-300 text-sm text-center mb-4">Are you sure you want to log out?</p>
+            <div class="flex gap-3">
+              <button
+                onclick="confirmLogoutYes()"
+                class="flex-1 h-11 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-xl text-sm"
+                type="button"
+              >
+                YES
+              </button>
+              <button
+                onclick="confirmLogoutNo()"
+                class="flex-1 h-11 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-xl text-sm"
+                type="button"
+              >
+                NO
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -569,7 +657,9 @@
             class="w-12 h-12 rounded-2xl bg-[#2a2b4e]/80 hover:bg-[#3a3b5e]/80 border border-gray-600/50 flex items-center justify-center transition-colors text-white"
             type="button"
           >
-            ←
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m15 18-6-6 6-6"></path>
+            </svg>
           </button>
           <h1 class="text-3xl font-bold text-white tracking-wider">LEADERBOARD</h1>
           <div class="w-12"></div>
@@ -582,6 +672,14 @@
             onclick="setLeaderboardTab('score')"
             class="h-12 px-8 rounded-full font-semibold text-sm bg-gradient-to-r from-[#00bfff] to-[#0099ff] text-white shadow-lg border border-cyan-300/30"
           >
+            <svg class="w-4 h-4 mr-2 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8 21h8"></path>
+              <path d="M12 17v4"></path>
+              <path d="M7 4h10"></path>
+              <path d="M17 4v7a5 5 0 0 1-10 0V4"></path>
+              <path d="M5 6H4a2 2 0 0 0-2 2v1a5 5 0 0 0 5 5"></path>
+              <path d="M19 6h1a2 2 0 0 1 2 2v1a5 5 0 0 1-5 5"></path>
+            </svg>
             SCORE
           </button>
           <button
@@ -590,6 +688,11 @@
             onclick="setLeaderboardTab('wins')"
             class="h-12 px-8 rounded-full font-semibold text-sm bg-[#2a2b4e]/80 text-gray-300 border border-gray-600/50 hover:bg-[#3a3b5e]/80"
           >
+            <svg class="w-4 h-4 mr-2 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="6"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+            </svg>
             WINS
           </button>
           <button
@@ -598,6 +701,10 @@
             onclick="setLeaderboardTab('streak')"
             class="h-12 px-8 rounded-full font-semibold text-sm bg-[#2a2b4e]/80 text-gray-300 border border-gray-600/50 hover:bg-[#3a3b5e]/80"
           >
+            <svg class="w-4 h-4 mr-2 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 3v18h18"></path>
+              <path d="m19 9-5 5-4-4-3 3"></path>
+            </svg>
             STREAK
           </button>
         </div>
@@ -631,8 +738,21 @@
                 class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#00bfff] to-[#0099ff] p-4 shadow-xl shadow-cyan-500/50 border border-white/20 hover:scale-105 transition-all duration-300 h-[220px] flex flex-col items-center justify-center"
                 type="button"
               >
+                <div class="mb-4 w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-sm border border-white/30 group-hover:bg-white/30 transition-all flex items-center justify-center p-2">
+                  <svg viewBox="0 0 80 80" class="w-full h-full" aria-hidden="true">
+                    <g>
+                      <path d="M15 55 L20 35 L30 45 L40 25 L50 45 L60 35 L65 55 Z" fill="white" opacity="0.9" />
+                      <circle cx="20" cy="32" r="4" fill="white" opacity="0.95" />
+                      <circle cx="40" cy="22" r="5" fill="white" opacity="0.95" />
+                      <circle cx="60" cy="32" r="4" fill="white" opacity="0.95" />
+                      <circle cx="30" cy="42" r="3" fill="cyan" opacity="0.9" />
+                      <circle cx="40" cy="38" r="3" fill="yellow" opacity="0.9" />
+                      <circle cx="50" cy="42" r="3" fill="cyan" opacity="0.9" />
+                    </g>
+                  </svg>
+                </div>
                 <div class="text-white text-center space-y-2">
-                  <h3 class="font-bold text-base tracking-wide">CLASSIC</h3>
+                  <h3 class="font-bold text-base tracking-wide">CLASSIC MODE</h3>
                   <p class="text-xs text-white/90 leading-relaxed px-2">1 point per completed box.</p>
                 </div>
               </button>
@@ -641,9 +761,28 @@
                 class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#ff1e5a] to-[#ff0844] p-4 shadow-xl shadow-pink-500/50 border border-white/20 hover:scale-105 transition-all duration-300 h-[220px] flex flex-col items-center justify-center"
                 type="button"
               >
+                <div class="mb-4 w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-sm border border-white/30 group-hover:bg-white/30 transition-all flex items-center justify-center p-2">
+                  <svg viewBox="0 0 80 80" class="w-full h-full" aria-hidden="true">
+                    <g>
+                      <rect x="15" y="20" width="50" height="40" rx="4" fill="white" opacity="0.2" />
+                      <line x1="15" y1="40" x2="65" y2="40" stroke="white" stroke-width="2" opacity="0.6" />
+                      <line x1="40" y1="20" x2="40" y2="60" stroke="white" stroke-width="2" opacity="0.6" />
+                      <path d="M15 20 L40 40 L65 20" stroke="white" stroke-width="2" opacity="0.5" fill="none" />
+                      <path d="M15 60 L40 40 L65 60" stroke="white" stroke-width="2" opacity="0.5" fill="none" />
+                      <circle cx="27" cy="30" r="4" fill="white" opacity="0.9" />
+                      <path d="M27 26 L27 30 L25 32 Z" fill="white" opacity="0.9" />
+                      <circle cx="53" cy="30" r="4" fill="white" opacity="0.9" />
+                      <path d="M53 26 L53 30 L51 32 Z" fill="white" opacity="0.9" />
+                      <circle cx="27" cy="50" r="4" fill="white" opacity="0.9" />
+                      <path d="M27 46 L27 50 L25 52 Z" fill="white" opacity="0.9" />
+                      <circle cx="53" cy="50" r="4" fill="white" opacity="0.9" />
+                      <path d="M53 46 L53 50 L51 52 Z" fill="white" opacity="0.9" />
+                    </g>
+                  </svg>
+                </div>
                 <div class="text-white text-center space-y-2">
-                  <h3 class="font-bold text-base tracking-wide">TERRITORY</h3>
-                  <p class="text-xs text-white/90 leading-relaxed px-2">Biggest connected territory wins.</p>
+                  <h3 class="font-bold text-base tracking-wide">TERRITORY TAKEDOWN</h3>
+                  <p class="text-xs text-white/90 leading-relaxed px-2">Area Mode – biggest connected territory wins.</p>
                 </div>
               </button>
               <button
@@ -651,9 +790,21 @@
                 class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#a855f7] to-[#8b5cf6] p-4 shadow-xl shadow-purple-500/50 border border-white/20 hover:scale-105 transition-all duration-300 h-[220px] flex flex-col items-center justify-center"
                 type="button"
               >
+                <div class="mb-4 w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-sm border border-white/30 group-hover:bg-white/30 transition-all flex items-center justify-center p-2">
+                  <svg viewBox="0 0 80 80" class="w-full h-full" aria-hidden="true">
+                    <g>
+                      <path d="M 40 15 C 35 18, 30 25, 28 32 C 26 38, 28 45, 30 50 C 32 54, 35 58, 40 62 C 45 58, 48 54, 50 50 C 52 45, 54 38, 52 32 C 50 25, 45 18, 40 15 Z" fill="#b91c1c" opacity="1" />
+                      <path d="M 28 32 C 25 30, 22 28, 20 30 C 18 33, 18 38, 20 42 C 22 45, 25 48, 28 48 C 28 42, 28 36, 28 32 Z" fill="#b91c1c" opacity="1" />
+                      <path d="M 52 32 C 55 30, 58 28, 60 30 C 62 33, 62 38, 60 42 C 58 45, 55 48, 52 48 C 52 42, 52 36, 52 32 Z" fill="#b91c1c" opacity="1" />
+                      <path d="M 40 20 C 37 22, 33 27, 32 33 C 31 38, 32 43, 34 48 C 36 52, 38 56, 40 58 C 42 56, 44 52, 46 48 C 48 43, 49 38, 48 33 C 47 27, 43 22, 40 20 Z" fill="#f97316" opacity="1" />
+                      <path d="M 40 28 C 38 30, 36 34, 36 38 C 36 42, 37 46, 38 50 C 39 52, 39 54, 40 55 C 41 54, 41 52, 42 50 C 43 46, 44 42, 44 38 C 44 34, 42 30, 40 28 Z" fill="#fbbf24" opacity="1" />
+                      <path d="M 40 35 C 39 36, 38 38, 38 40 C 38 43, 39 46, 40 48 C 41 46, 42 43, 42 40 C 42 38, 41 36, 40 35 Z" fill="#fef3c7" opacity="1" />
+                    </g>
+                  </svg>
+                </div>
                 <div class="text-white text-center space-y-2">
                   <h3 class="font-bold text-base tracking-wide">QUICKFIRE</h3>
-                  <p class="text-xs text-white/90 leading-relaxed px-2">Best to X points.</p>
+                  <p class="text-xs text-white/90 leading-relaxed px-2">Best to X points (player sets winning number).</p>
                 </div>
               </button>
             </div>
@@ -762,7 +913,7 @@
               ←
             </button>
             <div class="flex-1 text-center mr-12">
-              <h2 class="text-cyan-400 text-xs font-semibold tracking-wide">SINGLE PLAYER</h2>
+              <h2 id="difficultyModeTitle" class="text-cyan-400 text-xs font-semibold tracking-wide">Classic Mode</h2>
               <h1 class="text-2xl font-bold text-white tracking-wider">SELECT DIFFICULTY</h1>
             </div>
           </div>
@@ -770,43 +921,67 @@
           <div class="flex-1 flex items-center justify-center">
             <div class="grid grid-cols-4 gap-4 w-full max-w-[750px]">
               <button
-                onclick="setDifficulty('beginner')"
+                onclick="setDifficultyV0('easy')"
                 class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00ff88] to-[#00cc66] p-3 shadow-xl shadow-green-500/50 border border-white/20 hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center h-[220px]"
                 type="button"
               >
                 <div class="text-white text-center space-y-3">
-                  <h3 class="font-bold text-lg tracking-wide">CLASSROOM</h3>
-                  <p class="text-white/90 text-xs font-medium">Relaxed</p>
+                  <h3 class="font-bold text-lg tracking-wide">EASY</h3>
+                  <p class="text-white/90 text-xs font-medium">For Beginners</p>
+                  <div class="flex justify-center gap-1.5 pt-2">
+                    <div class="w-2 h-2 rounded-sm bg-white"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white/30"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white/30"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white/30"></div>
+                  </div>
                 </div>
               </button>
               <button
-                onclick="setDifficulty('medium')"
+                onclick="setDifficultyV0('medium')"
                 class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00bfff] to-[#0099ff] p-3 shadow-xl shadow-cyan-500/50 border border-white/20 hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center h-[220px]"
                 type="button"
               >
                 <div class="text-white text-center space-y-3">
-                  <h3 class="font-bold text-lg tracking-wide">WAR ROOM</h3>
-                  <p class="text-white/90 text-xs font-medium">Tactical</p>
+                  <h3 class="font-bold text-lg tracking-wide">MEDIUM</h3>
+                  <p class="text-white/90 text-xs font-medium">Moderate Challenge</p>
+                  <div class="flex justify-center gap-1.5 pt-2">
+                    <div class="w-2 h-2 rounded-sm bg-white"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white/30"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white/30"></div>
+                  </div>
                 </div>
               </button>
               <button
-                onclick="setDifficulty('advanced')"
+                onclick="setDifficultyV0('hard')"
                 class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ff9944] to-[#ff7711] p-3 shadow-xl shadow-orange-500/50 border border-white/20 hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center h-[220px]"
                 type="button"
               >
                 <div class="text-white text-center space-y-3">
-                  <h3 class="font-bold text-lg tracking-wide">HIGH-TECH</h3>
-                  <p class="text-white/90 text-xs font-medium">Serious</p>
+                  <h3 class="font-bold text-lg tracking-wide">HARD</h3>
+                  <p class="text-white/90 text-xs font-medium">Intense Difficulty</p>
+                  <div class="flex justify-center gap-1.5 pt-2">
+                    <div class="w-2 h-2 rounded-sm bg-white"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white/30"></div>
+                  </div>
                 </div>
               </button>
               <button
-                onclick="setDifficulty('impossible')"
+                onclick="setDifficultyV0('impossible')"
                 class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ff1e5a] to-[#ff0844] p-3 shadow-xl shadow-pink-500/50 border border-white/20 hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center h-[220px]"
                 type="button"
               >
                 <div class="text-white text-center space-y-3">
-                  <h3 class="font-bold text-lg tracking-wide">SPACE ARENA</h3>
-                  <p class="text-white/90 text-xs font-medium">Ultimate</p>
+                  <h3 class="font-bold text-lg tracking-wide">IMPOSSIBLE</h3>
+                  <p class="text-white/90 text-xs font-medium">For Experts Only</p>
+                  <div class="flex justify-center gap-1.5 pt-2">
+                    <div class="w-2 h-2 rounded-sm bg-white"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white"></div>
+                    <div class="w-2 h-2 rounded-sm bg-white"></div>
+                  </div>
                 </div>
               </button>
             </div>
@@ -846,7 +1021,11 @@
             type="button"
             aria-label="Open Menu"
           >
-            ☰
+            <svg class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="18" x2="20" y2="18"></line>
+            </svg>
           </button>
 
           <div id="redScore" class="flex-1 h-16 rounded-3xl bg-gradient-to-br from-[#ff1e5a] to-[#ff0844] shadow-xl border border-white/20 flex flex-col items-center justify-center px-4">
@@ -873,7 +1052,9 @@
               type="button"
               aria-label="Move left"
             >
-              ◀
+              <svg class="w-8 h-8 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m15 18-6-6 6-6"></path>
+              </svg>
             </button>
           </div>
 
@@ -899,7 +1080,9 @@
               type="button"
               aria-label="Move right"
             >
-              ▶
+              <svg class="w-8 h-8 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
             </button>
           </div>
         </div>

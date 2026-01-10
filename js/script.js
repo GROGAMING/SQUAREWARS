@@ -73,6 +73,19 @@ const AUTH_STORAGE_KEY = "squarewars_auth";
 const LEADERBOARD_STORAGE_KEY = "squarewars_leaderboard";
 let leaderboardTab = "score";
 
+function togglePasswordVisibility(inputId, eyeId, eyeOffId) {
+  const input = document.getElementById(String(inputId || ""));
+  const eye = document.getElementById(String(eyeId || ""));
+  const eyeOff = document.getElementById(String(eyeOffId || ""));
+  if (!input) return;
+  const isPassword = input.type === "password";
+  input.type = isPassword ? "text" : "password";
+  if (eye) eye.classList.toggle(CSS.HIDDEN, !isPassword);
+  if (eyeOff) eyeOff.classList.toggle(CSS.HIDDEN, isPassword);
+}
+
+window.togglePasswordVisibility = togglePasswordVisibility;
+
 function getAuthProfile() {
   try {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -295,12 +308,21 @@ function openDailyChallenge() {
   hideMainMenu();
   hideGameScreen();
   setScreenVisibility("dailyChallengeScreen", true);
+  updateDailyChallengeControlsVisibility();
   openDailyChallengeInstructions();
 }
 
 function closeDailyChallenge() {
   setScreenVisibility("dailyChallengeScreen", false);
   showMainMenu();
+}
+
+function updateDailyChallengeControlsVisibility() {
+  const left = document.getElementById('dailyControlsLeft');
+  const right = document.getElementById('dailyControlsRight');
+  const show = controlMode === 'buttons';
+  if (left) left.classList.toggle(CSS.HIDDEN, !show);
+  if (right) right.classList.toggle(CSS.HIDDEN, !show);
 }
 
 function openDailyChallengeInstructions() {
@@ -433,6 +455,7 @@ function setScoringMode(mode) {
   ownership = Object.create(null);
 
   if (gameMode === GAME_MODES.SINGLE) {
+    updateDifficultyHeaderForScoring();
     navigateTo(UI_IDS.difficultySelectModal);
   } else {
     updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
@@ -503,11 +526,24 @@ function confirmQuickfire() {
   ownership = Object.create(null);
 
   if (gameMode === GAME_MODES.SINGLE) {
+    updateDifficultyHeaderForScoring();
     navigateTo(UI_IDS.difficultySelectModal);
   } else {
     updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
     startGameFromMenu();
   }
+}
+
+function updateDifficultyHeaderForScoring() {
+  const el = document.getElementById("difficultyModeTitle");
+  if (!el) return;
+  const modeTitle =
+    scoringMode === SCORING_MODES.CLASSIC
+      ? "Classic Mode"
+      : scoringMode === SCORING_MODES.AREA
+        ? "Territory Takedown"
+        : "Quickfire Mode";
+  el.textContent = modeTitle;
 }
 
 function setDifficulty(difficulty) {
@@ -1272,20 +1308,20 @@ window.completeDailyChallenge = completeDailyChallenge;
 let tutorialIndex = 0;
 const tutorialSlides = [
   {
-    alt: "Drop pieces into the grid",
-    desc: "Tap a column to drop your piece. Connect 4 in a row to capture territory.",
+    alt: "Gameplay demonstration showing how to draw lines",
+    desc: "Draw lines between dots to create squares and score points!",
   },
   {
-    alt: "Capturing blocks squares",
-    desc: "When you connect 4, the captured area becomes blocked off and counts toward score.",
+    alt: "Example of completing a square",
+    desc: "When you complete a square, you earn a point and get another turn!",
   },
   {
-    alt: "Modes and scoring",
-    desc: "Choose Classic, Territory, or Quickfire. Quickfire ends when someone hits the target.",
+    alt: "Strategic blocking demonstration",
+    desc: "Strategic play is key! Block your opponent from completing squares.",
   },
   {
-    alt: "Controls",
-    desc: "Use Touch mode or Buttons mode (left/right + DROP) from Settings.",
+    alt: "Victory screen example",
+    desc: "The player with the most squares at the end wins. Good luck!",
   },
 ];
 
@@ -1306,8 +1342,8 @@ function renderTutorial() {
     for (let i = 0; i < tutorialSlides.length; i++) {
       const d = document.createElement("div");
       d.className =
-        "w-2 h-2 rounded-full transition-all " +
-        (i === tutorialIndex ? "bg-cyan-400" : "bg-gray-600");
+        "h-2 rounded-full transition-all " +
+        (i === tutorialIndex ? "w-8 bg-cyan-400" : "w-2 bg-gray-500");
       dots.appendChild(d);
     }
   }
@@ -1552,9 +1588,26 @@ function openSettings() {
   // Reflect current control mode
   const rTouch = document.getElementById('cmTouch');
   const rButtons = document.getElementById('cmButtons');
+  const uiTouchBtn = document.getElementById('settingsTouchBtn');
+  const uiButtonsBtn = document.getElementById('settingsButtonBtn');
+  const resumeBtn = document.getElementById('settingsResumeBtn');
   if (rTouch && rButtons) {
     rTouch.checked = controlMode === 'touch';
     rButtons.checked = controlMode === 'buttons';
+
+    if (resumeBtn) resumeBtn.classList.toggle(CSS.HIDDEN, !settingsReturnToGame);
+
+    const activeCls = 'bg-gradient-to-r from-[#00bfff] to-[#0099ff] text-white shadow-lg shadow-cyan-500/50';
+    const inactiveCls = 'text-gray-400';
+    if (uiTouchBtn) {
+      uiTouchBtn.classList.remove(activeCls, inactiveCls);
+      uiTouchBtn.classList.add(controlMode === 'touch' ? activeCls : inactiveCls);
+    }
+    if (uiButtonsBtn) {
+      uiButtonsBtn.classList.remove(activeCls, inactiveCls);
+      uiButtonsBtn.classList.add(controlMode === 'buttons' ? activeCls : inactiveCls);
+    }
+
     if (!openSettings._bound) {
       const onChange = (e) => {
         const val = rButtons.checked ? 'buttons' : 'touch';
@@ -1567,8 +1620,19 @@ function openSettings() {
           } else {
             hideColumnHighlight();
           }
+
+          if (uiTouchBtn) {
+            uiTouchBtn.classList.remove(activeCls, inactiveCls);
+            uiTouchBtn.classList.add(controlMode === 'touch' ? activeCls : inactiveCls);
+          }
+          if (uiButtonsBtn) {
+            uiButtonsBtn.classList.remove(activeCls, inactiveCls);
+            uiButtonsBtn.classList.add(controlMode === 'buttons' ? activeCls : inactiveCls);
+          }
+
           refreshControlButtonsUI();
           updateBoardControlsVisibility();
+          updateDailyChallengeControlsVisibility();
         }
       };
       rTouch.addEventListener('change', onChange);
@@ -1591,6 +1655,26 @@ function closeSettings() {
 
 window.openSettings = openSettings;
 window.closeSettings = closeSettings;
+
+function confirmLogoutYes() {
+  const ov = document.getElementById('logoutConfirmOverlay');
+  if (ov) {
+    ov.classList.add(CSS.HIDDEN);
+    ov.setAttribute('aria-hidden', 'true');
+  }
+  logout();
+}
+
+function confirmLogoutNo() {
+  const ov = document.getElementById('logoutConfirmOverlay');
+  if (ov) {
+    ov.classList.add(CSS.HIDDEN);
+    ov.setAttribute('aria-hidden', 'true');
+  }
+}
+
+window.confirmLogoutYes = confirmLogoutYes;
+window.confirmLogoutNo = confirmLogoutNo;
 
 function setErr(id, msg) {
   const el = document.getElementById(id);
@@ -1704,7 +1788,15 @@ function logout() {
 function wireLogoutButton() {
   const btn = document.getElementById('logoutBtn');
   if (!btn || btn._bound) return;
-  btn.addEventListener('click', () => logout());
+  btn.addEventListener('click', () => {
+    const ov = document.getElementById('logoutConfirmOverlay');
+    if (ov) {
+      ov.classList.remove(CSS.HIDDEN);
+      ov.setAttribute('aria-hidden', 'false');
+    } else {
+      logout();
+    }
+  });
   btn._bound = true;
 }
 
