@@ -96,30 +96,44 @@ export function applyResponsiveScale() {
   const intrinsicW = cols * CELL0 + (cols - 1) * GAP0 + PAD * 2 + BORDER * 2;
   const intrinsicH = rows * CELL0 + (rows - 1) * GAP0 + PAD * 2 + BORDER * 2;
 
-  const vw = Math.max(
-    320,
-    (window.visualViewport && window.visualViewport.width) ||
-      window.innerWidth ||
-      document.documentElement.clientWidth ||
-      360
-  );
-  const vh = Math.max(
-    320,
-    (window.visualViewport && window.visualViewport.height) ||
-      window.innerHeight ||
-      document.documentElement.clientHeight ||
-      480
-  );
-  const pagePaddingX = 24;
-  const pagePaddingY = 24;
-  const wScale = (vw - pagePaddingX) / intrinsicW;
-  const hScale = (vh - pagePaddingY) / intrinsicH;
-  SCALE = Math.min(1, Math.max(0, Math.min(wScale, hScale)));
+  const outer = document.getElementById("gridOuter");
+  const frame = outer && outer.closest && outer.closest(".sw-grid-frame");
+  if (frame) {
+    const cs = getComputedStyle(frame);
+    const padL = parseFloat(cs.paddingLeft) || 0;
+    const padR = parseFloat(cs.paddingRight) || 0;
+    const padT = parseFloat(cs.paddingTop) || 0;
+    const padB = parseFloat(cs.paddingBottom) || 0;
+    const availW = Math.max(0, frame.clientWidth - padL - padR);
+    const availH = Math.max(0, frame.clientHeight - padT - padB);
+    const wScale = availW / intrinsicW;
+    const hScale = availH / intrinsicH;
+    SCALE = Math.min(1, Math.max(0, Math.min(wScale, hScale)));
+  } else {
+    const vw = Math.max(
+      320,
+      (window.visualViewport && window.visualViewport.width) ||
+        window.innerWidth ||
+        document.documentElement.clientWidth ||
+        360
+    );
+    const vh = Math.max(
+      320,
+      (window.visualViewport && window.visualViewport.height) ||
+        window.innerHeight ||
+        document.documentElement.clientHeight ||
+        480
+    );
+    const pagePaddingX = 24;
+    const pagePaddingY = 24;
+    const wScale = (vw - pagePaddingX) / intrinsicW;
+    const hScale = (vh - pagePaddingY) / intrinsicH;
+    SCALE = Math.min(1, Math.max(0, Math.min(wScale, hScale)));
+  }
 
   const root = document.documentElement;
   root.style.setProperty("--scale", String(SCALE));
 
-  const outer = document.getElementById("gridOuter");
   if (outer) {
     outer.style.width = Math.round(intrinsicW * SCALE) + "px";
     outer.style.height = Math.round(intrinsicH * SCALE) + "px";

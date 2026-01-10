@@ -13,6 +13,8 @@
   0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 18px rgba(255, 165, 0, 0.45)); }
   50% { transform: translateY(-2px) scale(1.02); filter: drop-shadow(0 0 28px rgba(0, 212, 255, 0.55)); }
 }
+
+.sw-grid-frame { position: relative; }
 .menu-screen:not(.hidden) .menu-wrap { animation: menuIn 180ms ease both; }
 @keyframes menuIn {
   0% { transform: translateY(14px); opacity: 0; }

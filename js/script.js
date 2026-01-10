@@ -307,6 +307,7 @@ function openDailyChallenge() {
   closeInGameMenu();
   hideMainMenu();
   hideGameScreen();
+  mountBoardTo('dailyGridMount');
   setScreenVisibility("dailyChallengeScreen", true);
   updateDailyChallengeControlsVisibility();
   openDailyChallengeInstructions();
@@ -357,6 +358,7 @@ function authedLanding() {
     }
   });
   hideMainMenu();
+  mountBoardTo('dailyGridMount');
   setScreenVisibility("dailyChallengeScreen", true);
   openDailyChallengeInstructions();
 }
@@ -1267,9 +1269,20 @@ function openLeaderboard() {
 function showGameScreen() {
   const g = document.getElementById('gameScreen');
   if (g) {
+    mountBoardTo('gameGridMount');
     g.classList.remove(CSS.HIDDEN);
     g.setAttribute('aria-hidden', 'false');
   }
+}
+
+function mountBoardTo(mountId) {
+  const mount = document.getElementById(mountId);
+  const outer = document.getElementById(UI_IDS.gridOuter);
+  if (!mount || !outer) return;
+  if (outer.parentElement !== mount) {
+    mount.appendChild(outer);
+  }
+  applyResponsiveScale();
 }
 function hideGameScreen() {
   const g = document.getElementById('gameScreen');

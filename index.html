@@ -335,8 +335,8 @@
             </button>
           </div>
 
-          <div class="w-[450px] h-[260px] rounded-3xl bg-gradient-to-br from-gray-200 to-gray-300 shadow-2xl shadow-black/20 border-4 border-white/50 flex items-center justify-center flex-shrink-0">
-            <p class="text-gray-400 text-lg font-semibold">Daily Challenge Game Grid</p>
+          <div class="sw-grid-frame w-[450px] h-[260px] rounded-3xl bg-gradient-to-br from-gray-200 to-gray-300 shadow-2xl shadow-black/20 border-4 border-white/50 flex items-center justify-center flex-shrink-0">
+            <div id="dailyGridMount" class="w-full h-full flex items-center justify-center"></div>
           </div>
 
           <div id="dailyControlsRight" class="hidden flex flex-col gap-2 flex-shrink-0 justify-center" aria-label="Right board controls">
@@ -1080,11 +1080,13 @@
             </button>
           </div>
 
-          <div class="rounded-3xl bg-gradient-to-br from-gray-200 to-gray-300 shadow-2xl shadow-black/20 border-4 border-white/50 flex items-center justify-center flex-shrink-0 p-2">
-            <div class="grid-outer" id="gridOuter">
-              <div class="grid" id="gameGrid"></div>
-              <div id="outlineLayer"></div>
-              <div class="scan-line" aria-hidden="true"></div>
+          <div class="sw-grid-frame w-[450px] h-[260px] rounded-3xl bg-gradient-to-br from-gray-200 to-gray-300 shadow-2xl shadow-black/20 border-4 border-white/50 flex items-center justify-center flex-shrink-0">
+            <div id="gameGridMount" class="w-full h-full flex items-center justify-center">
+              <div class="grid-outer" id="gridOuter">
+                <div class="grid" id="gameGrid"></div>
+                <div id="outlineLayer"></div>
+                <div class="scan-line" aria-hidden="true"></div>
+              </div>
             </div>
           </div>
 
