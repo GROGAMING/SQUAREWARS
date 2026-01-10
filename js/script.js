@@ -1007,27 +1007,7 @@ function ensureControlsUI() {
     controls.appendChild(changeBtn);
   }
   changeBtn.onclick = () => {
-    // Ensure visuals are cleared when changing mode inline
-    resetBoardUI();
-    const outlineLayer = document.getElementById(UI_IDS.outlineLayer);
-    if (outlineLayer) outlineLayer.innerHTML = "";
-    redGames = 0;
-    blueGames = 0;
-    gameActive = false;
-    gameMode = null;
-    aiDifficulty = null;
-    const modeModal = document.getElementById(UI_IDS.modeSelectModal);
-    modeModal.classList.remove(CSS.HIDDEN);
-    modeModal.setAttribute("aria-hidden", "false");
-    updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
-    updateDisplay(
-      currentPlayer,
-      gameMode,
-      aiDifficulty,
-      scoringMode,
-      redGames,
-      blueGames
-    );
+    openModeSelect();
   };
 }
 
