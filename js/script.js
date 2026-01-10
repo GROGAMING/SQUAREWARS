@@ -546,6 +546,19 @@ function updateDifficultyHeaderForScoring() {
   el.textContent = modeTitle;
 }
 
+function setDifficultyV0(difficulty) {
+  const map = {
+    easy: "beginner",
+    medium: "medium",
+    hard: "advanced",
+    impossible: "impossible",
+  };
+  const mapped = map[String(difficulty)] || String(difficulty);
+  setDifficulty(mapped);
+}
+
+window.setDifficultyV0 = setDifficultyV0;
+
 function setDifficulty(difficulty) {
   aiDifficulty = difficulty;
   // Apply visual theme mapped to difficulty (UI-only; no logic change)
@@ -1116,9 +1129,7 @@ document.getElementById(UI_IDS.changeModeBtn).addEventListener("click", () => {
   gameActive = false;
   gameMode = null;
   aiDifficulty = null;
-  const modeModal = document.getElementById(UI_IDS.modeSelectModal);
-  modeModal.classList.remove(CSS.HIDDEN);
-  modeModal.setAttribute("aria-hidden", "false");
+  openModeSelect();
   updateLabelsForModeUI(gameMode, aiDifficulty, scoringMode, quickFireTarget);
   updateDisplay(
     currentPlayer,
@@ -1583,6 +1594,11 @@ function openSettings() {
   if (overlay) {
     overlay.classList.add(CSS.HIDDEN);
     overlay.setAttribute('aria-hidden', 'true');
+  }
+  const logoutOv = document.getElementById('logoutConfirmOverlay');
+  if (logoutOv) {
+    logoutOv.classList.add(CSS.HIDDEN);
+    logoutOv.setAttribute('aria-hidden', 'true');
   }
   setScreenVisibility(UI_IDS.settingsScreen, true);
   // Reflect current control mode

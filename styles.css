@@ -549,7 +549,7 @@ body::after {
 
 /* In-game options modal tweaks */
 #inGameMenuOverlay {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -561,7 +561,7 @@ body::after {
   align-items: center;
   z-index: 1000;
   overflow-y: auto;
-  padding: 20px;
+  padding: 0;
   box-sizing: border-box;
 }
 #inGameMenuOverlay .in-game-menu {

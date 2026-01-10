@@ -864,11 +864,11 @@ export function updateLabelsForModeUI(
   const blueLabel = document.getElementById(UI_IDS.blueLabel);
 
   // Compose center mode text for thin bar (short forms)
-  let centerMode = "1 point per box";
-  if (scoringMode === SCORING_MODES.AREA) centerMode = "Area Mode";
+  let centerMode = "CLASSIC";
+  if (scoringMode === SCORING_MODES.AREA) centerMode = "TERRITORY TAKEDOWN";
   if (scoringMode === SCORING_MODES.QUICKFIRE) {
     const n = quickFireTarget ?? 5;
-    centerMode = `Best to ${n}`;
+    centerMode = `QUICKFIRE (${n})`;
   }
 
   const thinModeEl = document.getElementById(UI_IDS.thinMode);
@@ -881,10 +881,15 @@ export function updateLabelsForModeUI(
   const thinBlue2 = document.getElementById(UI_IDS.thinBlueLabel);
   if (thinBlue2) {
     if (gameMode === "single") {
-      const difficultyName = aiDifficulty
-        ? aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)
-        : null;
-      thinBlue2.textContent = difficultyName ? `${difficultyName} AI` : "AI";
+      const map = {
+        beginner: "EASY AI",
+        medium: "MEDIUM AI",
+        advanced: "HARD AI",
+        impossible: "IMPOSSIBLE AI",
+        easy: "EASY AI",
+        hard: "HARD AI",
+      };
+      thinBlue2.textContent = map[aiDifficulty] || "AI";
     } else {
       thinBlue2.textContent = "Player 2";
     }
