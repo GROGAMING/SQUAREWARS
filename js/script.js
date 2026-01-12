@@ -369,6 +369,44 @@ function showAuthEntry() {
   openCreateAccount();
 }
 
+function wireCreateAccountUI() {
+  const displayName = document.getElementById('caDisplayName');
+  const email = document.getElementById('caEmail');
+  const password = document.getElementById('caPassword');
+  const confirm = document.getElementById('caConfirmPassword');
+  const terms = document.getElementById('caTerms');
+
+  const clearOnInput = (el, errId) => {
+    if (!el || el._swBound) return;
+    el.addEventListener('input', () => setErr(errId, ''));
+    el._swBound = true;
+  };
+
+  clearOnInput(displayName, 'caDisplayNameError');
+  clearOnInput(email, 'caEmailError');
+  clearOnInput(password, 'caPasswordError');
+  clearOnInput(confirm, 'caConfirmPasswordError');
+
+  if (terms && !terms._swBound) {
+    terms.addEventListener('change', () => setErr('caTermsError', ''));
+    terms._swBound = true;
+  }
+
+  const onEnterSubmit = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      createAccountComplete();
+    }
+  };
+
+  const enterTargets = [displayName, email, password, confirm];
+  enterTargets.forEach((el) => {
+    if (!el || el._swEnterBound) return;
+    el.addEventListener('keydown', onEnterSubmit);
+    el._swEnterBound = true;
+  });
+}
+
 function setScreenVisibility(id, visible) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -1419,35 +1457,21 @@ window.resetGameAndCloseMenu = resetGameAndCloseMenu;
 ensureControlsUI();
 applyResponsiveScale();
 enablePressedFeedback();
+wireCreateAccountUI();
 
-function bootToMainMenu() {
+function bootToCreateAccount() {
   try {
-    const loading = document.getElementById("loadingScreen");
-    const main = document.getElementById("mainMenuScreen");
+    const loading = document.getElementById('loadingScreen');
     if (loading) {
-      loading.classList.remove(CSS.HIDDEN);
-      loading.setAttribute("aria-hidden", "false");
+      loading.classList.add(CSS.HIDDEN);
+      loading.setAttribute('aria-hidden', 'true');
     }
-    if (main) {
-      main.classList.add(CSS.HIDDEN);
-      main.setAttribute("aria-hidden", "true");
-    }
-    setTimeout(() => {
-      if (loading) {
-        loading.classList.add(CSS.HIDDEN);
-        loading.setAttribute("aria-hidden", "true");
-      }
-      menuStack = ["mainMenuScreen"];
-      if (isAuthed()) {
-        authedLanding();
-      } else {
-        showAuthEntry();
-      }
-    }, 650);
+    menuStack = ['createAccountScreen'];
+    showAuthEntry();
   } catch {}
 }
 
-bootToMainMenu();
+bootToCreateAccount();
 
 // --- NEW: Board side controls wiring ---
 function wireBoardControlsUI() {
